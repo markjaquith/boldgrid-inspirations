@@ -41,6 +41,10 @@ class Boldgrid_Inspirations_Feedback {
 		// Is the current page for settings?
 		$is_settings_page = ( 1 === preg_match( '/^options-/', $pagenow ) );
 
+		// Allow feedback to be added via AJAX calls.
+		add_action( 'admin_head', array( $this, 'admin_head' ) );
+		add_action( 'wp_ajax_boldgrid_add_feedback', array( $this, 'ajax_add' ) );
+
 		// Add an action to run when using the Customizer.
 		add_action( 'customize_register', array (
 			$this,
@@ -250,6 +254,44 @@ class Boldgrid_Inspirations_Feedback {
 		update_option( 'boldgrid_feedback', $feedback_data );
 
 		return true;
+	}
+
+	/**
+	 * Method ran during admin_head hook.
+	 *
+	 * @since xxx
+	 */
+	public function admin_head() {
+		// Add a nonce to allow for boldgrid_feedback_via_ajax.
+		$ajax_nonce = wp_create_nonce( 'boldgrid_feedback_via_ajax' );
+		BoldGrid_Inspirations_Utility::inline_js_oneliner( 'boldgrid_feedback_via_ajax = "' . $ajax_nonce . '";' );
+	}
+
+	/**
+	 * Add feedback via ajax calls.
+	 *
+	 * @since xxx.
+	 */
+	public function ajax_add() {
+		// Validate our $_POST data.
+		foreach( array( 'feedback_key', 'feedback_value', 'security' )  as $check ) {
+			if( ! isset( $_POST[ $check ]) || empty( $_POST[ $check ] ) ) {
+				wp_die();
+			}
+		}
+
+		// Set vars.
+		$feedback_key   = $_POST[ 'feedback_key' ];
+		$feedback_value = $_POST[ 'feedback_value' ];
+		$feedback_nonce = $_POST[ 'security' ];
+
+		// Nonce check.
+		check_ajax_referer( 'boldgrid_feedback_via_ajax', 'security' );
+
+		// Add feedback.
+		self::add_feedback( $feedback_key, $feedback_value );
+
+		wp_die();
 	}
 
 	/**
