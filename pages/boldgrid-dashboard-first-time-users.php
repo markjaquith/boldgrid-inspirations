@@ -60,7 +60,7 @@ Watching the video above is recommended.  You can also visit our
 <?php
 // Use printf to separate out the actual words from HTML
 // so it can be sent through translate.
-printf( '<a href="http://www.boldgrid.com/support/" target="_blank">
+printf( '<a href="https://www.boldgrid.com/for-beginners/" target="_blank">
 			<span class="button button-secondary button-hero">%s</span>
 		</a>',
 	esc_html__( 'Learn More', 'boldgrid-inspirations' ) );
