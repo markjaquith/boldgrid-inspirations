@@ -292,10 +292,6 @@ class Boldgrid_Inspirations_Inspiration extends Boldgrid_Inspirations {
 		$customizer = new Boldgrid_Inspirations_Customizer( $this->pluginPath );
 		$customizer->add_hooks();
 
-		// BoldGrid Tutorials.
-		$tutorials = new Boldgrid_Inspirations_Tutorials( $this->pluginPath );
-		$tutorials->add_hooks();
-
 		// Javascript files per screen.
 		$screen = new Boldgrid_Inspirations_Screen();
 		$screen->add_hooks();
@@ -530,7 +526,6 @@ public function include_admin_files() {
 	require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-stock-photography.php';
 	require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-purchase-for-publish.php';
 	require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-dashboard.php';
-	require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-tutorials.php';
 	require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-screen.php';
 	require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-update.php';
 	require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-options.php';
