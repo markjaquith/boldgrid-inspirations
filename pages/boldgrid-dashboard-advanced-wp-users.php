@@ -2,55 +2,19 @@
 <div class="youtube-container">
 	<div class="youtube-player" data-id="fAbVXapGx48"></div>
 </div>
-<p>We encourage you to watch the video above and review the 
-
-<?php
-// Use printf to separate out the actual words from HTML
-// so it can be sent through translate.
-printf( '<a href="%s" class="dashicons-before dashicons-welcome-learn-more">%s</a>', 
-	
-	// Escape the URL to avoid XSS
-	esc_url( 
-		
-		// Add our query arguments
-		add_query_arg( 
-			
-			array (
-				
-				// The page we are linking to (BoldGrid Tutorials).
-				'page' => 'boldgrid-tutorials',
-				
-				// The tab we are linking to, "Advanced For WordPress Users"
-				'tab' => 'advanced' 
-			), 
-			
-			// The root page we are building our query off of.
-			'admin.php' ) ), 
-	
-	// End of Query Argument
-	
-	// End of Escaping
-	
-	// Link title is by itself, esc_html() escapes this output,
-	// then __() allows it to be sent to translate. 'boldgrid-inspirations'
-	// is our text domain.
-	esc_html__( ' Tutorials', 'boldgrid-inspirations' ) );
-
-// End of printf()
-
-?> before starting with 
+<p>We encourage you to watch the video above before starting with 
 
 <?php
 // Get BoldGrid settings:
 $boldgrid_settings = get_option( 'boldgrid_settings' );
 
 // Show eiher Inspirations lightbulb or BoldGrid Logo depending on their menu settings.
-( 1 == $boldgrid_settings['boldgrid_menu_option'] ? printf( 
+( 1 == $boldgrid_settings['boldgrid_menu_option'] ? printf(
 	'<a href="%s" class="dashicons-before dashicons-lightbulb">' .
-		 esc_html__( ' Inspirations', 'boldgrid-inspirations' ) . '</a>.', 
-		esc_url( add_query_arg( 'page', 'boldgrid-inspirations', admin_url( 'admin.php' ) ) ) ) : printf( 
+		 esc_html__( ' Inspirations', 'boldgrid-inspirations' ) . '</a>.',
+		esc_url( add_query_arg( 'page', 'boldgrid-inspirations', admin_url( 'admin.php' ) ) ) ) : printf(
 	'<a href="%s" class="dashicons-before boldgrid-icon">' .
-	 esc_html__( ' BoldGrid', 'boldgrid-inspirations' ) . '</a>.', 
+	 esc_html__( ' BoldGrid', 'boldgrid-inspirations' ) . '</a>.',
 	esc_url( add_query_arg( 'page', 'boldgrid-inspirations', admin_url( 'admin.php' ) ) ) ) );
 ?>
 </p>
@@ -60,33 +24,33 @@ $boldgrid_settings = get_option( 'boldgrid_settings' );
 
 <?php
 // Use printf to separate out the actual words from HTML so it can be translated.
-printf( 'Our <a href="%s">%s</a>', 
-	
+printf( 'Our <a href="%s">%s</a>',
+
 	// Escape the URL to avoid XSS
-	esc_url( 
-		
+	esc_url(
+
 		// Add our query arguments
-		add_query_arg( 
-			
+		add_query_arg(
+
 			array (
-				
+
 				// The page we are linking to (BoldGrid Tutorials).
 				'page' => 'boldgrid-tutorials',
-				
+
 				// The tab we are linking to, "Advanced For WordPress Users"
 				'tab' => 'inspirations',
-				
+
 				// The tutorial we are linking to (Staging)
-				'tutorial' => '1' 
-			), 
-			
+				'tutorial' => '1'
+			),
+
 			// The root page we are building our query off of.
-			'admin.php' ) ), 
-	
+			'admin.php' ) ),
+
 	// End of Query Argument
-	
+
 	// End of Escaping
-	
+
 	// Link title is by itself, esc_html() escapes this output,
 	// then __() allows it to be sent to translate. 'boldgrid-inspirations'
 	// is our text domain.
@@ -98,38 +62,38 @@ printf( 'Our <a href="%s">%s</a>',
 
 will help you transition to a new site while running your current Active Site.</p>
 
-<p>In addition to the video above, we have more detail on things that have changed like the 
+<p>In addition to the video above, we have more detail on things that have changed like the
 
 <?php
 // Use printf to separate out the actual words from HTML
 // so it can be sent through translate.
-printf( '<a href="%s">%s</a>', 
-	
+printf( '<a href="%s">%s</a>',
+
 	// Escape the URL to avoid XSS
-	esc_url( 
-		
+	esc_url(
+
 		// Add our query arguments
-		add_query_arg( 
-			
+		add_query_arg(
+
 			array (
-				
+
 				// The page we are linking to (BoldGrid Tutorials).
 				'page' => 'boldgrid-tutorials',
-				
+
 				// The tab we are linking to, "Advanced For WordPress Users"
 				'tab' => 'inspirations',
-				
+
 				// The tutorial we are linking to (Admin Menu)
-				'tutorial' => '4' 
-			), 
-			
+				'tutorial' => '4'
+			),
+
 			// The root page we are building our query off of.
-			'admin.php' ) ), 
-	
+			'admin.php' ) ),
+
 	// End of Query Argument
-	
+
 	// End of Escaping
-	
+
 	// Link title is by itself, esc_html() escapes this output,
 	// then __() allows it to be sent to translate. 'boldgrid-inspirations'
 	// is our text domain.
@@ -139,20 +103,20 @@ printf( '<a href="%s">%s</a>',
 
 ?>
 
- (you can change it back 
+ (you can change it back
 
 <?php
 // Use printf to separate out the actual words from HTML so it can be translated.
-printf( '<a href="%s">%s</a>', 
-	
+printf( '<a href="%s">%s</a>',
+
 	// Escape the URL to avoid XSS
-	esc_url( 
-		
+	esc_url(
+
 		// Add our query arguments
-		add_query_arg( 'page', 'boldgrid-settings', 'admin.php' ) ), 
-	
+		add_query_arg( 'page', 'boldgrid-settings', 'admin.php' ) ),
+
 	// End of Escaping
-	
+
 	// Link title is by itself, esc_html() escapes this output,
 	// then __() allows it to be sent to translate. 'boldgrid-inspirations'
 	// is our text domain.
@@ -160,38 +124,38 @@ printf( '<a href="%s">%s</a>',
 
 // End of printf()
 
-?> ), the 
+?> ), the
 
 <?php
 // Use printf to separate out the actual words from HTML
 // so it can be sent through translate.
-printf( '<a href="%s">%s</a>, ', 
-	
+printf( '<a href="%s">%s</a>, ',
+
 	// Escape the URL to avoid XSS
-	esc_url( 
-		
+	esc_url(
+
 		// Add our query arguments
-		add_query_arg( 
-			
+		add_query_arg(
+
 			array (
-				
+
 				// The page we are linking to (BoldGrid Tutorials).
 				'page' => 'boldgrid-tutorials',
-				
+
 				// The tab we are linking to, "Advanced For WordPress Users"
 				'tab' => 'customizations',
-				
+
 				// The tutorial we are linking to (Page and Post Editor)
-				'tutorial' => '9' 
-			), 
-			
+				'tutorial' => '9'
+			),
+
 			// The root page we are building our query off of.
-			'admin.php' ) ), 
-	
+			'admin.php' ) ),
+
 	// End of Query Argument
-	
+
 	// End of Escaping
-	
+
 	// Link title is by itself, esc_html() escapes this output,
 	// then __() allows it to be sent to translate. 'boldgrid-inspirations'
 	// is our text domain.
@@ -201,33 +165,33 @@ printf( '<a href="%s">%s</a>, ',
 
 // Use printf to separate out the actual words from HTML
 // so it can be sent through translate.
-printf( '<a href="%s">%s</a>,', 
-	
+printf( '<a href="%s">%s</a>,',
+
 	// Escape the URL to avoid XSS
-	esc_url( 
-		
+	esc_url(
+
 		// Add our query arguments
-		add_query_arg( 
-			
+		add_query_arg(
+
 			array (
-				
+
 				// The page we are linking to ( BoldGrid Tutorials ).
 				'page' => 'boldgrid-tutorials',
-				
+
 				// The tab we are linking to, "Advanced For WordPress Users."
 				'tab' => 'customizations',
-				
+
 				// The tutorial we are linking to ( Media Searches ).
-				'tutorial' => '10' 
-			), 
-			
+				'tutorial' => '10'
+			),
+
 			// The root page we are building our query off of.
-			'admin.php' ) ), 
-	
+			'admin.php' ) ),
+
 	// End of Query Argument
-	
+
 	// End of Escaping
-	
+
 	// Link title is by itself, esc_html() escapes this output,
 	// then __() allows it to be sent to translate. 'boldgrid-inspirations'
 	// is our text domain.
@@ -239,33 +203,33 @@ printf( '<a href="%s">%s</a>,',
 
 // Use printf to separate out the actual words from HTML
 // so it can be sent through translate.
-printf( '<a href="%s">%s</a>, easy ways to ', 
-	
+printf( '<a href="%s">%s</a>, easy ways to ',
+
 	// Escape the URL to avoid XSS
-	esc_url( 
-		
+	esc_url(
+
 		// Add our query arguments
-		add_query_arg( 
-			
+		add_query_arg(
+
 			array (
-				
+
 				// The page we are linking to ( BoldGrid Tutorials ).
 				'page' => 'boldgrid-tutorials',
-				
+
 				// The tab we are linking to, "Advanced For WordPress Users."
 				'tab' => 'inspirations',
-				
+
 				// The tutorial we are linking to ( GridBlocks ).
-				'tutorial' => '6' 
-			), 
-			
+				'tutorial' => '6'
+			),
+
 			// The root page we are building our query off of.
-			'admin.php' ) ), 
-	
+			'admin.php' ) ),
+
 	// End of Query Argument
-	
+
 	// End of Escaping
-	
+
 	// Link title is by itself, esc_html() escapes this output,
 	// then __() allows it to be sent to translate. 'boldgrid-inspirations'
 	// is our text domain.
@@ -275,33 +239,33 @@ printf( '<a href="%s">%s</a>, easy ways to ',
 
 // Use printf to separate out the actual words from HTML
 // so it can be sent through translate.
-printf( '<a href="%s">%s</a>, ', 
-	
+printf( '<a href="%s">%s</a>, ',
+
 	// Escape the URL to avoid XSS
-	esc_url( 
-		
+	esc_url(
+
 		// Add our query arguments
-		add_query_arg( 
-			
+		add_query_arg(
+
 			array (
-				
+
 				// The page we are linking to ( BoldGrid Tutorials ).
 				'page' => 'boldgrid-tutorials',
-				
+
 				// The tab we are linking to, "Advanced For WordPress Users."
 				'tab' => 'inspirations',
-				
+
 				// The tutorial we are linking to ( GridBlocks ).
-				'tutorial' => '9' 
-			), 
-			
+				'tutorial' => '9'
+			),
+
 			// The root page we are building our query off of.
-			'admin.php' ) ), 
-	
+			'admin.php' ) ),
+
 	// End of Query Argument
-	
+
 	// End of Escaping
-	
+
 	// Link title is by itself, esc_html() escapes this output,
 	// then __() allows it to be sent to translate. 'boldgrid-inspirations'
 	// is our text domain.
@@ -313,30 +277,30 @@ printf( '<a href="%s">%s</a>, ',
 
 // Use printf to separate out the actual words from HTML
 // so it can be sent through translate.
-printf( '<a href="%s">%s</a>.', 
-	
+printf( '<a href="%s">%s</a>.',
+
 	// Escape the URL to avoid XSS
-	esc_url( 
-		
+	esc_url(
+
 		// Add our query arguments
-		add_query_arg( 
-			
+		add_query_arg(
+
 			array (
-				
+
 				// The page we are linking to ( BoldGrid Tutorials ).
 				'page' => 'boldgrid-tutorials',
-				
+
 				// The tab we are linking to, "Advanced For WordPress Users."
-				'tab' => 'advanced' 
-			), 
-			
+				'tab' => 'advanced'
+			),
+
 			// The root page we are building our query off of.
-			'admin.php' ) ), 
-	
+			'admin.php' ) ),
+
 	// End of Query Argument
-	
+
 	// End of Escaping
-	
+
 	// Link title is by itself, esc_html() escapes this output,
 	// then __() allows it to be sent to translate. 'boldgrid-inspirations'
 	// is our text domain.
@@ -358,30 +322,30 @@ printf( '<a href="%s">%s</a>.',
 printf( '
 	<a href="%s">
 		<span class="button button-secondary button-hero">%s</span>
-	</a>', 
-	
+	</a>',
+
 	// Escape the URL to avoid XSS
-	esc_url( 
-		
+	esc_url(
+
 		// Add our query arguments
-		add_query_arg( 
-			
+		add_query_arg(
+
 			array (
-				
+
 				// The page we are linking to (BoldGrid Tutorials).
 				'page' => 'boldgrid-tutorials',
-				
+
 				// The tab we are linking to, "Advanced For WordPress Users"
-				'tab' => 'advanced' 
-			), 
-			
+				'tab' => 'advanced'
+			),
+
 			// The root page we are building our query off of.
-			'admin.php' ) ), 
-	
+			'admin.php' ) ),
+
 	// End of Query Argument
-	
+
 	// End of Escaping
-	
+
 	// Link title is by itself, esc_html() escapes this output,
 	// then __() allows it to be sent to translate. 'boldgrid-inspirations'
 	// is our text domain.
