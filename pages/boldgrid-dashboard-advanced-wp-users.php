@@ -2,7 +2,7 @@
 <div class="youtube-container">
 	<div class="youtube-player" data-id="fAbVXapGx48"></div>
 </div>
-<p>We encourage you to watch the video above before starting with 
+<p>We encourage you to watch the video above before starting with
 
 <?php
 // Get BoldGrid settings:
@@ -319,36 +319,9 @@ printf( '<a href="%s">%s</a>.',
 <?php
 // Use printf to separate out the actual words from HTML
 // so it can be sent through translate.
-printf( '
-	<a href="%s">
+printf( '<a href="https://www.boldgrid.com/for-professionals/" target="_blank">
 		<span class="button button-secondary button-hero">%s</span>
 	</a>',
-
-	// Escape the URL to avoid XSS
-	esc_url(
-
-		// Add our query arguments
-		add_query_arg(
-
-			array (
-
-				// The page we are linking to (BoldGrid Tutorials).
-				'page' => 'boldgrid-tutorials',
-
-				// The tab we are linking to, "Advanced For WordPress Users"
-				'tab' => 'advanced'
-			),
-
-			// The root page we are building our query off of.
-			'admin.php' ) ),
-
-	// End of Query Argument
-
-	// End of Escaping
-
-	// Link title is by itself, esc_html() escapes this output,
-	// then __() allows it to be sent to translate. 'boldgrid-inspirations'
-	// is our text domain.
 	esc_html__( 'Learn More', 'boldgrid-inspirations' ) );
 
 // End of printf()
