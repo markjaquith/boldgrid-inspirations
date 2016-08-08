@@ -144,11 +144,7 @@ class Boldgrid_Inspirations {
 		self::$is_asset_server_available = $is_asset_server_available;
 
 		// Save the WP Option:
-		if ( is_multisite() ) {
-			set_site_transient( 'boldgrid_available', $is_asset_server_available, HOUR_IN_SECONDS );
-		} else {
-			set_transient( 'boldgrid_available', $is_asset_server_available, HOUR_IN_SECONDS );
-		}
+		set_site_transient( 'boldgrid_available', $is_asset_server_available, HOUR_IN_SECONDS );
 
 		return true;
 	}

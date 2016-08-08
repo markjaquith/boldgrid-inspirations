@@ -104,10 +104,6 @@ class Boldgrid_Inspirations_Admin_Notices {
 	 * Return boolean for BoldGrid connection issue.
 	 */
 	public function boldgrid_connection_issue_exists() {
-		if ( is_multisite() ) {
-			return ! get_site_transient( 'boldgrid_available' );
-		} else {
-			return ! get_transient( 'boldgrid_available' );
-		}
+		return ! get_site_transient( 'boldgrid_available' );
 	}
 }
