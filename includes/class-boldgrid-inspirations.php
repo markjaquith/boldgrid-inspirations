@@ -77,8 +77,7 @@ class Boldgrid_Inspirations {
 		$this->set_api_key_hash();
 
 		// Initialize $is_asset_server_available; set class property from transient:
-		$is_asset_server_available = ( bool ) ( is_multisite() ? get_site_transient(
-			'boldgrid_available' ) : get_transient( 'boldgrid_available' ) );
+		$is_asset_server_available = ( bool ) get_site_transient( 'boldgrid_available' );
 
 		// If we had communication issues, then check now; it may be better:
 		if ( false === $is_asset_server_available ) {

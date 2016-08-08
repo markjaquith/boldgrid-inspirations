@@ -20,8 +20,7 @@ $data = $this->get_all_data_of_assets_needing_purchase( $args );
 $have_assets_needing_purchase = isset( $data['assets_needing_purchase']['by_page_id'] );
 
 // Check asset server availability:
-$is_asset_server_available = ( bool ) ( is_multisite() ? get_site_transient( 'boldgrid_available' ) : get_transient(
-	'boldgrid_available' ) );
+$is_asset_server_available = ( bool ) get_site_transient( 'boldgrid_available' );
 
 // Print a message for connection failure:
 if ( true === $is_asset_server_available ) {

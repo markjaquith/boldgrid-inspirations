@@ -8,8 +8,7 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 // Check asset server availability:
-$is_asset_server_available = ( bool ) ( is_multisite() ? get_site_transient( 'boldgrid_available' ) : get_transient(
-	'boldgrid_available' ) );
+$is_asset_server_available = ( bool ) get_site_transient( 'boldgrid_available' );
 
 // Print a message for connection failure:
 if ( false === $is_asset_server_available ) {

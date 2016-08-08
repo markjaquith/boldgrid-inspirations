@@ -7,8 +7,7 @@ if ( ! defined( 'WPINC' ) ) {
 	exit();
 }
 
-$is_asset_server_available = ( bool ) ( is_multisite() ? get_site_transient( 'boldgrid_available' ) : get_transient(
-	'boldgrid_available' ) );
+$is_asset_server_available = ( bool ) get_site_transient( 'boldgrid_available' );
 
 add_thickbox();
 
