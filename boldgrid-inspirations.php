@@ -36,19 +36,16 @@ if ( ! class_exists( 'Boldgrid_Inspirations' ) ) {
 // Load the inspiration class:
 require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-inspiration.php';
 
-// Set our configuration directory:
-$settings = array (
-	'configDir' => BOLDGRID_BASE_DIR . '/includes/config'
-);
-
 // Instantiate the inspiration class:
-$inspiration = new Boldgrid_Inspirations_Inspiration( $settings );
+$_bg_inspiration = new Boldgrid_Inspirations_Inspiration( array(
+	'configDir' => BOLDGRID_BASE_DIR . '/includes/config'
+));
 
 // Add pre-init hooks:
-$inspiration->add_pre_init_hooks();
+$_bg_inspiration->add_pre_init_hooks();
 
 // Add action to call pre_add_hooks after init:
 add_action( 'init', array (
-	$inspiration,
+	$_bg_inspiration,
 	'pre_add_hooks'
 ) );
