@@ -228,9 +228,9 @@ class Boldgrid_Inspirations_Branding {
 		<?php
 
 		if ( ! empty( $reseller_title ) ) {
-			echo $reseller_title;
+			echo esc_html( $reseller_title );
 			?> provides dedicated help for <a target='_blank'
-		href='<?php echo $reseller_support_url; ?>'>BoldGrid</a>.
+		href='<?php echo esc_url( $reseller_support_url ); ?>'>BoldGrid</a>.
 		<?php
 		} else {
 		?>
