@@ -463,7 +463,7 @@ class Boldgrid_Inspirations_Branding {
 <i>Built with <a href='https://www.boldgrid.com/' target='_blank'>BoldGrid</a>.
 </i>
 |
-<i>Powered by <a href='http://wordpress.org/' target='_blank'>WordPress</a>.
+<i>Powered by <a href='https://wordpress.org/' target='_blank'>WordPress</a>.
 </i>
 		<?php
 	}

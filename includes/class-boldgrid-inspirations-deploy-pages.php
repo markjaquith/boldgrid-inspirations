@@ -18,7 +18,7 @@
  * @subpackage Boldgrid_Inspirations_Deploy_Pages.
  * @author BoldGrid <support@boldgrid.com>.
  *
- * @link https://boldgrid.com.
+ * @link https://www.boldgrid.com/
  */
 class Boldgrid_Inspirations_Deploy_Pages {
 
