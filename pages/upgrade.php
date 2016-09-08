@@ -51,13 +51,13 @@ if ( is_wp_error( $result ) ) {
 }
 
 // REDIRECT back to the plugin.
-$redirect_url = admin_url() . "admin.php?page=imh-wpb";
+$redirect_url = admin_url( 'admin.php?page=imh-wpb' );
 
 ?>
 </div>
 <script type='text/javascript'>
 	<!--
 		alert('We noticed that your version of the IMHWPB plugin was out of date, so we updated it for you! Click OK to continue.');
-		window.location = '<?php echo $redirect_url; ?>';
+		window.location = <?php echo json_encode( $redirect_url ); ?>
 	//-->
 </script>
