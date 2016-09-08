@@ -552,42 +552,42 @@ public function add_boldgrid_help_context_tab_link() {
 				case 'page' :
 					$help_tab = array (
 						'title' => 'BoldGrid Help',
-						'content' => 'This is a BoldGrid help section for editing pages.  Feel free to visit <a target="_blank" href="http://www.boldgrid.com/">BoldGrid.com</a>'
+						'content' => 'This is a BoldGrid help section for editing pages.  Feel free to visit <a target="_blank" href="https://www.boldgrid.com/">BoldGrid.com</a>'
 					);
 					break;
 
 				case 'post' :
 					$help_tab = array (
 						'title' => 'BoldGrid Help',
-						'content' => 'This is a BoldGrid help section for editing posts.  Feel free to visit <a target="_blank" href="http://www.boldgrid.com/">BoldGrid.com</a>'
+						'content' => 'This is a BoldGrid help section for editing posts.  Feel free to visit <a target="_blank" href="https://www.boldgrid.com/">BoldGrid.com</a>'
 					);
 					break;
 
 				case 'transactions_page_cart' :
 					$help_tab = array (
 						'title' => 'BoldGrid Help',
-						'content' => 'This is a BoldGrid help section for cart/checkout.  Feel free to visit <a target="_blank" href="http://www.boldgrid.com/">BoldGrid.com</a>'
+						'content' => 'This is a BoldGrid help section for cart/checkout.  Feel free to visit <a target="_blank" href="https://www.boldgrid.com/">BoldGrid.com</a>'
 					);
 					break;
 
 				case 'transactions_page_boldgrid-receipts' :
 					$help_tab = array (
 						'title' => 'BoldGrid Help',
-						'content' => 'This is a BoldGrid help section for receipts/transaction history.  Feel free to visit <a target="_blank" href="http://www.boldgrid.com/">BoldGrid.com</a>'
+						'content' => 'This is a BoldGrid help section for receipts/transaction history.  Feel free to visit <a target="_blank" href="https://www.boldgrid.com/">BoldGrid.com</a>'
 					);
 					break;
 
 				case 'transactions_page_boldgrid-purchase-coins' :
 					$help_tab = array (
 						'title' => 'BoldGrid Help',
-						'content' => 'This is a BoldGrid help section for purchasing coins.  Feel free to visit <a target="_blank" href="http://www.boldgrid.com/">BoldGrid.com</a>'
+						'content' => 'This is a BoldGrid help section for purchasing coins.  Feel free to visit <a target="_blank" href="https://www.boldgrid.com/">BoldGrid.com</a>'
 					);
 					break;
 
 				default :
 					$help_tab = array (
 						'title' => 'BoldGrid Help',
-						'content' => 'This is a BoldGrid help section.  Feel free to visit <a target="_blank" href="http://www.boldgrid.com/">BoldGrid.com</a>'
+						'content' => 'This is a BoldGrid help section.  Feel free to visit <a target="_blank" href="https://www.boldgrid.com/">BoldGrid.com</a>'
 					);
 					break;
 			}
@@ -606,7 +606,7 @@ public function add_boldgrid_help_context_tab_link() {
 
 		// Add help sidebar content:
 		$screen->set_help_sidebar(
-			$help_sidebar_content . '<a target="_blank" href="http://www.boldgrid.com/">' .
+			$help_sidebar_content . '<a target="_blank" href="https://www.boldgrid.com/">' .
 				 'BoldGrid.com' . '</a>' );
 	}
 }

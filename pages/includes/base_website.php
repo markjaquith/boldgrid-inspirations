@@ -25,6 +25,6 @@
 
 <div id='step-2-request-a-theme' class='hidden'>
 	<span>Not seeing a theme you like?</span><br /> <a
-		href='http://www.boldgrid.com/faqs#request-a-theme' target='_blank'
+		href='https://www.boldgrid.com/faqs#request-a-theme' target='_blank'
 		class='button'>Request a Theme</a>
 </div>

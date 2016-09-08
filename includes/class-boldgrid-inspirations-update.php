@@ -482,7 +482,7 @@ class Boldgrid_Inspirations_Update {
 						$transient->response[$slug]['new_version'] = $theme_versions[$theme_id]['version'];
 
 						// URL for the new theme version information iframe.
-						$transient->response[$slug]['url'] = empty( $theme_uri ) ? '//www.boldgrid.com/themes/' .
+						$transient->response[$slug]['url'] = empty( $theme_uri ) ? 'https://www.boldgrid.com/themes/' .
 							 strtolower( $theme_name ) : $theme_uri;
 
 						// Theme package download link.
@@ -508,7 +508,7 @@ class Boldgrid_Inspirations_Update {
 							'tags' => $installed_theme->Tags,
 							// 'contributors' => '',
 							'last_updated' => $theme_versions[$theme_id]['updated'],
-							'homepage' => ( isset( $boldgrid_api_data->result->data->siteurl ) ? $boldgrid_api_data->result->data->siteurl : 'http://www.boldgrid.com/' )
+							'homepage' => ( isset( $boldgrid_api_data->result->data->siteurl ) ? $boldgrid_api_data->result->data->siteurl : 'https://www.boldgrid.com/' )
 						);
 						unset( $theme_id );
 					}

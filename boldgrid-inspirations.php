@@ -1,10 +1,10 @@
 <?php
 /*
  * Plugin Name: BoldGrid Inspirations
- * Plugin URI: http://www.boldgrid.com
+ * Plugin URI: https://www.boldgrid.com/
  * Version: 1.2.5
  * Author: BoldGrid.com <wpb@boldgrid.com>
- * Author URI: http://www.boldgrid.com
+ * Author URI: https://www.boldgrid.com/
  * Description: Be inspired, be custom, be bold!
  * Text Domain: boldgrid-inspirations
  * Domain Path: /languages
