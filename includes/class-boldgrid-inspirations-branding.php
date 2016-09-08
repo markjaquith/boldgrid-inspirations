@@ -373,34 +373,28 @@ class Boldgrid_Inspirations_Branding {
 		);
 
 		$reseller_title = (
-			esc_html(
-				! empty( $reseller_data['reseller_title'] ) ?
-				$reseller_data['reseller_title'] : 'BoldGrid.com'
-			)
+			! empty( $reseller_data['reseller_title'] ) ?
+			$reseller_data['reseller_title'] : 'BoldGrid.com'
 		);
 
 		$reseller_website_url = (
-			esc_url(
-				! empty( $reseller_data['reseller_website_url'] ) ?
-				$reseller_data['reseller_website_url'] : 'http://www.boldgrid.com/'
-			)
+			! empty( $reseller_data['reseller_website_url'] ) ?
+			$reseller_data['reseller_website_url'] : 'http://www.boldgrid.com/'
 		);
 
 		$reseller_support_url = (
-			esc_url(
-				! empty( $reseller_data['reseller_support_url'] ) ?
-				$reseller_data['reseller_support_url'] : 'http://www.boldgrid.com/documentation'
-			)
+			! empty( $reseller_data['reseller_support_url'] ) ?
+			$reseller_data['reseller_support_url'] : 'http://www.boldgrid.com/documentation'
 		);
 
 		$reseller_amp_url = (
 			! empty( $reseller_data['reseller_amp_url'] ) ?
-			esc_url( $reseller_data['reseller_amp_url'] ) : null
+			$reseller_data['reseller_amp_url'] : null
 		);
 
 		$args = array(
 			'id' => 'reseller-adminbar-icon',
-			'title' => '<span aria-hidden="true" class="' . strtolower( $reseller_identifier ) .
+			'title' => '<span aria-hidden="true" class="' . esc_attr( strtolower( $reseller_identifier ) ) .
 			'-icon ab-icon"></span>',
 			'href' => $reseller_website_url,
 			'meta' => array(
@@ -485,23 +479,19 @@ class Boldgrid_Inspirations_Branding {
 		$reseller_data = $this->get_reseller_data();
 
 		$reseller_title = (
-			esc_html(
-				! empty( $reseller_data['reseller_title'] ) ?
-				$reseller_data['reseller_title'] : 'BoldGrid.com'
-			)
+			! empty( $reseller_data['reseller_title'] ) ?
+			$reseller_data['reseller_title'] : 'BoldGrid.com'
 		);
 
 		$reseller_support_url = (
-			esc_url(
-				! empty( $reseller_data['reseller_support_url'] ) ?
-				$reseller_data['reseller_support_url'] : 'https://www.boldgrid.com/documentation'
-			)
+			! empty( $reseller_data['reseller_support_url'] ) ?
+			$reseller_data['reseller_support_url'] : 'https://www.boldgrid.com/documentation'
 		);
 
 		// Display the reseller footer.
 		?>|
 <i>Support from <a target='_blank'
-href='<?php echo $reseller_support_url; ?>'><?php echo $reseller_title; ?></a>.</i>
+href='<?php echo esc_url( $reseller_support_url ); ?>'><?php echo esc_html( $reseller_title ); ?></a>.</i>
 		<?php
 	}
 }
