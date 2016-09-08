@@ -32,7 +32,7 @@ if ( false !== $reseller && ! empty( $reseller['reseller_title'] ) ) {
 
 $attribution_wordpress_and_inspirations = '
 	<p style="clear:both;">
-		%s site was built on a powerful, Inspirations based web builder called <a href="http://www.boldgrid.com">BoldGrid</a>. It is running on <a href="http://wordpress.org">WordPress</a>, the most popular content management software online today.' .
+		%s site was built on a powerful, Inspirations based web builder called <a href="https://www.boldgrid.com/">BoldGrid</a>. It is running on <a href="https://wordpress.org/">WordPress</a>, the most popular content management software online today.' .
 	 $reseller_attribution . '
 	</p>
 ';
