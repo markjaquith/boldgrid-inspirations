@@ -41,15 +41,9 @@ class Boldgrid_Inspirations_Utility {
 	 */
 	public static function inline_js_file( $filename ) {
 		$full_path_to_js = plugins_url( '/assets/js/inline/' . $filename,
-		BOLDGRID_BASE_DIR . '/boldgrid-inspirations.php' );
+		BOLDGRID_BASE_DIR . '/boldgrid-inspirations.php' ) . '?ver=' . BOLDGRID_INSPIRATIONS_VERSION;
 
-		echo '<script type="text/javascript" src="' . $full_path_to_js;
-
-		if ( defined( 'BOLDGRID_INSPIRATIONS_VERSION' ) ) {
-			echo '?ver=' . BOLDGRID_INSPIRATIONS_VERSION;
-		}
-
-		echo '"></script>';
+		echo '<script type="text/javascript" src="' . esc_url( $full_path_to_js ) . '"></script>';
 	}
 
 	/**
