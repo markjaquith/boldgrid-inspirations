@@ -1,5 +1,4 @@
 <?php
-
 /**
  * BoldGrid Source Code
  *
@@ -8,13 +7,6 @@
  * @version $Id$
  * @author BoldGrid.com <wpb@boldgrid.com>
  */
-
-// Prevent direct calls
-if ( ! defined( 'WPINC' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
-}
 
 /**
  * BoldGrid Inspirations GridBlock Sets Preview Page.

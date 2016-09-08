@@ -328,14 +328,23 @@ class Boldgrid_Inspirations_Theme_Install {
 				if ( isset( $boldgrid_install_options['is_base_pageset'] ) ) {
 					// If base pageset bool is passed use it to determine if address widgets.
 					$is_base_pageset = (bool) $boldgrid_install_options['is_base_pageset'];
-				} else if ( ! empty( $boldgrid_install_options['page_set_id'] ) ) {
+				} elseif ( ! empty( $boldgrid_install_options['page_set_id'] ) ) {
 					/*
 					 * Backwards compatibility: pre 1.1.2 inspirations install.
 					 * Lookup ids if setting is not passed.
 					 */
-					$default_pagesets = array( 7, 8, 11, 15, 16, 17, 18 );
+					$default_pagesets = array(
+						7,
+						8,
+						11,
+						15,
+						16,
+						17,
+						18,
+					);
+
 					$page_set_id = $boldgrid_install_options['page_set_id'];
-					$is_base_pageset = in_array( $page_set_id, $default_pagesets );
+					$is_base_pageset = in_array( $page_set_id, $default_pagesets, true );
 				}
 
 				if ( $is_base_pageset ) {
@@ -347,8 +356,7 @@ class Boldgrid_Inspirations_Theme_Install {
 				}
 
 				return $boldgrid_theme_configs;
-			},
-			10
+			}
 		);
 	}
 
@@ -426,8 +434,8 @@ class Boldgrid_Inspirations_Theme_Install {
 					foreach ( $old_theme_mods as $old_theme_mod_name => $old_theme_mod ) {
 						// If theme mod not already set for theme
 
-						if ( false === isset( $theme_mods[$old_theme_mod_name] ) ) {
-							if ( false === in_array( $old_theme_mod_name,
+						if ( ! isset( $theme_mods[$old_theme_mod_name] ) ) {
+							if ( ! in_array( $old_theme_mod_name,
 								$do_not_transfer_settings ) ) {
 								$theme_mods[$old_theme_mod_name] = $old_theme_mod;
 								// Set this theme mod which will tell the customizer to display

@@ -1,11 +1,6 @@
 <?php
-
-// Prevent direct calls
-if ( ! defined( 'WPINC' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
-}
+// Prevent direct calls.
+require BOLDGRID_BASE_DIR . '/pages/templates/restrict-direct-access.php';
 
 /**
  * ****************************************************************************
@@ -19,22 +14,22 @@ $url_to_customizer = 'customize.php';
 if ( ! is_plugin_active( 'boldgrid-staging/boldgrid-staging.php' ) ) {
 	$template = 'Your new BoldGrid site is now installed and <a href="%s" target="_blank">ready to view</a>.';
 	$your_new_site_is_now_installed_message = sprintf( $template, get_site_url() );
-	
+
 	$_SESSION['wp_staging_view_version'] = 'production';
 } else {
 	// If installed to your active site:
 	if ( false == $this->is_staging_install() ) {
 		$site_type = 'Active';
-		
+
 		$_SESSION['wp_staging_view_version'] = 'production';
 	} else {
 		// If installed to your staging site:
 		$site_type = 'Staging';
-		
+
 		$_SESSION['wp_staging_view_version'] = 'staging';
 		$url_to_customizer = "customize.php?staging=1";
 	}
-	
+
 	$template = 'Your new BoldGrid site has installed as your <strong>%s</strong> site, and is <a href="%s" target="_blank">ready to view</a>.';
 	$your_new_site_is_now_installed_message = sprintf( $template, $site_type, get_site_url() );
 }

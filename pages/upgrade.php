@@ -1,11 +1,6 @@
 <?php
-
-// Prevent direct calls
-if ( ! defined( 'WPINC' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
-}
+// Prevent direct calls.
+require BOLDGRID_BASE_DIR . '/pages/templates/restrict-direct-access.php';
 
 ?>
 <h1>Updating plugin...</h1>
@@ -28,34 +23,34 @@ $plugin = 'boldgrid-inspirations/boldgrid-inspirations';
 
 $activate_path = 'boldgrid-inspirations/boldgrid-inspirations.php';
 
-// security
+// Security.
 if ( ! is_numeric( $latest_version ) ) {
 	die( 'Error: Latest version value not a number.' );
 }
 
 include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 
-// update transient values
+// Update transient values.
 $update_plugins = get_site_transient( 'update_plugins' );
 
 $update_plugins->response['boldgrid-inspirations/boldgrid-inspirations.php']->package = $plugin_url;
 
 set_site_transient( 'update_plugins', $update_plugins );
 
-// UPGRADE the plugin
-$upgrader = new Plugin_Upgrader( 
+// UPGRADE the plugin.
+$upgrader = new Plugin_Upgrader(
 	new Plugin_Installer_Skin( compact( 'title', 'url', 'nonce', 'plugin', 'api' ) ) );
 
 $upgrader_install = $upgrader->upgrade( $plugin );
 
-// ACTIVATE the plugin
+// ACTIVATE the plugin.
 $result = activate_plugin( $activate_path );
 
 if ( is_wp_error( $result ) ) {
 	wp_die( $result );
 }
 
-// REDIRECT back to the plugin
+// REDIRECT back to the plugin.
 $redirect_url = admin_url() . "admin.php?page=imh-wpb";
 
 ?>

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * BoldGrid Source Code
  *
@@ -9,15 +8,8 @@
  * @author BoldGrid.com <wpb@boldgrid.com>
  */
 
-// Prevent direct calls
-if ( ! defined( 'WPINC' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
-}
-
 /**
- * BoldGrid Filter Storage class
+ * The BoldGrid Filter Storage class.
  *
  * Stores a value and calls any existing function with this value.
  */
@@ -30,17 +22,17 @@ class Boldgrid_Filter_Storage {
 	 */
 	private $values;
 	private $class;
-	
+
 	/**
 	 * Stores the values for later use.
 	 *
-	 * @param mixed $values        	
+	 * @param mixed $values
 	 */
 	public function __construct( $values, $class ) {
 		$this->values = $values;
 		$this->class = $class;
 	}
-	
+
 	/**
 	 * Catches all function calls except __construct().
 	 *
@@ -49,27 +41,32 @@ class Boldgrid_Filter_Storage {
 	 *
 	 * @param string $callback
 	 *        	Function name
-	 * @param array $arguments        	
+	 * @param array $arguments
 	 * @return mixed
 	 * @throws InvalidArgumentException
 	 */
 	public function __call( $callback, $arguments ) {
 		if ( is_callable( array (
 			$this->class,
-			$callback 
+			$callback
 		) ) ) {
 			return call_user_func( array (
 				$this->class,
-				$callback 
+				$callback
 			), $arguments, $this->values );
 		}
-		
+
 		// Wrong function called.
-		throw new InvalidArgumentException( 
-			sprintf( 'File: %1$s<br>Line %2$d<br>Not callable: %3$s', __FILE__, __LINE__, 
-				print_r( array (
-					$this->class,
-					$callback 
-				), true ) ) );
+		throw new InvalidArgumentException(
+			sprintf(
+				'File: %1$s<br>Line %2$d<br>Not callable: %3$s', __FILE__, __LINE__,
+				print_r(
+					array (
+						$this->class,
+						$callback,
+					), true
+				)
+			)
+		);
 	}
 }

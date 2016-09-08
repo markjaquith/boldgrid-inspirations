@@ -1,10 +1,16 @@
 <?php
+// Prevent direct calls.
+require BOLDGRID_BASE_DIR . '/pages/templates/restrict-direct-access.php';
 
-// Prevent direct calls
-if ( ! defined( 'WPINC' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
+// Check if asset server is available.
+$is_asset_server_available = (bool) get_site_transient( 'boldgrid_available' );
+
+$notice_template_file = BOLDGRID_BASE_DIR .
+'/pages/templates/boldgrid-connection-issue.php';
+
+if ( ! $is_asset_server_available &&
+! in_array( $notice_template_file, get_included_files(), true ) ) {
+	include $notice_template_file;
 }
 
 // Wrap the entire page within a '.wrap'.
@@ -22,19 +28,16 @@ $have_assets_needing_purchase = isset( $data['assets_needing_purchase']['by_page
 // Check asset server availability:
 $is_asset_server_available = ( bool ) get_site_transient( 'boldgrid_available' );
 
-// Print a message for connection failure:
-if ( true === $is_asset_server_available ) {
-	// get the user's current copyright coin balance
-	$current_copyright_coin_balance = $this->get_current_copyright_coin_balance();
+// Get the user's current copyright coin balance.
+$current_copyright_coin_balance = $this->get_current_copyright_coin_balance();
+
+// Validate balance.
+if ( ! is_numeric( $current_copyright_coin_balance ) ) {
+	$current_copyright_coin_balance = '?';
 }
 
 // Include the navigation:
 include BOLDGRID_BASE_DIR . '/pages/includes/cart_header.php';
-
-// Print a message for connection failure:
-if ( false === $is_asset_server_available ) {
-	require BOLDGRID_BASE_DIR . '/pages/templates/boldgrid_connection_issue.php';
-}
 
 /**
  * ****************************************************************************
@@ -162,7 +165,7 @@ if ( $have_assets_needing_purchase ) {
 			 * Has this image been previously 'checked' or unchecked?
 			 */
 			// Unchecked, don't buy it.
-			if ( isset( $asset['checked_in_cart'] ) and false === $asset['checked_in_cart'] ) {
+			if ( isset( $asset['checked_in_cart'] ) and ! $asset['checked_in_cart'] ) {
 				$unselected_image = 'unselected-image';
 				$checked = '';
 			} else {
@@ -319,7 +322,8 @@ if ( $have_assets_needing_purchase ) {
 					<button class='button button-primary'
 						id='purchase_all_for_publishing'
 						<?php
-	if ( $current_copyright_coin_balance < $data['total_cost'] ) {
+	if ( ! is_numeric( $current_copyright_coin_balance ) ||
+	$current_copyright_coin_balance < $data['total_cost'] ) {
 		echo 'disabled="disabled"';
 	}
 	?>>Purchase for Publishing</button>

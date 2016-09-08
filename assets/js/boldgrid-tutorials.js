@@ -315,7 +315,7 @@ var BoldGridDashboard = BoldGridDashboard || {};
 		 * tabs and actual content displayed in the dashboard widget.
 		 */
 		// Handlebars template
-		template : Handlebars.compile( jQuery( "#boldgrid-dashboard-view" ).html() ),
+		template : Handlebars.compile( jQuery( '#boldgrid-dashboard-view' ).html() ),
 		// establish click even handlers for tabs and tab content
 		events : {
 			// on click for tab content links

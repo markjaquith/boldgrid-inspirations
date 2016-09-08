@@ -36,9 +36,9 @@ class Boldgrid_Inspirations_Update {
 	 */
 	private static function set_configs( $configs = array() ) {
 		// If configs is empty, then get and set the array.
-		if ( true === empty( $configs ) ) {
+		if ( empty( $configs ) ) {
 			// Load the Boldgrid_Inspirations_Config class if needed.
-			if ( false === class_exists( 'Boldgrid_Inspirations_Config' ) ) {
+			if ( ! class_exists( 'Boldgrid_Inspirations_Config' ) ) {
 				require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-config.php';
 			}
 
@@ -61,7 +61,7 @@ class Boldgrid_Inspirations_Update {
 	 */
 	public static function get_configs() {
 		// Set the configs, if not set.
-		if ( true === empty( self::$configs ) ) {
+		if ( empty( self::$configs ) ) {
 			self::set_configs();
 		}
 
@@ -77,7 +77,7 @@ class Boldgrid_Inspirations_Update {
 	 */
 	public function __construct( $boldgrid_inspirations ) {
 		// Set the BoldGrid configuration array.
-		if ( true === is_a ( $boldgrid_inspirations, 'BoldGrid_Inspirations' ) ) {
+		if ( is_a( $boldgrid_inspirations, 'BoldGrid_Inspirations' ) ) {
 			// Object.
 			self::set_configs( $boldgrid_inspirations->get_configs() );
 		} else {
@@ -177,20 +177,20 @@ class Boldgrid_Inspirations_Update {
 	/**
 	 * Update api data transient from data on our asset server.
 	 *
-	 * @return object $boldgrid_api_data or false
+	 * @see Boldgrid_Inspirations_Update::get_configs().
+	 * @see Boldgrid_Inspirations_Api::boldgrid_api_call().
+	 * @see Boldgrid_Inspirations_Api::set_is_asset_server_available().
+	 *
+	 * @return object|false A standard data object or FALSE on error.
 	 */
 	public static function update_api_data() {
 		// Get api data transient.
-		if ( is_multisite() ) {
-			$boldgrid_api_data = get_site_transient( 'boldgrid_api_data' );
-		} else {
-			$boldgrid_api_data = get_transient( 'boldgrid_api_data' );
-		}
+		$boldgrid_api_data = get_site_transient( 'boldgrid_api_data' );
 
 		// If the API data was just retrieved (last 5 seconds) and is ok, then just return it.
-		if ( false === empty( $boldgrid_api_data ) && isset( $boldgrid_api_data->updated ) &&
-			 $boldgrid_api_data->updated >= time() - 5 ) {
-
+		if ( ! empty( $boldgrid_api_data ) &&
+		isset( $boldgrid_api_data->updated ) &&
+		$boldgrid_api_data->updated >= time() - 5 ) {
 			return $boldgrid_api_data;
 		}
 
@@ -201,25 +201,26 @@ class Boldgrid_Inspirations_Update {
 		$boldgrid_configs = self::get_configs();
 
 		// If the ajax call path is not available.
-		if ( false === isset( $boldgrid_configs['ajax_calls']['get_version'] ) ) {
+		if ( ! isset( $boldgrid_configs['ajax_calls']['get_version'] ) ) {
 			$boldgrid_configs['ajax_calls']['get_version'] = '/api/plugin/check-version';
 		}
 
 		// If we have no transient but do have configs, then get data and set transient.
 		// Load the Boldgrid_Inspirations class if needed.
-		if ( false === class_exists( 'Boldgrid_Inspirations' ) ) {
+		if ( class_exists( 'Boldgrid_Inspirations' ) ) {
 			require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations.php';
 		}
 
 		// Get the latest version information (API call).
-		$boldgrid_api_data = Boldgrid_Inspirations::boldgrid_api_call(
-			$boldgrid_configs['ajax_calls']['get_version'] );
+		$boldgrid_api_data = Boldgrid_Inspirations_Api::boldgrid_api_call(
+			$boldgrid_configs['ajax_calls']['get_version']
+		);
 
 		// Check asset server availability.
 		if ( isset( $boldgrid_api_data->status ) ) {
-			Boldgrid_Inspirations::set_is_asset_server_available( true );
+			Boldgrid_Inspirations_Api::set_is_asset_server_available( true );
 		} else {
-			Boldgrid_Inspirations::set_is_asset_server_available( false );
+			Boldgrid_Inspirations_Api::set_is_asset_server_available( false );
 
 			return false;
 		}
@@ -227,11 +228,15 @@ class Boldgrid_Inspirations_Update {
 		// Fail if we do not have success.
 		if ( 200 !== $boldgrid_api_data->status || 'OK' !== $boldgrid_api_data->message ) {
 			error_log(
-				__METHOD__ . ': Failed to get valid updated boldgrid_api_data.  ' . print_r(
-					array (
+				__METHOD__ . ': Failed to get valid updated boldgrid_api_data.  ' .
+				print_r(
+					array(
 						'uri' => $boldgrid_configs['ajax_calls']['get_version'],
-						'$boldgrid_api_data' => $boldgrid_api_data
-					), true ) );
+						'$boldgrid_api_data' => $boldgrid_api_data,
+					),
+					true
+				)
+			);
 
 			return false;
 		}
@@ -240,16 +245,11 @@ class Boldgrid_Inspirations_Update {
 		$boldgrid_api_data->updated = time();
 
 		// Set api data transient, expired in 8 hours.
-		if ( is_multisite() ) {
-			delete_site_transient( 'boldgrid_api_data' );
-			set_site_transient( 'boldgrid_api_data', $boldgrid_api_data, 8 * HOUR_IN_SECONDS );
-		} else {
-			delete_transient( 'boldgrid_api_data' );
-			set_transient( 'boldgrid_api_data', $boldgrid_api_data, 8 * HOUR_IN_SECONDS );
-		}
+		delete_site_transient( 'boldgrid_api_data' );
+		set_site_transient( 'boldgrid_api_data', $boldgrid_api_data, 8 * HOUR_IN_SECONDS );
 
 		// Update boldgrid_reseller option.
-		$boldgrid_reseller_array = array ();
+		$boldgrid_reseller_array = array();
 
 		foreach ( $boldgrid_api_data->result->data as $key => $value ) {
 			if ( preg_match( '/^reseller_/', $key ) ) {
@@ -262,9 +262,10 @@ class Boldgrid_Inspirations_Update {
 			update_option( 'boldgrid_reseller', $boldgrid_reseller_array );
 		} else {
 			update_option( 'boldgrid_reseller',
-				array (
-					'reseller_nobrand' => true
-				) );
+				array(
+					'reseller_nobrand' => true,
+				)
+			);
 		}
 
 		return $boldgrid_api_data;
@@ -280,11 +281,7 @@ class Boldgrid_Inspirations_Update {
 	 */
 	public function custom_plugins_transient_update( $transient ) {
 		// Get api data transient.
-		if ( is_multisite() ) {
-			$boldgrid_api_data = get_site_transient( 'boldgrid_api_data' );
-		} else {
-			$boldgrid_api_data = get_transient( 'boldgrid_api_data' );
-		}
+		$boldgrid_api_data = get_site_transient( 'boldgrid_api_data' );
 
 		// If the api data transient does not exist or is a force check, then get the data and set
 		// it.
@@ -301,7 +298,7 @@ class Boldgrid_Inspirations_Update {
 		$boldgrid_configs = self::get_configs();
 
 		// If the API key is not set, then abort; return unchanged plugin update transient.
-		if( true === empty( $boldgrid_configs['api_key'] ) ){
+		if( empty( $boldgrid_configs['api_key'] ) ){
 			return $transient;
 		}
 
@@ -315,7 +312,7 @@ class Boldgrid_Inspirations_Update {
 			$transient = new stdClass();
 
 			// If we have section data, then prepare it for use.
-			if ( false === empty( $boldgrid_api_data->result->data->sections ) ) {
+			if ( ! empty( $boldgrid_api_data->result->data->sections ) ) {
 				// Remove new lines and double-spaces, to help prevent a broken JSON set.
 				$boldgrid_api_data->result->data->sections = preg_replace( '/\s+/', ' ',
 					trim( $boldgrid_api_data->result->data->sections ) );
@@ -325,7 +322,7 @@ class Boldgrid_Inspirations_Update {
 					true );
 
 				// If we have data, format it for use, else set a default message.
-				if ( false === empty( $transient->sections ) && count( $transient->sections ) ) {
+				if ( ! empty( $transient->sections ) && count( $transient->sections ) ) {
 					foreach ( $transient->sections as $section => $section_data ) {
 						$transient->sections[$section] = html_entity_decode( $section_data,
 							ENT_QUOTES );
@@ -347,7 +344,7 @@ class Boldgrid_Inspirations_Update {
 				 $boldgrid_configs['ajax_calls']['get_asset'] . '?key=' .
 				 $boldgrid_configs['api_key'] . '&id=' . $boldgrid_api_data->result->data->asset_id;
 
-			if ( false === empty( $boldgrid_api_data->result->data->compatibility ) && null !== ( $compatibility = json_decode(
+			if ( ! empty( $boldgrid_api_data->result->data->compatibility ) && null !== ( $compatibility = json_decode(
 				$boldgrid_api_data->result->data->compatibility, true ) ) ) {
 				$transient->compatibility = $boldgrid_api_data->result->data->compatibility;
 			}
@@ -363,16 +360,16 @@ class Boldgrid_Inspirations_Update {
 
 			$transient->added = '2015-03-19';
 
-			if ( false === empty( $boldgrid_api_data->result->data->siteurl ) ) {
+			if ( ! empty( $boldgrid_api_data->result->data->siteurl ) ) {
 				$transient->homepage = $boldgrid_api_data->result->data->siteurl;
 			}
 
-			if ( false === empty( $boldgrid_api_data->result->data->tags ) &&
+			if ( ! empty( $boldgrid_api_data->result->data->tags ) &&
 				 null !== ( $tags = json_decode( $boldgrid_api_data->result->data->tags, true ) ) ) {
 				$transient->tags = $boldgrid_api_data->result->data->tags;
 			}
 
-			if ( false === empty( $boldgrid_api_data->result->data->banners ) && null !== ( $banners = json_decode(
+			if ( ! empty( $boldgrid_api_data->result->data->banners ) && null !== ( $banners = json_decode(
 				$boldgrid_api_data->result->data->banners, true ) ) ) {
 				$transient->banners = $banners;
 			}
@@ -389,7 +386,7 @@ class Boldgrid_Inspirations_Update {
 			$obj->plugin = 'boldgrid-inspirations/boldgrid-inspirations.php';
 			$obj->new_version = $boldgrid_api_data->result->data->version;
 
-			if ( false === empty( $boldgrid_api_data->result->data->siteurl ) ) {
+			if ( ! empty( $boldgrid_api_data->result->data->siteurl ) ) {
 				$obj->url = $boldgrid_api_data->result->data->siteurl;
 			}
 
@@ -424,11 +421,7 @@ class Boldgrid_Inspirations_Update {
 		}
 
 		// Get api data transient.
-		if ( is_multisite() ) {
-			$boldgrid_api_data = get_site_transient( 'boldgrid_api_data' );
-		} else {
-			$boldgrid_api_data = get_transient( 'boldgrid_api_data' );
-		}
+		$boldgrid_api_data = get_site_transient( 'boldgrid_api_data' );
 
 		// If the api data transient does not exist or is a force check, then get the data and set
 		// it.
@@ -537,7 +530,7 @@ class Boldgrid_Inspirations_Update {
 		global $pagenow;
 
 		// Only require fresh data IF user is clicking "Check Again".
-		if ( 'update-core.php' !== $pagenow || false === isset( $_GET['force-check'] ) ) {
+		if ( 'update-core.php' !== $pagenow || ! isset( $_GET['force-check'] ) ) {
 			return $value;
 		}
 
@@ -629,11 +622,7 @@ class Boldgrid_Inspirations_Update {
 		$live_version = $plugin_data['Version'];
 
 		// Get the current plugin version from WP options.
-		if ( is_multisite() ) {
-			$current_version = get_site_option( 'boldgrid_inspirations_current_version' );
-		} else {
-			$current_version = get_option( 'boldgrid_inspirations_current_version' );
-		}
+		$current_version = get_site_option( 'boldgrid_inspirations_current_version' );
 
 		// If the current version matches the live version, then abort.
 		if ( $current_version === $live_version ) {
@@ -641,13 +630,8 @@ class Boldgrid_Inspirations_Update {
 		}
 
 		// Update the recorded previous and current versions in WP options.
-		if ( is_multisite() ) {
-			update_site_option( 'boldgrid_inspirations_previous_version', $current_version );
-			update_site_option( 'boldgrid_inspirations_current_version', $live_version );
-		} else {
-			update_option( 'boldgrid_inspirations_previous_version', $current_version );
-			update_option( 'boldgrid_inspirations_current_version', $live_version );
-		}
+		update_site_option( 'boldgrid_inspirations_previous_version', $current_version );
+		update_site_option( 'boldgrid_inspirations_current_version', $live_version );
 	}
 
 	/**
@@ -669,8 +653,7 @@ class Boldgrid_Inspirations_Update {
 	 * @since 1.0.12
 	 */
 	public function show_notices() {
-		// Get the WP option boldgrid_dismissed_admin_notices.
-		$boldgrid_dismissed_notices = get_option( 'boldgrid_dismissed_admin_notices' );
+		$admin_notices = new Boldgrid_Inspirations_Admin_Notices();
 
 		// Get boldgrid settings.
 		$boldgrid_settings = get_option( 'boldgrid_settings' );
@@ -682,11 +665,7 @@ class Boldgrid_Inspirations_Update {
 		$plugin_data = get_plugin_data( BOLDGRID_BASE_DIR . '/boldgrid-inspirations.php', false );
 
 		// Get the boldgrid_inspirations_activated option.
-		if ( is_multisite() ) {
-			$activated_version = get_site_option( 'boldgrid_inspirations_activated_version' );
-		} else {
-			$activated_version = get_option( 'boldgrid_inspirations_activated_version' );
-		}
+		$activated_version = get_site_option( 'boldgrid_inspirations_activated_version' );
 
 		/*
 		 * If current version is 1.0.12 or higher, the version originally activated was earlier than
@@ -701,11 +680,15 @@ class Boldgrid_Inspirations_Update {
 			 version_compare( $activated_version, '1.0.12', '<' ) );
 
 		// Is the notice already marked as dismissed.
-		$is_not_dismissed = ( false === $boldgrid_dismissed_notices ||
-			 false === in_array( 'update-notice-1-0-12', $boldgrid_dismissed_notices, true ) );
+		$has_been_dismissed = $admin_notices->has_been_dismissed( 'update-notice-1-0-12' );
 
-		// Check if the notice should be displayed.
-		if ( $is_live_ge_1012 && $is_activated_lt_1012 && $is_not_dismissed ) {
+		/*
+		 * Check if the notice should be displayed.
+		 *
+		 * As of 1.2.5, the current_user_can check was added. If the user cannot edit pages, there's
+		 * no need to tell them "Inspirations - Pages" has moved.
+		 */
+		if ( $is_live_ge_1012 && $is_activated_lt_1012 && ! $has_been_dismissed & current_user_can( 'edit_pages' ) ) {
 			// Display the notice.
 			?>
 <div id='update-notice-1-0-12'

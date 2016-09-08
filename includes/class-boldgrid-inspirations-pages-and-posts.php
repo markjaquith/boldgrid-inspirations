@@ -1,5 +1,4 @@
 <?php
-
 /**
  * BoldGrid Source Code
  *
@@ -8,13 +7,6 @@
  * @version $Id$
  * @author BoldGrid.com <wpb@boldgrid.com>
  */
-
-// Prevent direct calls
-if ( ! defined( 'WPINC' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
-}
 
 /**
  * BoldGrid Inspirations Pages And Posts.
@@ -256,7 +248,7 @@ class Boldgrid_Inspirations_Pages_And_Posts {
 
 		// Loop through each nav menu. If the page is in the menu, add it to our $in_menu array.
 		foreach ( $nav_menus as $nav_menu ) {
-			if ( true === $this->page_in_menu( $post_id, $nav_menu->term_id ) ) {
+			if ( $this->page_in_menu( $post_id, $nav_menu->term_id ) ) {
 				$in_menu[] = $nav_menu->term_id;
 			}
 		}
@@ -525,12 +517,12 @@ class Boldgrid_Inspirations_Pages_And_Posts {
 		}
 
 		// If there are no active menus, then print a message.
-		if ( false === $has_active_menus && '<div>' != $active_div_tag ) {
+		if ( ! $has_active_menus && '<div>' != $active_div_tag ) {
 			$nav_menus_html .= $active_div_tag . '<i>There are no menus to select.</i></div>';
 		} else
 
 		// If there are no staging menus, then print a message.
-		if ( false === $has_staging_menus && '<div>' != $staging_div_tag ) {
+		if ( ! $has_staging_menus && '<div>' != $staging_div_tag ) {
 			$nav_menus_html .= $staging_div_tag . '<i>There are no menus to select.</i></div>';
 		}
 

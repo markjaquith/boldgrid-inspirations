@@ -68,14 +68,14 @@ class Boldgrid_Inspirations_Cache {
 		$env_home = getenv( 'HOME' );
 
 		// Locate the home directory by environment variable or use parent of ABSPATH.
-		$home_dir = ( false === empty( $env_home ) ? $env_home : dirname( ABSPATH ) );
+		$home_dir = ( ! empty( $env_home ) ? $env_home : dirname( ABSPATH ) );
 
 		// Trim any trailing slash (or backslash in Windows).
 		$home_dir = rtrim( $home_dir, DIRECTORY_SEPARATOR );
 
 		// If the home directory is not defined, not a directory or not writable, then disable cache.
-		if ( empty( $home_dir ) || false === is_dir( $home_dir ) ||
-			 false === is_writable( $home_dir ) ) {
+		if ( empty( $home_dir ) || ! is_dir( $home_dir ) ||
+			 ! is_writable( $home_dir ) ) {
 			$this->enable_asset_cache = false;
 
 			return;
@@ -85,12 +85,12 @@ class Boldgrid_Inspirations_Cache {
 		$this->cache_folder = $home_dir . '/boldgrid-asset-cache';
 
 		// Create the cache directory if it does not exist.
-		if ( false === file_exists( $this->cache_folder ) ) {
+		if ( ! file_exists( $this->cache_folder ) ) {
 			mkdir( $this->cache_folder, 0700 );
 		}
 
 		// Enable cache only if the cache folder is defined, is a directory, and is writable.
-		$this->enable_asset_cache = ( false === empty( $this->cache_folder ) &&
+		$this->enable_asset_cache = ( ! empty( $this->cache_folder ) &&
 			 is_dir( $this->cache_folder ) && is_writable( $this->cache_folder ) );
 	}
 
@@ -106,8 +106,8 @@ class Boldgrid_Inspirations_Cache {
 	 */
 	public function get_shard_directory( $cache_id ) {
 		// Validate parent cache directory.
-		if ( empty( $this->cache_folder ) || false === is_dir( $this->cache_folder ) ||
-			 false === is_writable( $this->cache_folder ) ) {
+		if ( empty( $this->cache_folder ) || ! is_dir( $this->cache_folder ) ||
+			 ! is_writable( $this->cache_folder ) ) {
 			return false;
 		}
 
@@ -123,13 +123,13 @@ class Boldgrid_Inspirations_Cache {
 		$shard_directory_path = $this->cache_folder . '/' . $shard_name;
 
 		// Ensure the directory exists.
-		if ( false === is_dir( $shard_directory_path ) ) {
+		if ( ! is_dir( $shard_directory_path ) ) {
 			mkdir( $shard_directory_path, 0700 );
 		}
 
 		// Validate shard cache directory.
-		if ( false === is_dir( $shard_directory_path ) ||
-			 false === is_writable( $shard_directory_path ) ) {
+		if ( ! is_dir( $shard_directory_path ) ||
+			 ! is_writable( $shard_directory_path ) ) {
 			return false;
 		}
 
@@ -146,12 +146,12 @@ class Boldgrid_Inspirations_Cache {
 	 */
 	public function get_cache_files( $cache_id ) {
 		// If caching is not enabled, abort.
-		if ( true !== $this->enable_asset_cache ) {
+		if ( ! $this->enable_asset_cache ) {
 			return false;
 		}
 
 		// Try to get the $response from cache.
-		if ( false === empty( $cache_id ) ) {
+		if ( ! empty( $cache_id ) ) {
 			// Get the shard cache directory.
 			$cache_directory = $this->get_shard_directory( $cache_id );
 
@@ -210,7 +210,7 @@ class Boldgrid_Inspirations_Cache {
 	 */
 	public function save_cache_files( $cache_id, $response ) {
 		// If cache is not enabled, abort.
-		if ( true !== $this->enable_asset_cache ) {
+		if ( ! $this->enable_asset_cache ) {
 			return false;
 		}
 
@@ -224,7 +224,7 @@ class Boldgrid_Inspirations_Cache {
 		$cache_directory = $this->get_shard_directory( $cache_id );
 
 		// Validate cache directory.
-		if ( empty( $cache_directory ) || false === is_writable( $cache_directory ) ) {
+		if ( empty( $cache_directory ) || ! is_writable( $cache_directory ) ) {
 			error_log(
 				__METHOD__ . ': Error: Cache directory "' . $cache_directory . '" is not writable.' );
 
@@ -253,7 +253,7 @@ class Boldgrid_Inspirations_Cache {
 		unset( $response_headers );
 
 		// Check for write failure.
-		if ( false === $cache_header_written ) {
+		if ( ! $cache_header_written ) {
 			$asset_id = $response['headers']['z-asset-id'] ? $response['headers']['z-asset-id'] : 'UNKNOWN';
 
 			error_log(
@@ -267,7 +267,7 @@ class Boldgrid_Inspirations_Cache {
 		$cache_body_written = file_put_contents( $cache_body_path, $response['body'] );
 
 		// Check for write failure.
-		if ( false === $cache_body_written ) {
+		if ( ! $cache_body_written ) {
 			$asset_id = $response['headers']['z-asset-id'] ? $response['headers']['z-asset-id'] : 'UNKNOWN';
 
 			error_log(

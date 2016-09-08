@@ -1,18 +1,13 @@
 <?php
-
-// Prevent direct calls
-if ( ! defined( 'WPINC' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
-}
+// Prevent direct calls.
+require BOLDGRID_BASE_DIR . '/pages/templates/restrict-direct-access.php';
 
 ?>
 
 <!--
 *******************************************************************************
 Inline style
-******************************************************************************* 
+*******************************************************************************
  -->
 <style>
 ul#deploy_log {
@@ -57,7 +52,7 @@ h1 .dashicons.dashicons-yes {
 <!--
 *******************************************************************************
 Deployment container
-******************************************************************************* 
+*******************************************************************************
  -->
 
 <div name='deploy_status' id='deploy_status' class='wrap'>
@@ -84,7 +79,7 @@ Boldgrid_Inspirations_Utility::inline_js_file( 'after_deployment_container.js' )
 
 add_shortcode( 'imhwpb', array (
 	'imhwpbDeploy',
-	'dummy_shortcode_imhwpb' 
+	'dummy_shortcode_imhwpb'
 ) );
 
 $new_deploy = new Boldgrid_Inspirations_Deploy( $this->get_configs() );

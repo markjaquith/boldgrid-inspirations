@@ -1,11 +1,6 @@
 <?php
-
-// Prevent direct calls
-if ( ! defined( 'WPINC' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
-}
+// Prevent direct calls.
+require BOLDGRID_BASE_DIR . '/pages/templates/restrict-direct-access.php';
 
 $boldgrid_admin_notices = new Boldgrid_Inspirations_Admin_Notices();
 
@@ -18,7 +13,7 @@ include BOLDGRID_BASE_DIR . '/pages/templates/attachment_details.php';
 <div class='media-frame imhwpb-media-frame mode-select wp-core-ui'>
 	<div class="attachments-browser">
 	<?php
-	if ( true !== $boldgrid_connection_issue_exists ) {
+	if ( ! $boldgrid_connection_issue_exists ) {
 		?>
 		<div class="media-toolbar">
 			<div class="media-toolbar-secondary">
@@ -48,14 +43,19 @@ include BOLDGRID_BASE_DIR . '/pages/templates/attachment_details.php';
 			tabindex="-1">
 
 			<?php
-			// Print a message for connection failure:
-			if ( true === $boldgrid_connection_issue_exists ) {
-				require BOLDGRID_BASE_DIR . '/pages/templates/boldgrid_connection_issue.php';
-			} else /**
+			// Print a message for connection failure.
+			$notice_template_file = BOLDGRID_BASE_DIR .
+			'/pages/templates/boldgrid-connection-issue.php';
+
+			if ( $boldgrid_connection_issue_exists &&
+			! in_array( $notice_template_file, get_included_files(), true ) ) {
+				include $notice_template_file;
+			} else {
+			/*
 			 * Display a notice about possible explicit photos, only if the notice has not already
 			 * been dismissed.
 			 */
-			if ( false == $boldgrid_admin_notices->has_been_dismissed(
+				if ( ! $boldgrid_admin_notices->has_been_dismissed(
 				'possible_bgcs_explict_search_results' ) ) {
 				?>
 			<div class="error notice is-dismissible boldgrid-admin-notice"
@@ -64,7 +64,8 @@ include BOLDGRID_BASE_DIR . '/pages/templates/attachment_details.php';
 					search results, we cannot guarantee the content of all images in
 					your search results.</p>
 			</div>
-			<?php
+				<?php
+				}
 			}
 			?>
 

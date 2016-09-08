@@ -1,5 +1,4 @@
 <?php
-
 /**
  * BoldGrid Source Code
  *
@@ -9,151 +8,157 @@
  * @author BoldGrid.com <wpb@boldgrid.com>
  */
 
-// Prevent direct calls
-if ( ! defined( 'WPINC' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
-}
-
 /**
- * BoldGrid Screen class
+ * The BoldGrid Screen class.
  *
  * Handles actions based upon the wordpress admin screen.
  */
 class Boldgrid_Inspirations_Screen {
 	/**
-	 * Constructor
-	 */
-	public function __construct() {
-	}
-	
-	/**
-	 * Add hooks
+	 * Add hooks.
 	 */
 	public function add_hooks() {
 		/**
-		 * Enqueue js and css files
+		 * Enqueue js and css files.
 		 */
-		
+
 		// current_screen is an admin hook triggered after the necessary elements
 		// to identify a screen are set up.
-		add_action( 'current_screen', array (
-			$this,
-			'enqueue_script_per_screen_id' 
-		) );
-		
-		// In addition to enquing scripts per screen,
-		// we can also enqueue scripts per the GLOBAL $paegnow variable.
-		add_action( 'admin_enqueue_scripts', 
-			array (
+		add_action( 'current_screen',
+			array(
 				$this,
-				'enqueue_script_per_pagenow' 
-			) );
-		
-		// Pointers are registered per screen, which makes it fitting to configure
-		// them within this screen class.
-		add_action( 'current_screen', array (
-			$this,
-			'enqueue_pointers_per_screen_id' 
-		) );
-		
-		// load handlebar templates per screen
-		add_action( 'admin_footer', 
-			array (
+				'enqueue_script_per_screen_id',
+			)
+		);
+
+		// In addition to enquing scripts per screen, we can also enqueue scripts per the
+		// GLOBAL $paegnow variable.
+		add_action( 'admin_enqueue_scripts',
+			array(
 				$this,
-				'admin_footer_handlebars_per_screen_id' 
-			) );
+				'enqueue_script_per_pagenow',
+			)
+		);
+
+		// Pointers are registered per screen, which makes it fitting to configure them within
+		// this screen class.
+		add_action( 'current_screen',
+			array(
+				$this,
+				'enqueue_pointers_per_screen_id',
+			)
+		);
+
+		// Load handlebar templates per screen.
+		add_action( 'admin_footer',
+			array(
+				$this,
+				'admin_footer_handlebars_per_screen_id',
+			)
+		);
 	}
-	
+
 	/**
-	 * Admin footer per screen id
+	 * Admin footer per screen id.
 	 */
 	public function admin_footer_handlebars_per_screen_id() {
 		$this->set_screen();
-		
-		$js_per_screen_id = array ();
-		// 'nav-menus'
-		
+
+		$js_per_screen_id = array();
+
 		if ( in_array( $this->screen->id, $js_per_screen_id ) ) {
 			include BOLDGRID_BASE_DIR . '/pages/templates/screen/id/' . $this->screen->id . '.php';
 		}
 	}
-	
+
 	/**
-	 * Pointers (tooltips)
+	 * Pointers (tooltips).
 	 *
 	 * Pointers are registered per screen, which makes it fitting to configure them within this
 	 * screen class.
 	 */
 	public function enqueue_pointers_per_screen_id() {
-		include_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-wp-help-pointers.php';
-		
+		include_once BOLDGRID_BASE_DIR .
+		'/includes/class-boldgrid-inspirations-wp-help-pointers.php';
+
 		$pointers = new Boldgrid_WP_Help_Pointers();
-		
+
 		$pointers->add_hooks();
 	}
-	
+
 	/**
-	 * In addition to enquing scripts per screen,
-	 * we can also enqueue scripts per the GLOBAL $paegnow variable.
+	 * In addition to enquing scripts per screen, we can also enqueue scripts per
+	 * the GLOBAL $paegnow variable.
 	 */
 	public function enqueue_script_per_pagenow() {
 		GLOBAL $pagenow;
-		
-		$js_per_pagenow = array (
+
+		$js_per_pagenow = array(
 			'edit.php',
 			'post.php',
 		);
-		
-		if ( in_array( $pagenow, $js_per_pagenow ) ) {
-			// setup some vars...
+
+		if ( in_array( $pagenow, $js_per_pagenow, true ) ) {
+			// Setup some vars.
 			$handle = 'pagenow_js' . $this->screen->id;
-			
+
 			$file_path = 'assets/js/pagenow/' . $pagenow . '.js';
-			
-			// enqueue the js
-			wp_enqueue_script( $handle, 
-				plugins_url( $file_path, BOLDGRID_BASE_DIR . '/boldgrid-inspirations.php' ), 
-				array (), BOLDGRID_INSPIRATIONS_VERSION, true );
+
+			// Enqueue the js
+			wp_enqueue_script(
+				$handle,
+				plugins_url(
+					$file_path, BOLDGRID_BASE_DIR . '/boldgrid-inspirations.php'
+				),
+				array( 'base-admin-js' ),
+				BOLDGRID_INSPIRATIONS_VERSION,
+				true
+			);
 		}
 	}
-	
+
 	/**
-	 * Enqueue javascript based upon the screen id
+	 * Enqueue javascript based upon the screen id.
 	 */
 	public function enqueue_script_per_screen_id() {
 		$this->set_screen();
-		
-		$js_per_screen_id = array (
+
+		$js_per_screen_id = array(
 			'appearance_page_staged-theme',
 			'media_page_boldgrid-connect-search',
 			'page',
-			'upload' 
+			'upload',
 		);
-		
-		if ( in_array( $this->screen->id, $js_per_screen_id ) ) {
-			// setup some vars...
+
+		if ( in_array( $this->screen->id, $js_per_screen_id, true ) ) {
+			// Setup some vars.
 			$handle = 'screen_id_js' . $this->screen->id;
-			
+
 			$file_path = 'assets/js/screen/id/' . $this->screen->id . '.js';
-			
-			// enqueue the js
-			wp_enqueue_script( $handle, 
-				plugins_url( $file_path, BOLDGRID_BASE_DIR . '/boldgrid-inspirations.php' ), 
-				array (), BOLDGRID_INSPIRATIONS_VERSION, true );
+
+			// Enqueue the js.
+			wp_enqueue_script(
+				$handle,
+				plugins_url(
+					$file_path,
+					BOLDGRID_BASE_DIR . '/boldgrid-inspirations.php'
+				),
+				array(),
+				BOLDGRID_INSPIRATIONS_VERSION,
+				true
+			);
 		}
 	}
-	
+
 	/**
-	 * Set screen
+	 * Set screen.
 	 */
 	public function set_screen() {
-		// get the current screen if we don't already have it
+		// Get the current screen if we don't already have it.
 		if ( ! isset( $this->screen ) ) {
 			$this->screen = get_current_screen();
-			
-			// uncomment the below during dev to see which screen you're on
+
+			// Uncomment the below during dev to see which screen you're on.
 			// die( "<pre>" . print_r( $this->screen, 1 ) . "</pre>" );
 		}
 	}

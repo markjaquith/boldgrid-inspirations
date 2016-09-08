@@ -122,7 +122,7 @@ IMHWPB.EasyAttachmentPreviewSize = function() {
 		var dimensions = self.get_dimensions( innerHTML );
 
 		// If we don't have valid dimensions, abort.
-		if ( false === dimensions ) {
+		if ( ! dimensions ) {
 			return false;
 		}
 

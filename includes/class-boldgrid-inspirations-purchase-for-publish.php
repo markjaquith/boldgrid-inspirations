@@ -1,5 +1,4 @@
 <?php
-
 /**
  * BoldGrid Source Code
  *
@@ -9,24 +8,10 @@
  * @author BoldGrid.com <wpb@boldgrid.com>
  */
 
-// Prevent direct calls
-if ( ! defined( 'WPINC' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
-}
-
 /**
- * BoldGrid Purchase for Publish class
+ * BoldGrid Purchase for Publish class.
  */
 class Boldgrid_Inspirations_Purchase_For_Publish extends Boldgrid_Inspirations {
-	public function __construct( $pluginPath ) {
-		$this->pluginPath = $pluginPath;
-		parent::__construct( $pluginPath );
-
-		$this->api_key_hash = isset( $this->configs['api_key'] ) ? $this->configs['api_key'] : null;
-	}
-
 	/**
 	 * Hooks required for the PurchaseForPublish class
 	 */
@@ -170,8 +155,9 @@ class Boldgrid_Inspirations_Purchase_For_Publish extends Boldgrid_Inspirations {
 				// By default, it is always 'checked' unless:
 				// 1: $asset['checked_in_cart'] is specifically set, and
 				// 2: it is set to false.
-				$is_checked_in_cart = ( isset( $asset['checked_in_cart'] ) &&
-					 false === $asset['checked_in_cart'] ) ? false : true;
+				$is_checked_in_cart = ( ( isset( $asset['checked_in_cart'] ) &&
+					 ! $asset['checked_in_cart'] ) ? false : true
+				);
 
 				if ( $has_coin_cost && $is_checked_in_cart ) {
 					$total_coin_cost += $asset['coin_cost'];
@@ -187,6 +173,12 @@ class Boldgrid_Inspirations_Purchase_For_Publish extends Boldgrid_Inspirations {
 	 */
 	public function image_in_shopping_cart_checked_callback() {
 		global $wpdb;
+
+		// Only Administrators can be in the cart.
+		if( ! current_user_can( 'manage_options' ) ) {
+			echo __( 'Insufficient permissions', 'boldgrid-inspirations' );
+			wp_die();
+		}
 
 		$asset_id = intval( $_POST['asset_id'] );
 		$checked = trim( $_POST['checked'] );
@@ -218,7 +210,7 @@ class Boldgrid_Inspirations_Purchase_For_Publish extends Boldgrid_Inspirations {
 		 */
 
 		require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-asset-manager.php';
-		$assetManager = new Boldgrid_Inspirations_Asset_Manager( $this->pluginPath );
+		$assetManager = new Boldgrid_Inspirations_Asset_Manager();
 
 		$asset = $assetManager->get_asset(
 			array(
@@ -342,7 +334,7 @@ class Boldgrid_Inspirations_Purchase_For_Publish extends Boldgrid_Inspirations {
 			'<li>Available coin balance before purchase is: ' . $current_copyright_coin_balance .
 				 '</li>' );
 
-		if ( true !== $this->local_cost_matches_remote_cost() ) {
+		if ( ! $this->local_cost_matches_remote_cost() ) {
 			$this->update_local_asset_cost();
 
 			// Complete with errors:
@@ -360,7 +352,7 @@ class Boldgrid_Inspirations_Purchase_For_Publish extends Boldgrid_Inspirations {
 		$transaction_id = null;
 
 		require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-asset-manager.php';
-		$assetManager = new Boldgrid_Inspirations_Asset_Manager( $this->pluginPath );
+		$assetManager = new Boldgrid_Inspirations_Asset_Manager();
 
 		require_once BOLDGRID_BASE_DIR .
 			 '/includes/class-boldgrid-inspirations-enable-media-replace.php';
@@ -466,6 +458,11 @@ class Boldgrid_Inspirations_Purchase_For_Publish extends Boldgrid_Inspirations {
 	public function re_download_purchased_image_callback() {
 		global $wpdb;
 
+		// Only Administrators can re-download purchased images.
+		if( ! current_user_can( 'manage_options' ) ) {
+			wp_die();
+		}
+
 		// Get input POST vars:
 		$image_provider_id = $_POST['image_provider_id'];
 		$id_from_provider = $_POST['id_from_provider'];
@@ -479,7 +476,7 @@ class Boldgrid_Inspirations_Purchase_For_Publish extends Boldgrid_Inspirations {
 		}
 
 		require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-asset-manager.php';
-		$assetManager = new Boldgrid_Inspirations_Asset_Manager( $this->pluginPath );
+		$assetManager = new Boldgrid_Inspirations_Asset_Manager();
 
 		$download_data = array(
 			'type' => 'built_photo_search_purchase',
@@ -541,7 +538,7 @@ class Boldgrid_Inspirations_Purchase_For_Publish extends Boldgrid_Inspirations {
 	 */
 	public function update_local_asset_cost() {
 		require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-asset-manager.php';
-		$assetManager = new Boldgrid_Inspirations_Asset_Manager( $this->pluginPath );
+		$assetManager = new Boldgrid_Inspirations_Asset_Manager();
 
 		$local_updated = false;
 
@@ -587,7 +584,7 @@ for purchase, and will be removed from the cart.</p>
 			}
 		}
 
-		if ( true === $local_updated ) {
+		if ( $local_updated ) {
 			?>
 <p style='color: green;'>
 	Local prices have been updated! Please proceed to the <a
@@ -651,7 +648,7 @@ for purchase, and will be removed from the cart.</p>
 	 */
 	public function create_array_assets_needing_purchase( $args = array() ) {
 		require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-asset-manager.php';
-		$asset_manager = new Boldgrid_Inspirations_Asset_Manager( $this->pluginPath );
+		$asset_manager = new Boldgrid_Inspirations_Asset_Manager();
 
 		/**
 		 * ********************************************************************
@@ -832,10 +829,20 @@ for purchase, and will be removed from the cart.</p>
 
 	/**
 	 * Ajax calls come here to get details by transaction_item_id.
+	 *
+	 * When you are reviewing your transaction history and click 'View' for an invoice, this method
+	 * gets data for each of your images.
+	 *
+	 * @see Boldgrid_Inspirations_Api::get_api_key_hash().
 	 */
 	public function get_purchased_image_details_callback() {
 		// Connect WordPress database.
 		global $wpdb;
+
+		// Only Administrators can see transaction data.
+		if( ! current_user_can( 'manage_options' ) ) {
+			wp_die();
+		}
 
 		// Get and make sure we have a valid $transaction_item_id.
 		$transaction_item_id = $_POST['transaction_item_id'];
@@ -858,7 +865,7 @@ for purchase, and will be removed from the cart.</p>
 		 */
 
 		require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-asset-manager.php';
-		$assetManager = new Boldgrid_Inspirations_Asset_Manager( $this->pluginPath );
+		$assetManager = new Boldgrid_Inspirations_Asset_Manager();
 
 		// Grab the details of the asset based off of asset_id.
 		$search_params = array(
@@ -882,7 +889,7 @@ for purchase, and will be removed from the cart.</p>
 		 * IF the call to get_asset above returned false, try again, but force the search within
 		 * staging assets.
 		 */
-		if( false === $asset ) {
+		if( ! $asset ) {
 			$search_params[ 'staging' ] = true;
 			$asset = $assetManager->get_asset( $search_params );
 		}
@@ -917,7 +924,7 @@ for purchase, and will be removed from the cart.</p>
 			'method' => 'POST',
 			'body' => array(
 				'user_transaction_item_id' => $transaction_item_id,
-				'key' => $this->api_key_hash,
+				'key' => $this->api->get_api_key_hash(),
 			),
 			'timeout' => 20,
 		);
@@ -1003,7 +1010,9 @@ for purchase, and will be removed from the cart.</p>
 	}
 
 	/**
-	 * Get remote publish cost data
+	 * Get remote publish cost data.
+	 *
+	 * @see Boldgrid_Inspirations_Api::get_api_key_hash().
 	 *
 	 * @return boolean|unknown
 	 */
@@ -1026,7 +1035,7 @@ for purchase, and will be removed from the cart.</p>
 		$arguments = array(
 			'method' => 'POST',
 			'body' => array(
-				'key' => $this->api_key_hash,
+				'key' => $this->api->get_api_key_hash(),
 				'cost_data' => $this->get_local_publish_cost_data(),
 			)
 		);
@@ -1109,7 +1118,7 @@ for purchase, and will be removed from the cart.</p>
 		 * for the cart page itself for example.
 		 */
 		if ( true == $args['process_checked_in_cart_attribute'] ) {
-			if ( isset( $asset['checked_in_cart'] ) && false === $asset['checked_in_cart'] ) {
+			if ( isset( $asset['checked_in_cart'] ) && ! $asset['checked_in_cart'] ) {
 				return false;
 			}
 		}
@@ -1191,8 +1200,10 @@ for purchase, and will be removed from the cart.</p>
 			// Save this metadata for future use.
 			$this->wp_options_asset[ $asset_type ][ $asset['asset_key'] ]['_wp_attachment_metadata'] = $wp_attachment_metadata;
 
-			foreach ( $wp_attachment_metadata['sizes'] as $image_size ) {
-				$array_file_names_to_query[] = $image_size['file'];
+			if ( ! empty( $wp_attachment_metadata['sizes'] ) ) {
+				foreach ( $wp_attachment_metadata['sizes'] as $image_size ) {
+					$array_file_names_to_query[] = $image_size['file'];
+				}
 			}
 		}
 
@@ -1289,40 +1300,20 @@ for purchase, and will be removed from the cart.</p>
 	}
 
 	/**
-	 * Get current coin balance
+	 * Get current coin balance.
+	 *
+	 * @see Boldgrid_Inspirations_Coins::__construct().
+	 * @see Boldgrid_Inspirations_Coins::get_coin_balance().
 	 *
 	 * @return boolean
 	 */
 	public function get_current_copyright_coin_balance() {
-		$boldgrid_configs = $this->get_configs();
+		include_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-coins.php';
 
-		$url_to_get_balance = $boldgrid_configs['asset_server'] .
-			 $boldgrid_configs['ajax_calls']['get_coin_balance'];
+		$boldgrid_coins = new Boldgrid_Inspirations_Coins();
 
-		$arguments = array(
-			'method' => 'POST',
-			'body' => array(
-				'key' => $this->api_key_hash,
-			)
-		);
+		$coin_balance = $boldgrid_coins->get_coin_balance();
 
-		$response = wp_remote_post( $url_to_get_balance, $arguments );
-
-		if ( is_wp_error( $response ) ) {
-			error_log(
-				__METHOD__ . ': Error: Could not retrieve coin balance from the asset server!
-' . print_r(
-					array(
-						'url' => $url_to_get_balance,
-						'arguments' => $arguments,
-						'response' => $response,
-					), true ) );
-
-			return false;
-		} else {
-			$json_decode_response = json_decode( $response['body'] );
-
-			return $json_decode_response->result->data->balance;
-		}
+		return $coin_balance;
 	}
 }

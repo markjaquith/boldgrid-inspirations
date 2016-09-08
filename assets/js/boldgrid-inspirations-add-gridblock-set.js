@@ -319,7 +319,7 @@ IMHWPB.AddGridBlockSet = function($) {
 	this.gridblock_sets_get = function() {
 		// If we don't have any cached data:
 		if ( 'undefined' == typeof IMHWPB.gridblock_sets ||
-			false === IMHWPB.gridblock_sets.kitchen_sink ||
+			! IMHWPB.gridblock_sets.kitchen_sink ||
 			0 === IMHWPB.gridblock_sets.kitchen_sink.length ) {
 				self.$loading_message.removeClass( 'hidden' )
 					.html(

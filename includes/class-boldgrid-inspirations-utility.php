@@ -8,13 +8,6 @@
  * @author BoldGrid.com <wpb@boldgrid.com>
  */
 
-// Prevent direct calls.
-if ( ! defined( 'WPINC' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
-}
-
 /**
  * BoldGrid Inspiration Utility class.
  *
@@ -48,7 +41,7 @@ class Boldgrid_Inspirations_Utility {
 	 */
 	public static function inline_js_file( $filename ) {
 		$full_path_to_js = plugins_url( '/assets/js/inline/' . $filename,
-			BOLDGRID_BASE_DIR . '/boldgrid-inspirations.php' );
+		BOLDGRID_BASE_DIR . '/boldgrid-inspirations.php' );
 
 		echo '<script type="text/javascript" src="' . $full_path_to_js;
 
@@ -115,5 +108,41 @@ class Boldgrid_Inspirations_Utility {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Read an include file and set it into a variable.
+	 *
+	 * @since 1.2.5
+	 *
+	 * @static
+	 *
+	 * @param string $file A file to parse.
+	 * @return string The markup.
+	 */
+	public static function file_to_var( $file ) {
+		ob_start();
+		include $file;
+		return ob_get_clean();
+	}
+
+	/**
+	 * Convert content encoding from "UTF-8" to "HTML-ENTITIES".
+	 *
+	 * If mbstring is not loaded in PHP then the input will be returned unconverted.
+	 *
+	 * @since 1.2.5
+	 *
+	 * @static
+	 *
+	 * @param string $input Content to be converted.
+	 * @return string Content that may have been converted.
+	 */
+	public static function utf8_to_html( $input ) {
+		if( function_exists( 'mb_convert_encoding' ) ){
+			return mb_convert_encoding( $input, 'HTML-ENTITIES', 'UTF-8' );
+		} else {
+			return $input;
+		}
 	}
 }

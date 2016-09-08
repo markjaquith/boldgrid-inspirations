@@ -80,22 +80,24 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 		parent::__construct();
 
 		// If Imagick is used, then set the thread limit to 1 to avoid known issues.
+		putenv( 'MAGICK_THREAD_LIMIT=1' );
+
 		require_once ABSPATH . 'wp-includes/class-wp-image-editor.php';
 		require_once ABSPATH . 'wp-includes/class-wp-image-editor-imagick.php';
 
-		if ( true === WP_Image_Editor_Imagick::test() ) {
+		if ( WP_Image_Editor_Imagick::test() ) {
 			// The imagick::RESOURCETYPE_THREAD may not be declared, so use the int 6.
 			// Silence warning due to static call to non-static method.
 			@Imagick::setResourceLimit( 6, 1 );
 		}
 
 		// If on a preview server, then instantiate the cache class.
-		if ( true === $this->is_preview_server ) {
+		if ( $this->is_preview_server ) {
 			require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-cache.php';
 			$this->asset_cache = new Boldgrid_Inspirations_Cache();
 
 			// If cache is disabled, then null the object.
-			if ( false === $this->asset_cache->is_cache_enabled() ) {
+			if ( ! $this->asset_cache->is_cache_enabled() ) {
 				$this->asset_cache = null;
 			}
 		}
@@ -165,17 +167,17 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 	 */
 	public function asset_needs_publish_decision( $asset ) {
 		// If the user already purchased this asset.
-		if ( false === empty( $asset['purchase_date'] ) ) {
+		if ( ! empty( $asset['purchase_date'] ) ) {
 			return false;
 		}
 
 		// If it's an attribution required image.
-		if ( false === empty( $asset['attribution'] ) ) {
+		if ( ! empty( $asset['attribution'] ) ) {
 			return false;
 		}
 
 		// If they've already made a decision.
-		if ( false === empty( $asset['publish_decision_status'] ) ) {
+		if ( ! empty( $asset['publish_decision_status'] ) ) {
 			return false;
 		}
 
@@ -272,7 +274,7 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 		 * Because we are resizing images before we set them as assets,
 		 * we don't need WordPress to resize theme for us.
 		 */
-		if ( false === $this->is_preview_server || true === $params['add_meta_data'] ) {
+		if ( ! $this->is_preview_server || $params['add_meta_data'] ) {
 			// Generates metadata for an image attachment,
 			// and create a thumbnail and other intermediate sizes of the image attachment based on
 			// the sizes defined on the Settings_Media_Screen.
@@ -284,7 +286,7 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 			// Check if there was an error.
 			if ( false === $result ) {
 				// Strip body in params, if present.
-				if ( true === isset( $params['body'] ) ) {
+				if ( isset( $params['body'] ) ) {
 					unset( $params['body'] );
 				}
 
@@ -425,10 +427,10 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 		$default_image_width = 300;
 		foreach ( $boldgrid_dynamic_images as $key => $image ) {
 			// Validate Options.
-			$id_from_provider = ( false === empty( $image['id_from_provider'] ) ? $image['id_from_provider'] : null );
-			$image_provider_id = ( false === empty( $image['image_provider_id'] ) ? $image['image_provider_id'] : null );
-			$width = ( false === empty( $image['width'] ) ? $image['width'] : $default_image_width );
-			$post_id = ( false === empty( $image['post_id'] ) ? $image['post_id'] : null );
+			$id_from_provider = ( ! empty( $image['id_from_provider'] ) ? $image['id_from_provider'] : null );
+			$image_provider_id = ( ! empty( $image['image_provider_id'] ) ? $image['image_provider_id'] : null );
+			$width = ( ! empty( $image['width'] ) ? $image['width'] : $default_image_width );
+			$post_id = ( ! empty( $image['post_id'] ) ? $image['post_id'] : null );
 
 			// If all required parameters are set.
 			if ( $id_from_provider && $image_provider_id && $width && $post_id && $api_key ) {
@@ -506,18 +508,18 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 		$image_from_cache = false;
 
 		// If caching is enabled, try to get the $response from cache.
-		if ( null !== $this->asset_cache && false === empty( $info['cache_id'] ) ) {
+		if ( null !== $this->asset_cache && ! empty( $info['cache_id'] ) ) {
 			$response = $this->asset_cache->get_cache_files( $info['cache_id'] );
 
 			// Check cache response.
-			if ( false === empty( $response ) ) {
+			if ( ! empty( $response ) ) {
 				// Using cache.
 				$image_from_cache = true;
 			}
 		}
 
 		// If caching is not being used, then download the file.
-		if ( true !== $image_from_cache ) {
+		if ( ! $image_from_cache ) {
 			// Not using cache.
 
 			// File is not in cache, so download it.
@@ -527,7 +529,7 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 			// Attempt to retrieve an image, retry if needed.
 			// If purchasing an image, then the following successful call will deduct coins.
 
-			while ( false === $successful_download && $download_timeouts < 3 ) {
+			while ( ! $successful_download && $download_timeouts < 3 ) {
 				switch ( $info['method'] ) {
 					case 'get' :
 						// all get requests should have an increased timeout.
@@ -561,7 +563,7 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 			}
 
 			// If the download failed, return false.
-			if ( false === $successful_download ) {
+			if ( ! $successful_download ) {
 				return false;
 			}
 		}
@@ -590,8 +592,8 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 		}
 
 		// Save cache files, if enabled.
-		if ( null !== $this->asset_cache && true !== $image_from_cache &&
-			 false === empty( $info['cache_id'] ) ) {
+		if ( null !== $this->asset_cache && ! $image_from_cache &&
+			 ! empty( $info['cache_id'] ) ) {
 			// Save cache files.
 			$this->asset_cache->save_cache_files( $info['cache_id'], $response );
 		}
@@ -643,7 +645,7 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 			}
 		}
 
-		if ( true === $asset_previously_downloaded ) {
+		if ( $asset_previously_downloaded ) {
 			// Example $existing_asset_metadata: http://pastebin.com/FDtTV8uy .
 			$existing_asset_metadata = wp_get_attachment_metadata(
 				$existing_asset['attachment_id'] );
@@ -665,7 +667,7 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 		 * Save the image.
 		 * wp_upload_bits: Create a file in the upload folder with given content.
 		 */
-		if ( false === $asset_previously_downloaded ) {
+		if ( ! $asset_previously_downloaded ) {
 			// Example $uploaded: http://pastebin.com/YGW6cmfW .
 			$uploaded = wp_upload_bits( $filename, null, $data );
 
@@ -689,7 +691,7 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 		 * * a new asset in the boldgrid_assets option.
 		 * We'd then have two attachments, the watermarked and unwatermarked.
 		 */
-		if ( true === $is_purchase && ! $is_redownload ) {
+		if ( $is_purchase && ! $is_redownload ) {
 			return array (
 				'transaction_item_id' => $transaction_item_id,
 				'transaction_id' => $transaction_id,
@@ -701,7 +703,7 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 		 * Actions to take for new downloads.
 		 * If we've already downloaded this asset previously, then we can skip this.
 		 */
-		if ( false === $asset_previously_downloaded ) {
+		if ( ! $asset_previously_downloaded ) {
 			// Retrieve the file type from the file name.
 			$wp_filetype = wp_check_filetype( $uploaded['file'], null );
 
@@ -751,7 +753,7 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 			 * Because we are resizing images before we set them as assets,
 			 * we don't need wordpress to resize theme for us.
 			 */
-			if ( false === $this->is_preview_server || false != $add_meta_data ) {
+			if ( ! $this->is_preview_server || $add_meta_data ) {
 				/*
 				 * Generates metadata for an image attachment, and create a thumbnail and other
 				 * intermediate sizes of the image attachment based on the sizes defined on the
@@ -971,6 +973,8 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 	 * We will check the $item variable to determine if we're downloading an asset
 	 * or something else.
 	 *
+	 * @see Boldgrid_Inspirations_Api::get_api_key_hash().
+	 *
 	 * @param int|array $item An asset id or an array of parameters.
 	 * @param int $transaction_id An optional transaction id.
 	 * @return array
@@ -997,7 +1001,7 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 									'method' => 'POST',
 									'body' => array (
 									/* @formatter:off */
-									'key' => $this->api_key_hash,
+									'key' => $this->api->get_api_key_hash(),
 									'id_from_provider' 			=> $item['params']['id_from_provider'],
 									'image_provider_id' 		=> 	$item['params']['image_provider_id'],
 									'imgr_image_id' 			=> 	isset( $item['params']['imgr_image_id'] )				? $item['params']['imgr_image_id']				: null,
@@ -1021,7 +1025,7 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 									'method' => 'POST',
 									'body' => array (
 										/* @formatter:off */
-										'key' => $this->api_key_hash,
+										'key' => $this->api->get_api_key_hash(),
 										'id_from_provider' 			=> $item['params']['id_from_provider'],
 										'image_provider_id' 		=> 	$item['params']['image_provider_id'],
 										'imgr_image_id' 			=> 	isset( $item['params']['imgr_image_id'] )				? $item['params']['imgr_image_id']				: null,
@@ -1066,7 +1070,7 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 							'arguments' => array (
 								'method' => 'POST',
 								'body' => array (
-									'key' 				=> 	$this->api_key_hash,
+									'key' 				=> 	$this->api->get_api_key_hash(),
 									'id_from_provider' 	=> 	$_POST['id_from_provider'],
 									'image_provider_id' => 	$_POST['image_provider_id'],
 									'image_size' 		=> 	$_POST['image_size'],
@@ -1090,7 +1094,7 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 				/* @formatter:off */
 				$url = $boldgrid_configs['asset_server'] . $boldgrid_configs['ajax_calls']['get_asset'] .
 					'?id=' 				. 	$item .
-					'&key=' 			. 	$this->api_key_hash;
+					'&key=' 			. 	$this->api->get_api_key_hash();
 				/* @formatter:on */
 
 				$return = array (
@@ -1216,7 +1220,7 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 	 */
 	public function save_wp_options_asset() {
 		// Just seems like a good idea to make sure we are not erasing the data.
-		if ( false === empty( $this->wp_options_asset ) ) {
+		if ( ! empty( $this->wp_options_asset ) ) {
 			update_option( 'boldgrid_asset', $this->wp_options_asset );
 		}
 	}
@@ -1350,10 +1354,10 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 		$is_asset_active = ( 'active' === $this->asset_id_data[ $asset_id ]['active'] );
 
 		// Determine the option name we will be working with.
-		$option_name = ( true === $is_asset_active ? 'boldgrid_asset' : 'boldgrid_staging_boldgrid_asset' );
+		$option_name = ( $is_asset_active ? 'boldgrid_asset' : 'boldgrid_staging_boldgrid_asset' );
 
 		// Get our assets.
-		if ( true === $is_asset_active ) {
+		if ( $is_asset_active ) {
 			$assets = $this->get_active_assets();
 		} else {
 			$assets = get_option( $option_name );

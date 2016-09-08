@@ -1,5 +1,4 @@
 <?php
-
 /**
  * BoldGrid Source Code
  *
@@ -9,37 +8,31 @@
  * @author BoldGrid.com <wpb@boldgrid.com>
  */
 
-// Prevent direct calls
-if ( ! defined( 'WPINC' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
-}
-
 /**
- * BoldGrid Stock Photography class
+ * BoldGrid Stock Photography class.
  */
 class Boldgrid_Inspirations_Stock_Photography extends Boldgrid_Inspirations {
-	public function __construct( $pluginPath ) {
-		$this->pluginPath = $pluginPath;
-
-		parent::__construct( $pluginPath );
-	}
+	/**
+	 * The Boldgrid Inspirations Asset Manager class object.
+	 *
+	 * @var Boldgrid_Inspirations_Asset_Manager
+	 */
+	private $asset_manager;
 
 	/**
-	 * Add dashboard media tabs
+	 * Add dashboard media tabs.
 	 *
 	 * @param string $hook
 	 */
 	public function add_dashboard_media_tabs( $hook ) {
 		global $pagenow;
 
-		$pages_to_add_menu = array (
+		$pages_to_add_menu = array(
 			'upload.php',
-			'media-new.php'
+			'media-new.php',
 		);
 
-		if ( in_array( $pagenow, $pages_to_add_menu ) ) {
+		if ( in_array( $pagenow, $pages_to_add_menu, true ) ) {
 			// Determine which page should be active
 			$is_library = ( 'upload.php' == $pagenow && ( ! isset( $_GET['page'] ) ||
 				 ( isset( $_GET['page'] ) && 'boldgrid-connect-search' != $_GET['page'] ) ) );
@@ -236,29 +229,34 @@ iframe#boldgrid_connect_search {
 		global $wpdb;
 
 		// An array of info to send back to the browser.
-		$response = array ();
+		$response = array();
+
+		// Access the post object.
+		$post = ! empty( $_POST['post_id'] ) && get_post_status( $_POST['post_id'] ) ? get_post( $_POST['post_id'] ) : wp_die();
+
+		// Capability check.
+		$cap = ( 'page' == $post->post_type ) ? 'edit_page' : 'edit_post';
+		current_user_can( $cap, $post->ID ) ? : wp_die();
 
 		require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-asset-manager.php';
 
-		$this->AssetManager = new Boldgrid_Inspirations_Asset_Manager();
+		$this->asset_manager = new Boldgrid_Inspirations_Asset_Manager();
 
 		$boldgrid_configs = $this->get_configs();
-
-		$post_id = ! empty( $_POST['post_id'] ) ? $_POST['post_id'] : false;
 
 		$item = array (
 			'type' => 'stock_photography_download',
 			'params' => array (
 				'key' => $boldgrid_configs['api_key'],
-				'id_from_provider' => $_POST['id_from_provider'],
-				'image_provider_id' => $_POST['image_provider_id'],
+				'id_from_provider' => (int) $_POST['id_from_provider'],
+				'image_provider_id' => (int) $_POST['image_provider_id'],
 				'image_size' => $_POST['image_size'],
-				'width' => isset( $_POST['width'] ) ? $_POST['width'] : null,
-				'height' => isset( $_POST['height'] ) ? $_POST['height'] : null
+				'width' => isset( $_POST['width'] ) ? (int) $_POST['width'] : null,
+				'height' => isset( $_POST['height'] ) ? (int) $_POST['height'] : null
 			)
 		);
 
-		$image = $this->AssetManager->download_and_attach_asset( $post_id, null, $item, 'all',
+		$image = $this->asset_manager->download_and_attach_asset( $post->ID, null, $item, 'all',
 			false );
 
 		$response['attachment_id'] = $image['attachment_id'];
@@ -404,13 +402,14 @@ iframe#boldgrid_connect_search {
 
 		// Get the asset.
 		require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-asset-manager.php';
-		$this->AssetManager = new Boldgrid_Inspirations_Asset_Manager();
+		$this->asset_manager = new Boldgrid_Inspirations_Asset_Manager();
 
-		$asset = $this->AssetManager->get_asset(
-			array (
+		$asset = $this->asset_manager->get_asset(
+			array(
 				'by' => 'attachment_id',
 				'attachment_id' => $attachment_id
-			) );
+			)
+		);
 
 		// If this is not an asset, abort.
 		if ( false == $asset ) {
@@ -424,14 +423,14 @@ iframe#boldgrid_connect_search {
 		);
 
 		// Update the asset.
-		$this->AssetManager->update_asset(
+		$this->asset_manager->update_asset(
 			array (
 				'task' => 'update_entire_asset',
 				'asset_id' => $asset['asset_id'],
 				'asset' => $asset
 			) );
 
-		$asset = $this->AssetManager->get_asset(
+		$asset = $this->asset_manager->get_asset(
 			array (
 				'by' => 'attachment_id',
 				'attachment_id' => $attachment_id

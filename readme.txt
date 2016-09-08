@@ -2,7 +2,7 @@
 Contributors: imh_brad, joemoto, rramo012, timph
 Tags: inspiration,customization,build,create,design
 Requires at least: 4.3
-Tested up to: 4.5.3
+Tested up to: 4.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -25,6 +25,54 @@ The second phase is Customization; tools to transform your website into your vis
 3. You will find the Inspirations menu in your WordPress Dashboard / admin panel.
 
 == Changelog ==
+
+= 1.2.5 =
+* Bug fix:		JIRA WPB-2325	Added wrapper to handle mb_convert_encoding() if mbstring is not loaded.
+* Bug fix:		JIRA WPB-2313	Disabled GridBlocks in network admin pages.
+* New feature:	JIRA WPB-2268	Changed to resized preview screenshots for Inspirations Design First concept.
+* New feature:	JIRA WPB-2287	Adjust device preview buttons in step 2 to behave like those in editor.
+* New feature:	JIRA WPB-2291	Auto install staging in final step if user chooses staging.
+* Update:		JIRA WPB-2290	Changed 'Install' button to 'Next'.
+* Bug fix:		JIRA WPB-2289	Continuously clicking category in step 1 shuffles themes.
+* Update:		JIRA WPB-2267	Added message to Inspirations when no generic themes are available.
+* Update:		JIRA WPB-2315	Added error handling for malformed ajax results for call to /api/build/get-generic.
+* Update:		JIRA WPB-2316	Add error handling for failures to fetch categories.
+* Update:		JIRA WPB-2317	Add error handling for failures to fetch pagesets.
+* Update:		JIRA WPB-2319	Check user capabilities before prompting for api key.
+* Update:		JIRA WPB-2320	Ensure user has permission to edit page before allowing download_and_insert_into_page.
+* Update:		JIRA WPB-2322	Sanitize user feedback before adding to options table.
+* Update:		JIRA WPB-2323	Allow admin notices to be dismissed per user.
+* Update:		JIRA WPB-2326	Update 'update' class to utilize Admin Notices class.
+* Update:		JIRA WPB-2327	Check user capabilities before showing admin notices.
+* Update:		JIRA WPB-2331	Update confirmation messages.
+
+= 1.2.4 =
+* Bug fix:		JIRA WPB-2269	Typo fix in Boldgrid_Inspirations_Dependency_Plugins::print_uninstalled_plugins().
+* Bug fix:		JIRA WPB-2270	New From GridBlocks became unavailable.
+
+= 1.2.3 =
+* New feature:	JIRA WPB-2172	For preview generic builds, added an option for identification for purges, etc.
+* Bug fix:		JIRA WPB-2263	For preview sites under multisite, set the admin email address using the network admin email address.
+* Bug fix:		JIRA WPB-2223	Reworked API key validation and connection issue notices, formatting.
+* Misc:			JIRA WPB-2256	Updated readme.txt for Tested up to: 4.6.
+* Rework:		JIRA WPB-2150	Moved API methods to a new class, formatting, and phpcs rework.
+* Bug fix:      JIRA WPB-2224	Hide the email address field when widget is loaded.
+* Bug fix:		JIRA WPB-2225	Fixed jQuery Migrate deprecated warning.
+* Update:		JIRA WPB-2245	Changed feed to pull from dashboard tag on blog.
+* Bug fix:		JIRA WPB-2265	Uncaught TypeError: IMHWPB.BaseAdmin is not a constructor.
+* Bug fix:		JIRA WBP-2236	Errors everywhere when logging in as an Editor.
+* Bug fix:		JIRA WPB-2234	Add current_user_can checks to Boldgrid_Inspirations->set_api_key_callback().
+* Bug fix:		JIRA WPB-2237	Limit ajax requests by user.
+* Bug fix:		JIRA WPB-2240	Limit printing of configs in head.
+
+= 1.2.2 =
+* Bug fix:		JIRA WPB-2058	Added wrap class to the tutorials page.
+* Bug fix:		JIRA WPB-2184	In PHP 5.2, deactivate and die properly.
+* New feature:  				Added BoldGrid news widget to dashboard.
+* Bug fix: 		JIRA WPB-1994	Fixed issue with WP Theme Editor not being available.
+* New feature: 					Added BoldGrid Feedback widget.
+* Bug fix:		JIRA WPB-2169	Connect Search defaults to smallest image size when no recommended sizes available.
+* Bug fix:    JIRA WPB-2192 Allow bug report to correctly show parent themes if submitted.
 
 = 1.2.1 =
 * Bug fix:		JIRA WPB-2160	New From GridBlocks, multiple pages are installed.

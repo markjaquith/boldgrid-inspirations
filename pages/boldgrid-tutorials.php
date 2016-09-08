@@ -1,7 +1,6 @@
 <?php
-
-// Don't let this page get loaded directly.
-defined( 'WPINC' ) ?  : die();
+// Prevent direct calls.
+require BOLDGRID_BASE_DIR . '/pages/templates/restrict-direct-access.php';
 
 $boldgrid_menu_options = get_option( 'boldgrid_settings' );
 
@@ -11,49 +10,50 @@ $boldgrid_menu_options = get_option( 'boldgrid_settings' );
  * If we're using the single menu, then don't use the BG icon, as that correlates to the icon in the
  * dashboard menu.
  */
-$anchor_text = esc_html__( ' BoldGrid Support', 'boldgrid-inspirations' );
+$anchor_text = esc_html__( 'BoldGrid Support', 'boldgrid-inspirations' );
 
 $boldgrid_support_url = esc_url( '//www.boldgrid.com/support' );
 
 if ( 1 == $boldgrid_menu_options['boldgrid_menu_option'] ) {
 	$template = '<a target="_blank" href="%s" class="dashicons-before boldgrid-icon">%s</a>, ';
-	
+
 	$link_to_boldgrid_support = sprintf( $template, $boldgrid_support_url, $anchor_text );
 } else {
 	$template = '<a target="_blank" href="%s">%s</a>, ';
-	
+
 	$link_to_boldgrid_support = sprintf( $template, $boldgrid_support_url, $anchor_text );
 }
 ?>
+<div class='wrap'>
 <h2>BoldGrid Tutorials</h2>
 <div class="boldgrid-tutorials">
 	<div class="plugin-card no-float">
 		<div class="plugin-card-top ">
 			<p>
-				The following tutorials contain technical and business advice to help you create a beautiful and effective web site. Additional guides and community help can be found at 
+				The following tutorials contain technical and business advice to help you create a beautiful and effective web site. Additional guides and community help can be found at
 				<?php echo $link_to_boldgrid_support; ?>
-				or from your official host at top left. Have you watched the BoldGrid Introduction videos? Check those out on your 
+				or from your official host at top left. Have you watched the BoldGrid Introduction videos? Check those out on your
 				<?php
 				// Use printf to separate out the actual words from HTML so it can be translated.
-				printf( ' <a href="%s" class="dashicons-before dashicons-dashboard"> %s</a>.', 
-					esc_url( get_dashboard_url() ), 
+				printf( ' <a href="%s" class="dashicons-before dashicons-dashboard"> %s</a>.',
+					esc_url( get_dashboard_url() ),
 					esc_html__( 'Dashboard', 'boldgrid-inspirations' ) ); // End of printf()
 				?>
 			</p>
 			<p>
-				The Inspiration Tab is applicable for all users. You will learn the process for choosing the look and feel of your Base Website (including your WordPress theme), and picking pages typical for your industry (called Page Sets) as you go through 
+				The Inspiration Tab is applicable for all users. You will learn the process for choosing the look and feel of your Base Website (including your WordPress theme), and picking pages typical for your industry (called Page Sets) as you go through
 				<?php
 				// Show eiher Inspirations lightbulb or BoldGrid Logo depending on their menu
 				// settings.
-				( 1 == $boldgrid_menu_options['boldgrid_menu_option'] ? printf( 
+				( 1 == $boldgrid_menu_options['boldgrid_menu_option'] ? printf(
 					'<a href="%s" class="dashicons-before dashicons-lightbulb"> ' .
-						 esc_html__( 'Inspirations', 'boldgrid-inspirations' ) . '</a>.  ', 
-						esc_url( 
-							add_query_arg( 'page', 'boldgrid-inspirations', 
-								admin_url( 'admin.php' ) ) ) ) : printf( 
+						 esc_html__( 'Inspirations', 'boldgrid-inspirations' ) . '</a>.  ',
+						esc_url(
+							add_query_arg( 'page', 'boldgrid-inspirations',
+								admin_url( 'admin.php' ) ) ) ) : printf(
 					'<a href="%s" class="dashicons-before boldgrid-icon"> ' .
-					 esc_html__( 'BoldGrid', 'boldgrid-inspirations' ) . '</a>.  ', 
-					esc_url( 
+					 esc_html__( 'BoldGrid', 'boldgrid-inspirations' ) . '</a>.  ',
+					esc_url(
 						add_query_arg( 'page', 'boldgrid-inspirations', admin_url( 'admin.php' ) ) ) ) );
 				?>
 			</p>
@@ -61,56 +61,56 @@ if ( 1 == $boldgrid_menu_options['boldgrid_menu_option'] ) {
 				After that, you will move on to making the Inspiration your own. Before starting to
 
 				<?php
-				
+
 				// Use printf to separate out the actual words from HTML
 				// so it can be sent through translate.
-				printf( 
-					'<a href="%s" class="dashicons-before dashicons-admin-customize"> %s</a>, ', 
-					
+				printf(
+					'<a href="%s" class="dashicons-before dashicons-admin-customize"> %s</a>, ',
+
 					// build URL and make sure it's escaped to avoid XSS attacks
-					esc_url( 
-						
+					esc_url(
+
 						// build our query
-						add_query_arg( 
-							
+						add_query_arg(
+
 							// pack it in an array
 							array (
-								
+
 								// we want to get the proper URL encoded and without slashes
-								'return' => urlencode( wp_unslash( $_SERVER['REQUEST_URI'] ) ) 
-							), 
+								'return' => urlencode( wp_unslash( $_SERVER['REQUEST_URI'] ) )
+							),
 							// End of array.
-							
+
 							// root page to apply our query to
-							'customize.php' ) ), 
-					
+							'customize.php' ) ),
+
 					// End of our query argument
-					
+
 					// End of escaped URL build
-					
+
 					// Link title is "Customize."
 					esc_html__( 'Customize', 'boldgrid-inspirations' ) );
-				
+
 				// End of printf()
-				
+
 				?> it is usually best to determine how much time you will have to put into Customization. Keep in mind you don't need to do it all now, you can grow your site over time. For first time webmasters, we recommend starting small. BoldGrid will help you build up skills in running your site. As you progress, you will know more about what you want to accomplish and how to do it.
 			</p>
 			<p>
 				If you find something confusing in the Tutorials or with BoldGrid itself, please
 
 				<?php
-				
+
 				// Use printf to separate out the actual words from HTML so it can be translated.
-				printf( ' <a target="_blank" href="%s">%s</a>, ', 
-					
+				printf( ' <a target="_blank" href="%s">%s</a>, ',
+
 					// URL that we are linking to.
-					esc_url( '//boldgrid.com/feedback' ), 
-					
+					esc_url( '//boldgrid.com/feedback' ),
+
 					// Link's text, "let us know.""
 					esc_html__( 'let us know', 'boldgrid-inspirations' ) );
-				
+
 				// End of printf()
-				
+
 				?> and we will work on it right away!
 			</p>
 		</div>
@@ -149,4 +149,5 @@ if ( 1 == $boldgrid_menu_options['boldgrid_menu_option'] ) {
 	</script>
 		</section>
 	</article>
+</div>
 </div>

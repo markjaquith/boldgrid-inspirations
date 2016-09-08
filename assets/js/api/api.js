@@ -201,7 +201,7 @@ IMHWPB.Api = function( configs ) {
 				responseObj = JSON && JSON.parse( response ) || $.parseJSON( response );
 
 				// If the key was saved successfully.
-				if ( true === responseObj.success ) {
+				if ( responseObj.success ) {
 					// Change the notice from red to green.
 					$c_zakn.toggleClass( 'error' ).toggleClass( 'updated' );
 

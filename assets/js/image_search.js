@@ -136,10 +136,13 @@ IMHWPB.StockImageSearch = function( configs, $ ) {
 	 *
 	 */
 	this.event_handler_search_result_click = function( result ) {
-		var image_provider_id = jQuery( result ).data( 'image-provider-id' );
-		var id_from_provider = jQuery( result ).data( 'id-from-provider' );
-
-		var attachment_details = jQuery( '#attachment_details', $c_imhmf );
+		var image_provider_id = jQuery( result ).data( 'image-provider-id' ),
+			id_from_provider = jQuery( result ).data( 'id-from-provider' ),
+			attachment_details = jQuery( '#attachment_details', $c_imhmf ),
+			// Count of image sizes that have been flagged as recommended.
+			recommendedCount,
+			// The select element with options of different image sizes.
+			$imageSelect;
 
 		// show loading message...
 		jQuery( attachment_details )
@@ -173,7 +176,7 @@ IMHWPB.StockImageSearch = function( configs, $ ) {
 			var has_sizes = ( true == jQuery.isArray( sizes ) && 0 < jQuery( sizes ).length ) ? true
 			    : false;
 
-			if ( true === has_sizes ) {
+			if ( has_sizes ) {
 				/*
 				 * We successfully fetched the details of the image. Display
 				 * those attachment details for the user.
@@ -181,6 +184,22 @@ IMHWPB.StockImageSearch = function( configs, $ ) {
 				var source = jQuery( "#attachment-details-template" ).html();
 				var template = Handlebars.compile( source );
 				jQuery( '#attachment_details', $c_imhmf ).html( template( msg.result.data ) );
+
+				// After the attachment details pane has been loaded, set a few variables.
+				$imageSelect = $( '#image_size' );
+				recommendedCount = $imageSelect.find( 'option.recommended_image_size' ).length;
+
+				/*
+				 * If we have no recommended image sizes, by default select the last / largest image
+				 * in the results.
+				 *
+				 * If we did not do this, when searching for large background images we would see
+				 * 75px by 75px as the default option rather than a large image we need such as
+				 * 1920px by 1080.
+				 */
+				if( 0 === recommendedCount ) {
+					$imageSelect.find( 'option:last' ).prop( 'selected', true );
+				}
 
 				// PreSelect Alignment if replacing an image
 				self.select_image_alignment();
@@ -236,13 +255,13 @@ IMHWPB.StockImageSearch = function( configs, $ ) {
 		var inCustomizer = ( 'dashboard-customizer' === self.baseAdmin.GetURLParameter( 'ref' ) ),
 			action = null;
 
-		if ( typeof parent.wp.media.frame !== 'undefined' && 'replace-image' === parent.wp.media.frame._state ) {
+		if ( 'undefined' !== parent.wp.media.frame && 'replace-image' === parent.wp.media.frame._state ) {
 			action = 'replace-image';
-		} else if( typeof parent.window.send_to_editor === 'function' && false === inCustomizer ) {
+		} else if( 'function' === typeof parent.window.send_to_editor && ! inCustomizer ) {
 			action = 'editor';
 		} else if( 'dashboard-media' === self.baseAdmin.GetURLParameter( 'ref' ) ) {
 			action = 'dashboard-media';
-		} else if( true === inCustomizer ) {
+		} else if( inCustomizer ) {
 			action = 'customizer';
 		}
 

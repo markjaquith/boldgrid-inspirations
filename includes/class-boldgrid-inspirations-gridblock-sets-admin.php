@@ -1,5 +1,4 @@
 <?php
-
 /**
  * BoldGrid Source Code
  *
@@ -8,13 +7,6 @@
  * @version $Id$
  * @author BoldGrid.com <wpb@boldgrid.com>
  */
-
-// Prevent direct calls
-if ( ! defined( 'WPINC' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
-}
 
 /**
  * BoldGrid Inspirations GridBlock Sets Admin.
@@ -54,8 +46,8 @@ class Boldgrid_Inspirations_GridBlock_Sets_Admin {
 	 * @since 1.0.10
 	 */
 	public function add_hooks() {
-		// If we're not in the dashboard, return.
-		if ( ! is_admin() ) {
+		// If we're not in the admin section, return.
+		if ( ! is_admin() || is_network_admin() ) {
 			return;
 		}
 
@@ -153,6 +145,11 @@ class Boldgrid_Inspirations_GridBlock_Sets_Admin {
 	public function get_gridblock_sets_callback() {
 		global $wpdb;
 
+		// If you cannot edit a post, you cannot get GridBlocks.
+		if( ! current_user_can( 'edit_posts' ) ) {
+			wp_die();
+		}
+
 		$this->gridblock_sets = $this->gridblock_sets->get();
 
 		echo json_encode( $this->gridblock_sets );
@@ -169,6 +166,11 @@ class Boldgrid_Inspirations_GridBlock_Sets_Admin {
 	 */
 	public function gridblock_set_create_page_callback() {
 		global $wpdb;
+
+		// If you cannot edit pages, you cannot create a page from a GridBlock Set.
+		if( ! current_user_can( 'edit_pages' ) ) {
+			wp_die();
+		}
 
 		include_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-asset-manager.php';
 		$assetManager = new Boldgrid_Inspirations_Asset_Manager();
@@ -256,7 +258,7 @@ class Boldgrid_Inspirations_GridBlock_Sets_Admin {
 		$assetManager = new Boldgrid_Inspirations_Asset_Manager();
 
 		$dom = new DOMDocument();
-		@$dom->loadHTML( mb_convert_encoding( $page->post_content, 'HTML-ENTITIES', 'UTF-8' ) );
+		@$dom->loadHTML( Boldgrid_Inspirations_Utility::utf8_to_html( $page->post_content ) );
 
 		// Get all of the images in the selection.
 		$images = $dom->getElementsByTagName( 'img' );
@@ -316,6 +318,11 @@ class Boldgrid_Inspirations_GridBlock_Sets_Admin {
 	 */
 	public function gridblock_set_create_preview_callback() {
 		global $wpdb;
+
+		// If you cannot edit pages, you cannot create a GridBlock Set preview.
+		if( ! current_user_can( 'edit_pages' ) ) {
+			wp_die();
+		}
 
 		$key = $_POST['key'];
 		$category = $_POST['category'];

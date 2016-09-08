@@ -150,7 +150,7 @@ div.welcome-panel-content {
 }
 
 /** YouTube Video Embed Cleanup **/
-.youtube-container { 
+.youtube-container {
   display: block;
   margin: 20px auto;
   width: 100%;
@@ -159,7 +159,7 @@ div.welcome-panel-content {
 
 .youtube-player {
   display: block;
-  width: 100%; 
+  width: 100%;
   /* assumed we only use 16:9 ratio */
   padding-bottom: 56.25%;
   overflow: hidden;
@@ -172,12 +172,6 @@ div.welcome-panel-content {
   display: block;
 }
 
-@-moz-document url-prefix() {
-  img.youtube-thumb, x:-moz-any-link, x:default {
-    top: -16.91% !important;
-  }
-}
-
 img.youtube-thumb {
   bottom: 0;
   display: block;
@@ -188,7 +182,7 @@ img.youtube-thumb {
   position: absolute;
   right: 0;
   top: 0;
-  height: auto 
+  height: auto
 }
 
 div.play-button {
@@ -208,12 +202,12 @@ div.play-button:hover {
   filter: alpha(opacity=100);
 }
 
-#youtube-iframe { 
-  width: 100%; 
-  height: 100%; 
-  position: absolute; 
-  top: 0; 
-  left: 0; 
+#youtube-iframe {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 /** decrease padding of widget when viewport width decerases  **/
@@ -289,4 +283,25 @@ div.play-button:hover {
   font-weight: bold;
   padding: 3px 8px;
   border-radius: 90%;
+}
+
+/** BoldGrid News Widget Styles **/
+#boldgrid_news_widget .rss-date {
+	margin-left: 1em;
+	color: #72777c;
+	font-size: 13px;
+}
+
+/** BoldGrid Feedback Widget Styles **/
+#boldgrid_feedback_widget select,
+#boldgrid_feedback_widget textarea,
+#boldgrid_feedback_widget input[type="text"] {
+	width: 100%;
+}
+#boldgrid_feedback_widget .feedback-form-label {
+	padding: .4em 0;
+}
+#boldgrid_feedback_widget #feedback-email-address,
+#boldgrid_feedback_widget #feedback-comment-area {
+	display: none;
 }

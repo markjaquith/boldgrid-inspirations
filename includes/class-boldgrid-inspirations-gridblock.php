@@ -1,5 +1,14 @@
 <?php
 /**
+ * BoldGrid Source Code
+ *
+ * @package Boldgrid_Inspirations_Deploy
+ * @copyright BoldGrid.com
+ * @version $Id$
+ * @author BoldGrid.com <wpb@boldgrid.com>
+ */
+
+/**
  * Functionality used for BoldGrid Inspiration loaded Gridblocks.
  *
  * Build kitchen sink and return the content used to build those pages. Also ties into a
@@ -12,7 +21,7 @@
  * @author BoldGrid <wpb@boldgrid.com>.
  */
 class Boldgrid_Inspirations_Gridblock {
-	
+
 	/**
 	 * Inspiration PLugin Configurations
 	 *
@@ -20,7 +29,7 @@ class Boldgrid_Inspirations_Gridblock {
 	 * @since 1.0.9
 	 */
 	protected $configs;
-	
+
 	/**
 	 * Sets the Inspiration plugin configs into this helper class
 	 *
@@ -30,23 +39,23 @@ class Boldgrid_Inspirations_Gridblock {
 	public function __construct( $configs ) {
 		$this->configs = $configs;
 	}
-	
+
 	/**
 	 * Add hooks
 	 */
 	public function add_hooks() {
 		add_action( 'wp_enqueue_scripts', array (
 			$this,
-			'enqueue_bootstrap_css' 
+			'enqueue_bootstrap_css'
 		), 991 );
-		
+
 		// Add any gridblock stored on servers via api calls
 		add_filter( 'boldgrid_dynamic_gridblocks', array (
 			$this,
-			'fetch_gridblocks' 
+			'fetch_gridblocks'
 		) );
 	}
-	
+
 	/**
 	 * Add the bootstrap class with the same handle as the theme
 	 * If both the theme and the plugin include the same handle regardless of version,
@@ -56,11 +65,11 @@ class Boldgrid_Inspirations_Gridblock {
 	 */
 	public function enqueue_bootstrap_css() {
 		// Just the Grid
-		wp_enqueue_style( 'bootstrap-styles', 
+		wp_enqueue_style( 'bootstrap-styles',
 			plugin_dir_url( BOLDGRID_BASE_DIR . '/boldgrid-inspirations.php' ) .
 				 'assets/css/bootstrap/bootstrap.min.css', array (), '3.3.1' );
 	}
-	
+
 	/**
 	 * Get a "sub_cat_id" and a "theme_id" for parent category "Universal".
 	 *
@@ -78,32 +87,32 @@ class Boldgrid_Inspirations_Gridblock {
 			// Universal > Default
 			'sub_cat_id' => 33,
 			// boldgrid-gridone
-			'theme_id' => 40 
+			'theme_id' => 40
 		);
-		
+
 		// Set the api url for "get categories".
 		$get_categories_url = $this->configs['asset_server'] .
 			 $this->configs['ajax_calls']['get_categories'];
-		
+
 		// Reach out to the asset server and get a list of categories.
-		$response = wp_remote_post( $get_categories_url, 
+		$response = wp_remote_post( $get_categories_url,
 			array (
 				'body' => array (
 					'key' => $this->configs['api_key'],
-					'site_hash' => $this->configs['site_hash'] 
+					'site_hash' => $this->configs['site_hash']
 				),
-				'timeout' => 45 
+				'timeout' => 45
 			) );
-		
+
 		// Decode our response.
 		$response_body = wp_remote_retrieve_body( $response );
 		$response_decoded = json_decode( $response_body, true );
-		
+
 		// If we don't have any categories, return our failsafe data.
 		if ( empty( $response_decoded['result']['data']['categories'] ) ) {
 			return $failsafe_return_data;
 		}
-		
+
 		// Loop through all of the categories. When we get to the 'Universal' category, set
 		// $sub_cat_id to the first sub category in the array.
 		foreach ( $response_decoded['result']['data']['categories'] as $sub_category_data ) {
@@ -111,52 +120,52 @@ class Boldgrid_Inspirations_Gridblock {
 				$sub_cat_id = $sub_category_data['subcategories'][0]['id'];
 			}
 		}
-		
+
 		// If we have an invalid "sub_cat_id", return our failsafe data.
 		if ( empty( $sub_cat_id ) || ! is_numeric( $sub_cat_id ) ) {
 			return $failsafe_return_data;
 		}
-		
+
 		// Set the api url for "get themes".
 		$get_theme_ids_url = $this->configs['asset_server'] .
 			 $this->configs['ajax_calls']['get_theme_ids'];
-		
+
 		// Reach out to the asset server and get a list of themes for our sub category.
-		$response = wp_remote_post( $get_theme_ids_url, 
+		$response = wp_remote_post( $get_theme_ids_url,
 			array (
 				'body' => array (
 					'cat_id' => $sub_cat_id,
 					'key' => $this->configs['api_key'],
-					'site_hash' => $this->configs['site_hash'] 
+					'site_hash' => $this->configs['site_hash']
 				),
-				'timeout' => 45 
+				'timeout' => 45
 			) );
-		
+
 		// Decode our response.
 		$response_body = wp_remote_retrieve_body( $response );
 		$response_decoded = json_decode( $response_body, true );
-		
+
 		// If we don't have a valid theme, return our failsafe data.
 		if ( empty( $response_decoded['result']['data']['themes'][0] ) ||
 			 ! is_numeric( $response_decoded['result']['data']['themes'][0] ) ) {
 			return $failsafe_return_data;
 		}
-		
+
 		// Grab the first theme in the list.
 		$theme_id = $response_decoded['result']['data']['themes'][0];
-		
+
 		return array (
 			'sub_cat_id' => $sub_cat_id,
-			'theme_id' => $theme_id 
+			'theme_id' => $theme_id
 		);
 	}
-	
+
 	/**
 	 * Gets pages that will serve as Gridblocks in the BoldGrid Editor Plugin.
 	 * Attached to main filter.
 	 *
 	 * @since 1.0.9
-	 * @param array $gridblocks        	
+	 * @param array $gridblocks
 	 * @return array An Array of page that will be parsed for gridblocks
 	 */
 	public function fetch_gridblocks( $gridblocks ) {
@@ -164,7 +173,7 @@ class Boldgrid_Inspirations_Gridblock {
 		$gridblocks = array_merge( $gridblocks, $kitchen_sink_pages );
 		return $gridblocks;
 	}
-	
+
 	/**
 	 * Gets the html that was created through a building a profile.
 	 *
@@ -177,17 +186,17 @@ class Boldgrid_Inspirations_Gridblock {
 	 */
 	public function fetch_html( $site_url ) {
 		$url = $this->configs['preview_server'] . $this->configs['ajax_calls']['get-site-content'];
-		
+
 		$request_params = array (
-			'url' => $site_url 
+			'url' => $site_url
 		);
-		
-		return wp_remote_retrieve_body( 
+
+		return wp_remote_retrieve_body(
 			wp_remote_post( $url, array (
-				'body' => $request_params 
+				'body' => $request_params
 			) ) );
 	}
-	
+
 	/**
 	 * Rebuild the kitchen sink based on the users original selections.
 	 * Returns build profile data
@@ -198,12 +207,12 @@ class Boldgrid_Inspirations_Gridblock {
 	public function build_kitchen_sink() {
 		// Set the PHP max_execution_time to 60 seconds (1 minute):
 		@ini_set( 'max_execution_time', 60 );
-		
+
 		$build_profile_data = array ();
 		$boldgrid_install_options = get_option( 'boldgrid_install_options' );
-		
+
 		$url = $this->configs['asset_server'] . $this->configs['ajax_calls']['get_layouts'];
-		
+
 		// Set our "sub_cat_id" and "theme_id".
 		if ( false === $boldgrid_install_options ) {
 			$universal_data = $this->get_universal_data();
@@ -213,31 +222,31 @@ class Boldgrid_Inspirations_Gridblock {
 			$theme_id = $boldgrid_install_options['theme_id'];
 			$sub_cat_id = $boldgrid_install_options['subcategory_id'];
 		}
-		
+
 		$request_params = array (
 			'build_kitchen_sink' => 1, // Hard code to true
 			'theme_id' => $theme_id,
 			'sub_cat_id' => $sub_cat_id,
 			'key' => $this->configs['api_key'],
-			'site_hash' => $this->configs['site_hash'] 
+			'site_hash' => $this->configs['site_hash']
 		);
-		
-		$response = wp_remote_post( $url, 
+
+		$response = wp_remote_post( $url,
 			array (
 				'body' => $request_params,
-				'timeout' => 45 
+				'timeout' => 45
 			) );
-		
+
 		$response_body = wp_remote_retrieve_body( $response );
 		$response_decoded = json_decode( $response_body, true );
-		
+
 		if ( ! empty( $response_decoded['result']['data'] ) ) {
 			$build_profile_data = $response_decoded['result']['data'];
 		}
-		
+
 		return $build_profile_data;
 	}
-	
+
 	/**
 	 * Retrieve an array of pages that the user would have received had the built the
 	 * kitchen sink for their category.
@@ -249,23 +258,23 @@ class Boldgrid_Inspirations_Gridblock {
 		$build_profile_data = $this->build_kitchen_sink();
 		$build_profile_id = ! empty( $build_profile_data['theme']['id'] ) ? $build_profile_data['theme']['id'] : '';
 		$site_url = ! empty( $build_profile_data['theme']['previewUrl'] ) ? $build_profile_data['theme']['previewUrl'] : '';
-		
+
 		$html_json = $this->fetch_html( $site_url );
 		$page_data_decoded['build_profile'] = array (
 			'id' => $build_profile_id,
-			'url' => $site_url 
+			'url' => $site_url
 		);
-		$page_data_decoded = array_merge( $page_data_decoded, 
+		$page_data_decoded = array_merge( $page_data_decoded,
 			$this->json_decode_response( $html_json ) );
-		
+
 		return $page_data_decoded;
 	}
-	
+
 	/**
 	 * Json decode the return of an API call.
 	 *
 	 * @since 1.0.9
-	 * @param string $html_json        	
+	 * @param string $html_json
 	 * @return $html array
 	 */
 	public function json_decode_response( $html_json ) {
@@ -276,7 +285,7 @@ class Boldgrid_Inspirations_Gridblock {
 				$page_data_decoded = $json_array['data'];
 			}
 		}
-		
+
 		return $page_data_decoded;
 	}
 }

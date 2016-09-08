@@ -40,7 +40,7 @@ $download_button_text = ( true == $ref_is_dashboard_media || true == $ref_is_cus
 			</span>
 		</h3>
 		<div class="attachment-info">
-			<div id='attachment_details_thumbnail' class="thumbnail thumbnail-image">	
+			<div id='attachment_details_thumbnail' class="thumbnail thumbnail-image">
 				<img src="{{thumbnail_url}}" draggable="false">
 			</div>
 			<div class="details">

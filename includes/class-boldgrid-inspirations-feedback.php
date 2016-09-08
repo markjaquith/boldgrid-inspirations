@@ -33,42 +33,53 @@ class Boldgrid_Inspirations_Feedback {
 		$update_pages = array(
 			'update-core.php',
 			'plugins.php',
-			'upgrade.php'
+			'upgrade.php',
 		);
 
-		$is_update_page = in_array( $pagenow, $update_pages );
+		$is_update_page = ( in_array( $pagenow, $update_pages, true )
+		);
 
 		// Is the current page for settings?
 		$is_settings_page = ( 1 === preg_match( '/^options-/', $pagenow ) );
 
+		// Is the current task not to be interrupted with feedback?
+		$uninterrupt_tasks = array(
+			'deploy'
+		);
+
+		$uninterrupt_task = (
+			isset( $_POST['task'] ) && in_array( $_POST['task'], $uninterrupt_tasks, true )
+		);
+
 		// Add an action to run when using the Customizer.
-		add_action( 'customize_register', array (
+		add_action( 'customize_register', array(
 			$this,
-			'customizer_start'
+			'customizer_start',
 		) );
 
 		// Add an action to run when a theme is activated.
-		add_action( 'after_switch_theme', array (
+		add_action( 'after_switch_theme', array(
 			$this,
-			'theme_activation'
+			'theme_activation',
 		) );
 
 		// Add an action to record when a page is created using a GridBlock.
 		add_action( 'boldgrid_inspirations_post_gridblock_set_create_page_callback',
-			array (
+			array(
 				$this,
-				'gridblock_add_page'
+				'gridblock_add_page',
 			) );
 
 		// Add an action to check the payload.
-		add_action( 'admin_init', array (
+		add_action( 'admin_init', array(
 			$this,
-			'check_payload'
+			'check_payload',
 		) );
 
 		// Add an action to display admin notices.
-		if ( false === ( is_network_admin() || $is_update_page || $is_settings_page ) ) {
-			add_action( 'admin_init', array (
+		if ( ! ( is_network_admin() || $is_update_page || $is_settings_page ||
+		$uninterrupt_task ) ) {
+			add_action( 'admin_notices', array(
 				$this,
 				'display_feedback_notice'
 			) );
@@ -76,16 +87,16 @@ class Boldgrid_Inspirations_Feedback {
 
 		// Add an action to handle diagnostic data requests.
 		add_action( 'wp_ajax_boldgrid_feedback_diagnostic_data',
-			array (
+			array(
 				$this,
-				'feedback_diagnostic_data_callback'
+				'feedback_diagnostic_data_callback',
 			) );
 
 		// Add an action to handle diagnostic data requests.
 		add_action( 'wp_ajax_boldgrid_feedback_submit',
-			array (
+			array(
 				$this,
-				'feedback_submit_callback'
+				'feedback_submit_callback',
 			) );
 	}
 
@@ -142,7 +153,8 @@ class Boldgrid_Inspirations_Feedback {
 	 */
 	public function gridblock_add_page( $args = null ) {
 		// Get the BoldGrid page id.
-		$boldgrid_page_id = isset( $args['boldgrid_page_id'] ) ? $args['boldgrid_page_id'] : null;
+		$boldgrid_page_id = ( isset( $args['boldgrid_page_id'] ) ? $args['boldgrid_page_id'] : null
+		);
 
 		// Insert new data.
 		self::add_feedback( 'gridblock_add_page', $boldgrid_page_id );
@@ -156,8 +168,6 @@ class Boldgrid_Inspirations_Feedback {
 	 * Check feedback payload to see if data needs to be delivered.
 	 *
 	 * @since 1.0.9
-	 *
-	 * @return null
 	 */
 	public function check_payload() {
 		// Initialize $success.
@@ -167,17 +177,15 @@ class Boldgrid_Inspirations_Feedback {
 		$feedback_data = get_option( 'boldgrid_feedback' );
 
 		// If there is data, then send it.
-		if ( false === empty( $feedback_data ) ) {
+		if ( ! empty( $feedback_data ) ) {
 			// Deliver the data.
 			$success = $this->deliver_payload( $feedback_data );
 		}
 
 		// If successful, then clear boldgrid_feedback.
-		if ( true === $success ) {
+		if ( $success ) {
 			delete_option( 'boldgrid_feedback' );
 		}
-
-		return;
 	}
 
 	/**
@@ -186,13 +194,14 @@ class Boldgrid_Inspirations_Feedback {
 	 * Deliver the feedback payload to the asset server.
 	 *
 	 * @since 1.0.9
+	 * @see Boldgrid_Inspirations_Api::boldgrid_api_call().
 	 *
 	 * @param array $data Feedback data array (from the WP Option "boldgrid_feedback").
 	 * @return bool
 	 */
 	private function deliver_payload( $data = null ) {
 		// Check data.
-		if ( empty( $data ) || false === is_array( $data ) ) {
+		if ( empty( $data ) || ! is_array( $data ) ) {
 			return false;
 		}
 
@@ -200,11 +209,12 @@ class Boldgrid_Inspirations_Feedback {
 		$feedback_data['boldgrid_feedback'] = wp_json_encode( $data );
 
 		// Send the data.
-		$response = Boldgrid_Inspirations::boldgrid_api_call( '/api/feedback/process', false,
-			$feedback_data, 'POST' );
+		$response = Boldgrid_Inspirations_Api::boldgrid_api_call( '/api/feedback/process', false,
+			$feedback_data, 'POST'
+		);
 
 		// Check response.
-		if ( false === empty( $response ) && 'Data accepted' === $response->message ) {
+		if ( ! empty( $response->message ) && 'Data accepted' === $response->message ) {
 			// Success.
 			return true;
 		} else {
@@ -237,17 +247,14 @@ class Boldgrid_Inspirations_Feedback {
 		$feedback_data = get_option( 'boldgrid_feedback' );
 
 		// Insert new data.
-		$feedback_data[] = array (
+		$feedback_data[] = array(
 			'type' => $metaname,
 			'timestamp' => $timestamp,
-			'value' => $metavalue
+			'value' => $metavalue,
 		);
 
-		// Sanitize the option data.
-		$feedback_data = sanitize_option( 'boldgrid_feedback', $feedback_data );
-
 		// Save data.
-		update_option( 'boldgrid_feedback', $feedback_data );
+		update_option( 'boldgrid_feedback', $feedback_data, false );
 
 		return true;
 	}
@@ -264,6 +271,14 @@ class Boldgrid_Inspirations_Feedback {
 	 * @return null
 	 */
 	public function display_feedback_notice() {
+		/*
+		 * Inspirations deployment creates pages, and so the user must be able to 'edit_pages'. If
+		 * the current user cannot, they don't need to see this message.
+		 */
+		if( ! current_user_can( 'edit_pages' ) ) {
+			return;
+		}
+
 		// Get boldgrid_install_options from WP Options.
 		$install_options = get_option( 'boldgrid_install_options' );
 
@@ -293,7 +308,7 @@ class Boldgrid_Inspirations_Feedback {
 		$feedback_sent = get_user_meta( $user_id, 'boldgrid_feedback_sent' );
 
 		// Examine the feedback sent timestamps array, check if the latest is newer than 7 days.
-		if ( false === empty( $feedback_sent ) ) {
+		if ( ! empty( $feedback_sent ) ) {
 			// Initialize $latest_feedback_sent.
 			$latest_feedback_sent = null;
 
@@ -315,40 +330,32 @@ class Boldgrid_Inspirations_Feedback {
 			}
 		}
 
-		// Get the WP option boldgrid_dismissed_admin_notices.
-		$boldgrid_dismissed_notices = get_option( 'boldgrid_dismissed_admin_notices' );
+		// Instantiate the Boldgrid_Inspirations_Admin_Notices class.
+		$admin_notices = new Boldgrid_Inspirations_Admin_Notices();
 
-		// Is the notice already marked as dismissed.
-		$is_dismissed = ! ( false === $boldgrid_dismissed_notices ||
-			 false === in_array( 'feedback-notice-1-1', $boldgrid_dismissed_notices, true ) );
+		$dismissal = $admin_notices->get( 'feedback-notice-1-1' );
 
-		// If the notice was dismissed more than a week ago, then clear the dismissal.
-		// Abort if a dismissal was in the last week.
-		if ( true === $is_dismissed ) {
-			foreach ( $boldgrid_dismissed_notices as $timestamp => $id ) {
-				if ( 'feedback-notice-1-1' === $id ) {
-					// The notice id was found.
-					// If the dismissal was in the last week, abort.
-					if ( $timestamp > $seven_days_ago ) {
-						return;
-					}
+		$has_been_dismissed = ( false !== $dismissal );
 
-					// Clear the dismissal.
-					unset( $boldgrid_dismissed_notices[$timestamp] );
-
-					// Update the WP Option boldgrid_dismissed_admin_notices.
-					update_option( 'boldgrid_dismissed_admin_notices', $boldgrid_dismissed_notices );
-
-					// Break this loop.
-					break;
-				}
+		if ( $has_been_dismissed ) {
+			/*
+			 * If the user dismissed this notice within the last week, abort and do not show the
+			 * notice.
+			 *
+			 * Otherwise, the user dismissed the notice more than seven days ago. Delete that
+			 * dismissal and give them another reminder for feedback.
+			 */
+			if ( $dismissal['timestamp'] > $seven_days_ago ) {
+				return;
+			} else {
+				$admin_notices->clear( 'feedback-notice-1-1' );
 			}
 		}
 
 		// Add an action to ask for feedback.
-		add_action( 'admin_notices', array (
+		add_action( 'all_admin_notices', array(
 			$this,
-			'ask_feedback'
+			'ask_feedback',
 		) );
 	}
 
@@ -358,8 +365,6 @@ class Boldgrid_Inspirations_Feedback {
 	 * Displays an admin notice to ask for feedback.
 	 *
 	 * @since 1.1
-	 *
-	 * @return null
 	 */
 	public function ask_feedback() {
 		// Get the admin email address.
@@ -378,12 +383,11 @@ class Boldgrid_Inspirations_Feedback {
 
 		// Get the reseller title.
 		$reseller_title = esc_html(
-			false === empty( $reseller_data['reseller_title'] ) ? $reseller_data['reseller_title'] : null );
+			! empty( $reseller_data['reseller_title'] ) ? $reseller_data['reseller_title'] : null
+		);
 
 		// Display the notice.
 		include BOLDGRID_BASE_DIR . '/pages/templates/feedback-notice-1-1.php';
-
-		return;
 	}
 
 	/**
@@ -394,15 +398,27 @@ class Boldgrid_Inspirations_Feedback {
 	 * @return null
 	 */
 	public function enqueue_scripts() {
-		wp_register_style( 'boldgrid-feedback-css',
-			plugins_url( '/assets/css/boldgrid-feedback.css',
-				BOLDGRID_BASE_DIR . '/boldgrid-inspirations.php' ), array (), BOLDGRID_INSPIRATIONS_VERSION );
+		wp_register_style(
+			'boldgrid-feedback-css',
+			plugins_url(
+				'/assets/css/boldgrid-feedback.css',
+				BOLDGRID_BASE_DIR . '/boldgrid-inspirations.php'
+			),
+			array(),
+			BOLDGRID_INSPIRATIONS_VERSION
+		);
 
 		wp_enqueue_style( 'boldgrid-feedback-css' );
 
-		wp_register_script( 'boldgrid-feedback-js',
-			plugins_url( 'assets/js/boldgrid-feedback.js',
-				BOLDGRID_BASE_DIR . '/boldgrid-inspirations.php' ), array (), BOLDGRID_INSPIRATIONS_VERSION );
+		wp_register_script(
+			'boldgrid-feedback-js',
+			plugins_url(
+				'assets/js/boldgrid-feedback.js',
+				BOLDGRID_BASE_DIR . '/boldgrid-inspirations.php'
+			),
+			array(),
+			BOLDGRID_INSPIRATIONS_VERSION
+		);
 
 		wp_enqueue_script( 'boldgrid-feedback-js' );
 
@@ -423,6 +439,12 @@ class Boldgrid_Inspirations_Feedback {
 	 * @return null
 	 */
 	public function feedback_diagnostic_data_callback() {
+		// If this user is not an Administrator, do not allow this data to be populated and returned.
+		if( ! current_user_can( 'manage_options' ) ) {
+			echo __( 'To have diagnostic data sent with your feedback, please login as an Administrator', 'boldgrid-inspirations' );
+			wp_die( 'Error: WordPress security violation.' );
+		}
+
 		// Check the nonce.
 		$nonce_check = check_ajax_referer( 'feedback-notice-1-1', 'feedback_auth', false );
 
@@ -472,7 +494,7 @@ class Boldgrid_Inspirations_Feedback {
 
 		// Print the network active plugin slugs.
 		if ( is_multisite() ) {
-			$sitewide_plugins = array_keys( get_site_option( 'active_sitewide_plugins', array () ) );
+			$sitewide_plugins = array_keys( get_site_option( 'active_sitewide_plugins', array() ) );
 
 			$active_plugins = array_unique( array_merge( $site_plugins, $sitewide_plugins ) );
 		} else {
@@ -522,7 +544,7 @@ class Boldgrid_Inspirations_Feedback {
 			$return .= '  ' . $object->get( 'Name' ) . ' (' . $key . ') [' .
 				 $object->get( 'Version' ) . ']' . $active . $staging . PHP_EOL;
 
-			$parent_theme = $object->get( 'parent' );
+			$parent_theme = $object->get( 'Template' );
 
 			$return .= '    Parent Theme: ' . ( $parent_theme ? $parent_theme : 'None' ) . PHP_EOL;
 
@@ -536,10 +558,10 @@ class Boldgrid_Inspirations_Feedback {
 		$return .= 'BoldGrid Information:' . PHP_EOL;
 
 		// Get BoldGrid settings.
-		$options = get_option( 'boldgrid_settings' );
+		//$options = get_option( 'boldgrid_settings' );
 
 		// Print the update release channel.
-		//$release_channel = isset( $options['release_channel'] ) ? $options['release_channel'] : 'stable';
+		//$release_channel = ( isset( $options['release_channel'] ) ? $options['release_channel'] : 'stable' );
 
 		//$return .= ' Release Channel: ' . $release_channel . PHP_EOL;
 
@@ -600,6 +622,11 @@ class Boldgrid_Inspirations_Feedback {
 	public function feedback_submit_callback() {
 		// Check the nonce.
 		$nonce_check = check_ajax_referer( 'feedback-notice-1-1', 'feedback_auth', false );
+
+		// If you are not at least a Contributor, you may not submit feedback.
+		if( ! current_user_can( 'edit_posts' ) ) {
+			wp_die( 'Error: WordPress security violation.' );
+		}
 
 		if ( 1 !== $nonce_check ) {
 			// Terminate this callback script, with an error message.

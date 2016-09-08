@@ -1,33 +1,29 @@
 <?php
 // Prevent direct calls.
-if ( ! defined( 'WPINC' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
-}
+require BOLDGRID_BASE_DIR . '/pages/templates/restrict-direct-access.php';
 
-/* @formatter:off */
-return array (
-	'ajax_calls' => array (
-		// layout.
+return array(
+	'ajax_calls' => array(
+		// Layout.
 		'get_theme_ids' =>								'/api/layout/get-themes-for-category',
 		'get_num_themes' =>								'/api/layout/get-num-available-themes',
-		// category.
+		// Category.
 		'get_categories' =>								'/api/category/get-active',
 		'get_subcategories_from_page_set' =>			'/api/category/get-subcategories-from-page-set',
 		'get_category_tags' =>							'/api/category/get-tags',
 		'category_search' =>							'/api/category/search',
-		// asset.
+		// Asset.
 		'get_asset' =>									'/api/asset/get',
 		'get-total-asset-cost' =>						'/api/asset/get-total-asset-cost',
-		// build.
+		// Build.
 		'get_layouts' =>								'/api/build/create',
 		'get_build_profile' =>							'/api/build/get',
 		'get_install_details' =>						'/api/build/get-install-details',
 		'get_build_profile_using_in_progress_theme' =>	'/api/build/get-using-in-progress-theme',
-		// pde.
+		'get_generic' =>								'/api/build/get-generic',
+		// Pde.
 		'get_curated' =>								'/api/pde/get-curated-asset',
-		// theme.
+		// Theme.
 		'get_theme_details' =>							'/api/theme/get',
 		'get_all_active_themes' =>						'/api/theme/get-all-active',
 		'get_theme_info' =>								'/api/theme/get-wordpress-info',
@@ -36,11 +32,11 @@ return array (
 		'get_theme_basic_details' =>					'/api/theme/get-theme-basic-details',
 		'create_theme' =>								'/api/theme/create',
 		'submit_theme_for_approval' =>					'/api/theme/submit-for-approval',
-		// plugin.
+		// Plugin.
 		'get_plugins' =>								'/api/plugin/get-plugin-data',
 		'get_version' =>								'/api/plugin/check-version',
 		'get_plugin_version' =>							'/api/open/get-plugin-version',
-		// pageset.
+		// Pageset.
 		'get_page_set_custom_details' =>				'/api/page-set/get-custom-details',
 		'get_page_set_details' =>						'/api/page-set/get-details',
 		'get_category_page_sets' =>						'/api/page-set/get-category-related',
@@ -49,20 +45,20 @@ return array (
 		'create_page_revision' =>						'/api/page-set/create-page-revision',
 		'submit_page_set_for_approval' =>				'/api/page-set/submit-for-approval',
 		'get_all_active_pages' =>						'/api/page-set/get-all-active',
-		// language.
+		// Language.
 		'get_languages' =>								'/api/language/get',
 		// Page and Post Editor.
 		'get_page_post_layouts' =>						'/api/page-post/get-configs',
-		// user.
+		// User.
 		'get_transaction_history' =>					'/api/user/get-coin-history',
 		'get_coin_balance' =>							'/api/user/get-coin-balance',
 		'validate_connect_key' =>						'/api/user/validate-connect-key',
 		'generate_api_key'	=>							'/api/open/generateKey',
-		// image.
+		// Image.
 		'image_search' =>								'/api/image/search',
 		'image_get_details' =>							'/api/image/get-details',
 		'image_download' =>								'/api/image/download',
-		// built photo search.
+		// Built photo search.
 		'bps-get-photo' =>								'/api/built-photo-search/get-photo',
 		'bps-get-photos' =>								'/api/built-photo-search/get-photos',
 		'bps-get-queries' =>							'/api/built-photo-search/get-queries',
@@ -70,30 +66,30 @@ return array (
 		'bps-save-new-query' =>							'/api/built-photo-search/save-new-query',
 		'bps-save-new-phrase-and-results' =>			'/api/built-photo-search/save-new-phrase-and-results',
 
-		//Preview Server.
+		// Preview Server.
 		'get-site-content' => 							'/wpb-maintenance/get-site-content.php',
 	),
 	'asset_server' =>									'https://wp-assets.boldgrid.com',
 	'preview_server' =>									'https://wp-preview.boldgrid.com',
 	'author_preview_server' =>							'https://wp-staging.boldgrid.com',
-	'installation' => array (
-		'max_num_install_attempts' => 5
+	'installation' => array(
+		'max_num_install_attempts' => 5,
 	),
 	'plugins' => array(
-		'staging' => array (
-			'path' => 'boldgrid-staging/boldgrid-staging.php'
+		'staging' => array(
+			'path' => 'boldgrid-staging/boldgrid-staging.php',
 		),
-		'gallery' => array (
-			'path' => 'boldgrid-gallery/wc-gallery.php'
+		'gallery' => array(
+			'path' => 'boldgrid-gallery/wc-gallery.php',
 		),
-		'editor' => array (
-			'path' => 'boldgrid-editor/boldgrid-editor.php'
+		'editor' => array(
+			'path' => 'boldgrid-editor/boldgrid-editor.php',
 		),
-		'author' => array (
-			'path' => 'boldgrid-author/boldgrid-author.php'
+		'author' => array(
+			'path' => 'boldgrid-author/boldgrid-author.php',
 		),
-		'form' => array (
-			'path' => 'boldgrid-ninja-forms/ninja-forms.php'
+		'form' => array(
+			'path' => 'boldgrid-ninja-forms/ninja-forms.php',
 		),
 	),
 	'features' => array(
@@ -107,4 +103,3 @@ return array (
 	),
 	'xhprof' => false,
 );
-/* @formatter:on */

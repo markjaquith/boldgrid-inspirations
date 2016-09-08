@@ -1,0 +1,463 @@
+/* Page layout */
+#screen-design  .left,
+#screen-content .left {
+	border: 0px solid #000;
+	width: 200px;
+	box-sizing: border-box;
+}
+
+.left .category,
+.left .pageset-option,
+.left .coin-option {
+	background: #fff;
+}
+
+/* Page layout */
+#screen-design  .right,
+#screen-content .right {
+	border: 0px solid #000;
+	width: calc( 100% - 215px );
+	box-sizing: border-box;
+	position: relative;
+}
+
+/* The heading, "Category filter" */
+.category-filter,
+.coin-filter,
+.page-set-filter {
+	background: #e6e6e6;
+	padding: 3px 0px 3px 10px;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+.coin-option,
+.pageset-option,
+.sub-category {
+	cursor: pointer;
+}
+
+/* COIN BUDGET: The help text. */
+.coin-filter .imgedit-help {
+	font-weight: normal;
+	text-transform: none;
+	font-style: italic;
+}
+
+/* COIN BUDGET: The help icon. */
+.coin-filter span.dashicons {
+	cursor: pointer;
+	margin-top: -2px;
+}
+
+/* Radio Buttons */
+input[type="radio"][name="pageset"],
+input[type="radio"][name="coin-budget"],
+input[type="radio"][name="sub-category"] {
+	visibility: hidden;
+}
+.coin-option,
+.pageset-option,
+.sub-category {
+	padding: .5em 0;
+	-webkit-transition: background-color .3s linear, color .3s linear;
+	-moz-transition: background-color .3s linear, color .3s linear;
+	-o-transition: background-color .3s linear, color .3s linear;
+	-ms-transition: background-color .3s linear, color .3s linear;
+	transition: background-color .3s linear, color .3s linear;
+}
+
+/* Theme name */
+.theme-name,
+#theme-title {
+	text-transform: capitalize;
+}
+
+#theme-title {
+	font-weight: bold;
+	font-size: 14px;
+}
+
+/* Sub category name */
+.theme-name .sub-category-name,
+.summary-subheading {
+	color: #aaa;
+	font-size: 12px;
+	font-style: italic;
+	font-weight: normal;
+}
+
+/* Coin Budget Styling */
+#build-cost::before {
+	content: '/';
+	padding: 0 .5em;
+}
+
+/* Theme */
+.theme {
+	-webkit-transition-property:		-webkit-box-shadow;
+	-webkit-transition-duration:		.05s;
+	-webkit-transition-timing-function:	ease-in-out;
+	transition-property:		box-shadow;
+	transition-duration:		.05s;
+	transition-timing-function:	ease-in-out;
+}
+
+/* Theme hover */
+.theme:hover {
+	-webkit-box-shadow: 0px 0px 7px 0px rgba(0, 141, 194, 1.0);
+	-moz-box-shadow:    0px 0px 7px 0px rgba(0, 141, 194, 1.0);
+	box-shadow:         0px 0px 7px 0px rgba(0, 141, 194, 1.0);
+}
+
+.info-icon:before {
+	content: "\f223";
+	font: normal 16px/1 dashicons;
+}
+
+.top-menu {
+	background: #ccc;
+	margin: -10px -20px 30px -22px;
+	padding-left: 22px;
+}
+
+.top-menu a {
+	padding: 15px 30px;
+	display: inline-block;
+	cursor: pointer;
+	color: #6b747b;
+}
+
+.top-menu .active {
+	background: #f1f1f1;
+	color: #fa5a26;
+}
+
+a.disabled {
+	cursor: not-allowed;
+}
+
+body.waiting .devices button,
+body.waiting .pageset-option,
+body.waiting .coin-option,
+body.waiting .pointer {
+	cursor: wait;
+}
+
+.boldgrid-loading {
+	position: absolute;
+	top: 69px;
+	left: 0px;
+	right: 0px;
+	background-color: #f1f1f1;
+}
+
+.theme-screenshot .img {
+	width: 290px;
+	height: 217px;
+	/* 194 */
+}
+
+/* Filter Toggle Styles. */
+.wp-filter .drawer-toggle {
+	border-radius: 4px;
+}
+.wp-filter .drawer-toggle.open {
+	border-radius: 4px;
+	color: white;
+	background: #72777c;
+}
+.wp-filter .drawer-toggle.open:hover {
+	color: white;
+}
+.wp-filter .drawer-toggle.open:before {
+	color: white;
+}
+
+.pageset-option.active,
+.coin-option.active,
+.sub-category.active,
+.pageset-option.blue,
+.coin-option.blue,
+.blue {
+	color: white;
+}
+
+/* Back/Install Buttons */
+.inspirations.button {
+	padding: 0 3em;
+	margin-top: .5em;
+}
+
+/* Device/preview size toggles */
+.devices {
+	margin-left: 2.5em;
+}
+
+.devices button {
+	display: inline-flex;
+	cursor: pointer;
+	background: transparent;
+	border: none;
+	height: 45px;
+	padding: 0 3px;
+	margin: 0 0 0 -4px;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	border-top: 1px solid transparent;
+	border-bottom: 4px solid transparent;
+	-webkit-transition: background .1s ease-in-out;
+	transition: background .1s ease-in-out;
+}
+
+.devices button:focus {
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	outline: none;
+}
+
+.devices button:before {
+	display: inline-block;
+	-webkit-font-smoothing: antialiased;
+	font: normal 20px/30px "dashicons";
+	vertical-align: top;
+	margin: 3px 0;
+	padding: 4px 8px;
+	color: #656a6f;
+}
+
+.devices button.active {
+	border-bottom-color: #191e23;
+}
+
+.devices button.active:before,
+.devices button:hover:before,
+.devices button:focus:before {
+	color: #191e23;
+}
+
+.devices .preview-desktop:before {
+	content: "\f472";
+}
+
+.devices .preview-tablet:before {
+	content: "\f471";
+}
+
+.devices .preview-mobile:before {
+	content: "\f470";
+}
+
+/* Highlight a button blue. This means the current preview size represents this dimension. */
+.devices button.highlight:before {
+	color: #00a0d2;
+}
+
+/* Allow a button to be rotated to represent a landscape preview. */
+.devices button.landscape:before {
+	-webkit-transform: rotate(90deg);
+	-moz-transform: rotate(90deg);
+	-o-transform: rotate(90deg);
+	-ms-transform: rotate(90deg);
+	transform: rotate(90deg);
+}
+
+/**
+* Theme preview and iframe.
+*/
+
+#preview-container {
+	margin:0px;
+	padding:0px;
+	max-width: 100%;
+	height: 800px;
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+
+#theme-preview {
+	width: 100%;
+	height: 100%;
+}
+
+/* ****************************************************************************
+Desktop view.
+**************************************************************************** */
+
+#preview-container.preview-desktop #theme-preview {
+	min-width: 992px;
+	height: 100%;
+}
+
+/* ****************************************************************************
+Mobile view.
+
+Based off of iPhone 4
+http://www.kylejlarson.com/blog/iphone-6-screen-size-web-design-tips/
+**************************************************************************** */
+
+#preview-container.preview-mobile {
+	height: 480px;
+}
+
+#preview-container.preview-mobile #theme-preview {
+	width: 320px;
+	height: 480px;
+}
+
+#preview-container.preview-mobile.landscape {
+	height: 320px;
+}
+
+#preview-container.preview-mobile.landscape #theme-preview {
+	width: 480px;
+	height: 320px;
+}
+
+/* ****************************************************************************
+Tablet view.
+
+Based off of iPad (1st and 2nd Generation)
+http://ivomynttinen.com/blog/the-ios-design-cheat-sheet-volume-2
+**************************************************************************** */
+
+#preview-container.preview-tablet {
+	height: 1024px;
+}
+
+#preview-container.preview-tablet #theme-preview {
+	width: 768px;
+	height: 1024px;
+}
+
+#preview-container.preview-tablet.landscape {
+	height: 768px;
+}
+
+#preview-container.preview-tablet.landscape #theme-preview {
+	width: 1024px;
+	height: 768px;
+}
+
+.wp-filter {
+	display: none;
+}
+
+/**
+* Confirmation, the last step of Inspirations.
+*/
+
+.confirmation .boldgrid-plugin-card {
+	width:100%; max-width:650px;
+}
+
+/* Any paragraph that has a class beginning with 'note-'. */
+.confirmation p[class^="note-"] {
+	color: #aaa;
+}
+
+/**
+* Media queries appear in this order:
+*
+* For average size displays.
+* @media (min-width: 782px) and (max-width: 1423px) {
+*
+* Small screens, everything is pretty much made full width.
+* @media screen and (max-width: 782px) {
+*
+* Force left menu to be open on desktop if it was previously collapsed in mobile.
+* @media (min-width: 783px) {
+*
+* For large displays, show
+* @media (min-width: 1423px) {
+*/
+
+@media (min-width: 782px) and (max-width: 1423px) {
+	#screen-design .left,
+	#screen-content .left {
+		display: none;
+	}
+	#screen-content .left {
+		width: 100%;
+		background-color: transparent;
+		margin-bottom: 2em;
+	}
+	.pageset-option,
+	.coin-option {
+		background-color: #fff;
+	}
+
+	#screen-content .right {
+		width: 100%;
+	}
+	#screen-content .wp-filter {
+		display: block;
+		padding: .8em 0;
+	}
+	.content-menu-section {
+		float: left;
+		width: 25%;
+		padding-right: 1em;
+	}
+}
+
+@media screen and (max-width: 782px) {
+	#screen-content .left,
+	#screen-design .left {
+		width: 100%;
+		display: none;
+		margin-bottom: 2em;
+	}
+	#screen-content .wp-filter {
+		padding: .8em 0;
+	}
+	.wp-filter {
+		display: block;
+	}
+	#screen-design .right,
+	#screen-content .right {
+		width: 100%;
+	}
+	.inspirations.button {
+		padding: .3em 1em;
+		margin-top: -0.8em;
+		margin-bottom: 1em;
+	}
+}
+
+/* Force left menu to be open on desktop if it was previously collapsed in mobile. */
+@media (min-width: 783px) {
+	#screen-design .left {
+		display: block !important;
+	}
+	#screen-design {
+		padding-top: 5em;
+	}
+	.top-menu.design {
+		width: 100%;
+		z-index: 999;
+		position: fixed;
+	}
+	#screen-design .left {
+		position: fixed;
+	}
+}
+
+@media (min-width: 1423px) {
+	#screen-content .left {
+		display: block !important; /* Show left menu on large screens. */
+	}
+	.top-menu.content {
+		width: 100%;
+		z-index: 999;
+		position: fixed;
+	}
+	#screen-content {
+		padding-top: 5em;
+	}
+	#screen-content .left {
+		position: fixed;
+	}
+	html {
+		overflow-y: scroll; /** Force to prevent previews from jumping around between loads. **/
+	}
+}

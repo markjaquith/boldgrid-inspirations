@@ -1,18 +1,17 @@
 <?php
+// Prevent direct calls.
+require BOLDGRID_BASE_DIR . '/pages/templates/restrict-direct-access.php';
 
-// Prevent direct calls
-if ( ! defined( 'WPINC' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
-}
+// Check asset server availability.
+$is_asset_server_available = (bool) get_site_transient( 'boldgrid_available' );
 
-// Check asset server availability:
-$is_asset_server_available = ( bool ) get_site_transient( 'boldgrid_available' );
+// Print a message for connection failure.
+$notice_template_file = BOLDGRID_BASE_DIR .
+'/pages/templates/boldgrid-connection-issue.php';
 
-// Print a message for connection failure:
-if ( false === $is_asset_server_available ) {
-	require BOLDGRID_BASE_DIR . '/pages/templates/boldgrid_connection_issue.php';
+if ( ! $is_asset_server_available &&
+! in_array( $notice_template_file, get_included_files(), true ) ) {
+	include $notice_template_file;
 }
 
 /**

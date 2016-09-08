@@ -40,7 +40,7 @@ class Boldgrid_Inspirations_Deploy {
 	protected $activate_theme = true;
 
 	/**
-	 * homepage_only option.
+	 * The homepage_only option.
 	 *
 	 * @access protected
 	 *
@@ -120,7 +120,8 @@ class Boldgrid_Inspirations_Deploy {
 	 *
 	 * @var array
 	 */
-	public $plugin_installation_data = array ();
+	public $plugin_installation_data = array();
+
 	/**
 	 * Class property for the asset cache object (only for preview servers).
 	 *
@@ -132,9 +133,31 @@ class Boldgrid_Inspirations_Deploy {
 	private $asset_cache = null;
 
 	/**
+	 * Does the user want to start over before deployment?
+	 *
+	 * @since 1.2.3
+	 * @access public
+	 */
+	public $start_over = false;
+
+	/**
+	 * The Boldgrid Inspirations Asset Manager class object.
+	 *
+	 * @var Boldgrid_Inspirations_Asset_Manager
+	 */
+	private $asset_manager;
+
+	/**
+	 * The Boldgrid Inspirations Built Photo Search class object.
+	 *
+	 * @var Boldgrid_Inspirations_Built_Photo_Search
+	 */
+	private $built_photo_search;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param array $configs
+	 * @param array $configs BoldGrid configuration array.
 	 */
 	public function __construct( $configs ) {
 		// Set $this->configs class property.
@@ -145,15 +168,15 @@ class Boldgrid_Inspirations_Deploy {
 
 		// Instantiate the asset manager class.
 		require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-asset-manager.php';
-		$this->AssetManager = new Boldgrid_Inspirations_Asset_Manager();
+		$this->asset_manager = new Boldgrid_Inspirations_Asset_Manager();
 
 		// Get the asset cache object from the asset manager.
-		$this->asset_cache = $this->AssetManager->get_asset_cache();
+		$this->asset_cache = $this->asset_manager->get_asset_cache();
 
 		// Instantiate the built photo search class.
 		require_once BOLDGRID_BASE_DIR .
 			 '/includes/class-boldgrid-inspirations-built-photo-search.php';
-		$this->BuiltPhotoSearch = new Boldgrid_Inspirations_Built_Photo_Search();
+		$this->built_photo_search = new Boldgrid_Inspirations_Built_Photo_Search();
 
 		// Variables used for debug purposes.
 		$this->start_time = time();
@@ -210,7 +233,7 @@ class Boldgrid_Inspirations_Deploy {
 	 * @todo We are hard coding the details below. In the future, the values
 	 *       will be grabbed from the options table.
 	 *
-	 * @return null
+	 * @see Boldgrid_Inspirations_Api::get_api_key_hash().
 	 */
 	public function get_deploy_details() {
 		// Get configs.
@@ -223,21 +246,33 @@ class Boldgrid_Inspirations_Deploy {
 		// REQUIRED - $this->page_set_id tells us which individual pages to download
 		$this->page_set_id = intval( $_POST['boldgrid_page_set_id'] );
 
-		// REQUIRED - we need authorization
-		// Look in the config for the api_key
-		$this->api_key_hash = isset( $this->configs['api_key'] ) ? sanitize_text_field(
-			$this->configs['api_key'] ) : null;
+		// REQUIRED - we need authorization.
+		// Look in the config for the api_key.
+		$api_key_hash = $this->asset_manager->api->get_api_key_hash();
 
-		// If it's not there, check $_REQUEST['key']
-		$this->api_key_hash = ( null == $this->api_key_hash && isset( $_REQUEST['key'] ) ) ? sanitize_text_field(
-			$_REQUEST['key'] ) : $this->api_key_hash;
+		// If the hash is missing, then try getting it from the configs.
+		if ( empty( $api_key_hash ) ) {
+			$api_key_hash = (
+				isset( $this->configs['api_key'] ) ?
+				sanitize_text_field( $this->configs['api_key'] ) : null
+			);
+		}
+
+		// If the hash is still not found, then check $_REQUEST['key'].
+		if ( empty( $api_key_hash ) && ! empty( $_REQUEST['key'] ) ) {
+				$api_key_hash = sanitize_text_field( $_REQUEST['key'] );
+		}
 
 		// REQUIRED
-		$this->site_hash = isset( $_REQUEST['site_hash'] ) ? sanitize_title_with_dashes(
-			trim( $_REQUEST['site_hash'] ) ) : null;
+		$this->site_hash = (
+			isset( $_REQUEST['site_hash'] ) ?
+			sanitize_title_with_dashes( trim( $_REQUEST['site_hash'] ) ) : null
+		);
 
-		$this->site_hash = ( null == $this->site_hash && isset( $boldgrid_configs['site_hash'] ) ) ? sanitize_title_with_dashes(
-			$boldgrid_configs['site_hash'] ) : $this->site_hash;
+		$this->site_hash = (
+			( null == $this->site_hash && isset( $boldgrid_configs['site_hash'] ) ) ?
+			sanitize_title_with_dashes( $boldgrid_configs['site_hash'] ) : $this->site_hash
+		);
 
 		// REQUIRED
 		$this->theme_id = intval( $_POST['boldgrid_theme_id'] );
@@ -257,15 +292,15 @@ class Boldgrid_Inspirations_Deploy {
 		// REQUIRED todo: subcategory_id is used in deploy_page_sets to get homepage data... Should
 		// this actually be category_id ?
 		$this->subcategory_id = null;
-		if ( false === empty( $_POST['boldgrid_sub_cat_id'] ) ) {
+		if ( ! empty( $_POST['boldgrid_sub_cat_id'] ) ) {
 			// For most requests:
 			$this->subcategory_id = intval( $_POST['boldgrid_sub_cat_id'] );
-		} elseif ( false === empty( $_POST['subcategory_id'] ) ) {
+		} elseif ( ! empty( $_POST['subcategory_id'] ) ) {
 			// For direct call to deploy_page_sets:
 			$this->subcategory_id = intval( $_POST['subcategory_id'] );
 		} else {
 			// If subcategory is not available in POST, then try to get it from the install options:
-			if ( true === $this->is_staging_install() ) {
+			if ( $this->is_staging_install() ) {
 				$install_options = get_option( 'boldgrid_staging_boldgrid_install_options' );
 			} else {
 				$install_options = get_option( 'boldgrid_install_options' );
@@ -335,6 +370,11 @@ class Boldgrid_Inspirations_Deploy {
 		if( $this->is_preview_server && isset( $_POST['is_generic'] ) && '1' === $_POST['is_generic'] ) {
 			$this->is_generic = true;
 		}
+
+		// Does the user want to start over?
+		if( isset( $_POST['start_over'] ) && 'true' === $_POST['start_over'] ) {
+			$this->start_over = true;
+		}
 	}
 
 	/**
@@ -373,6 +413,7 @@ class Boldgrid_Inspirations_Deploy {
 	 * 1 call at a time.
 	 *
 	 * @since 1.1.2
+	 * @see Boldgrid_Inspirations_Api::get_api_key_hash().
 	 *
 	 * @return array Array of pages.
 	 */
@@ -387,19 +428,24 @@ class Boldgrid_Inspirations_Deploy {
 		$get_install_details = $boldgrid_configs['asset_server'] .
 			 $boldgrid_configs['ajax_calls']['get_install_details'];
 
+		// Get the API key hash.
+		$api_key_hash = $this->asset_manager->api->get_api_key_hash();
+
 		$arguments = array (
 			'method' => 'POST',
 			'body' => array (
 				'subcategory_id' => $boldgrid_install_options['subcategory_id'],
 				'page_set_id' => $boldgrid_install_options['page_set_id'],
-				'key' => ! empty( $this->api_key_hash ) ? $this->api_key_hash : null
+				'key' => ! empty( $api_key_hash ) ? $api_key_hash : null
 			),
 			'timeout' => 20
 		);
 
 		$response = wp_remote_retrieve_body( wp_remote_post( $get_install_details, $arguments ) );
 		$response = json_decode( $response ?  : '', true );
-		$remote_options = ! empty( $response['result']['data'] ) ? $response['result']['data'] : array ();
+		$remote_options = (
+			! empty( $response['result']['data'] ) ? $response['result']['data'] : array()
+		);
 
 		// Update the boldgird_ install options array.
 		$boldgrid_install_options = array_merge( $boldgrid_install_options, $remote_options );
@@ -465,8 +511,18 @@ class Boldgrid_Inspirations_Deploy {
 			$this->add_to_deploy_log( 'Switching to new blog...', false );
 			switch_to_blog( $new_blog_id );
 
+			// Set the blog's admin email address using the network admin email address.
+			$email_address = get_site_option( 'admin_email' );
+
+			update_option( 'admin_email' , $email_address );
+
+			// If this is a generic build, then set an option to identify it later (purges, etc.).
+			if ( $this->is_generic ) {
+				update_option( 'is_generic_build', true );
+			}
+
 			// Ensure that we have the current boldgrid_asset information (should be empty).
-			$this->AssetManager->get_wp_options_asset();
+			$this->asset_manager->get_wp_options_asset();
 
 			// JoeC says site needs to be https, so let's get er done
 			$path_to_new_blog = esc_url(
@@ -526,7 +582,7 @@ class Boldgrid_Inspirations_Deploy {
 	 */
 	public function update_site_option_retry( $option = null, $value = null, $timeout = 5 ) {
 		// Validate input:
-		if ( empty( $option ) || empty( $value ) || false === is_numeric( $timeout ) || $timeout < 0 ) {
+		if ( empty( $option ) || empty( $value ) || ! is_numeric( $timeout ) || $timeout < 0 ) {
 			return false;
 		}
 
@@ -544,7 +600,7 @@ class Boldgrid_Inspirations_Deploy {
 		// Determine $deadline:
 		$deadline = $start_time + $timeout;
 
-		while ( false === $success && time() < $deadline ) {
+		while ( ! $success && time() < $deadline ) {
 			if ( update_site_option( $option, $value ) ) {
 				// Success: Return true:
 				return true;
@@ -561,9 +617,11 @@ class Boldgrid_Inspirations_Deploy {
 	/**
 	 * Download the theme chosen by the user and set it as the active theme
 	 *
-	 * @return string or false
-	 *
 	 * @todo Refactor/rework this method. It should be moved to Boldgrid_Inspirations_Theme_Install.
+	 *
+	 * @see Boldgrid_Inspirations_Api::get_api_key_hash().
+	 *
+	 * @return string or false
 	 */
 	public function deploy_theme() {
 		$this->change_deploy_status( 'Downloading theme...' );
@@ -572,11 +630,12 @@ class Boldgrid_Inspirations_Deploy {
 		// Get configs:
 		$boldgrid_configs = $this->get_configs();
 
-		/**
-		 * Connect to the asset server and get all of the details for our theme
-		 */
+		// Connect to the asset server and get all of the details for our theme.
 		$url_to_get_theme_details = $boldgrid_configs['asset_server'] .
 			 $boldgrid_configs['ajax_calls']['get_theme_details'];
+
+		// Get the API key hash.
+		$api_key_hash = $this->asset_manager->api->get_api_key_hash();
 
 		$arguments = array (
 			'method' => 'POST',
@@ -587,7 +646,7 @@ class Boldgrid_Inspirations_Deploy {
 				'is_preview_server' => $this->is_preview_server,
 				'build_profile_id' => $this->boldgrid_build_profile_id,
 				'is_staged' => ! empty( $_POST['staging'] ) ? trim( $_POST['staging'] ) : null,
-				'key' => ! empty( $this->api_key_hash ) ? $this->api_key_hash : null,
+				'key' => ! empty( $api_key_hash ) ? $api_key_hash : null,
 				'site_hash' => ! empty( $boldgrid_configs['site_hash'] ) ? $boldgrid_configs['site_hash'] : null
 			),
 			'timeout' => 20
@@ -690,7 +749,7 @@ class Boldgrid_Inspirations_Deploy {
 				$installed_theme_version = get_site_option( $theme_version_option_name, null,
 					false );
 
-				if ( $installed_theme_version && false === $theme_dir_exists ) {
+				if ( $installed_theme_version && ! $theme_dir_exists ) {
 					delete_site_option( $theme_version_option_name );
 
 					$installed_theme_version = null;
@@ -698,7 +757,7 @@ class Boldgrid_Inspirations_Deploy {
 			} else {
 				$installed_theme_version = get_option( $theme_version_option_name );
 
-				if ( $installed_theme_version && false === $theme_dir_exists ) {
+				if ( $installed_theme_version && ! $theme_dir_exists ) {
 					delete_option( $theme_version_option_name );
 
 					$installed_theme_version = null;
@@ -719,7 +778,7 @@ class Boldgrid_Inspirations_Deploy {
 			$installed_version_number = is_object( $theme ) ? $theme->get('Version') : null;
 
 			$is_version_change = $incoming_version_number && ( $incoming_version_number != $installed_version_number );
-			$install_this_theme = ( $is_version_change || false === $theme_dir_exists ) && ! $is_git_theme;
+			$install_this_theme = ( $is_version_change || ! $theme_dir_exists ) && ! $is_git_theme;
 
 			/**
 			 * About to attempt to install this theme.
@@ -731,8 +790,8 @@ class Boldgrid_Inspirations_Deploy {
 					 $boldgrid_configs['ajax_calls']['get_asset'] . '?id=' .
 					 $this->theme_details->themeRevision->AssetId;
 
-				if ( ! empty( $this->api_key_hash ) ) {
-					$theme_url .= '&key=' . $this->api_key_hash;
+				if ( ! empty( $api_key_hash ) ) {
+					$theme_url .= '&key=' . $api_key_hash;
 				}
 
 				// If this is a user environment, install for repo.boldgrid.com.
@@ -756,7 +815,8 @@ class Boldgrid_Inspirations_Deploy {
 
 						// Get the WP Option boldgrid_we_are_currently_installing_a_theme:
 						$we_are_currently_installing_a_theme = get_site_option(
-							'boldgrid_we_are_currently_installing_a_theme', false, false );
+							'boldgrid_we_are_currently_installing_a_theme', false, false
+						);
 
 						if ( $theme_installation_failed_attemps >
 							 $boldgrid_configs['installation']['max_num_install_attempts'] ) {
@@ -788,13 +848,14 @@ class Boldgrid_Inspirations_Deploy {
 						if ( false == $we_are_currently_installing_a_theme ) {
 							// Get the installed theme version:
 							$installed_theme_version = get_site_option( $theme_version_option_name,
-								null, false );
+								null, false
+							);
 
 							// Check the current theme version against the incoming version:
 							$install_this_theme = ( $installed_theme_version !=
 								 $incoming_theme_version );
 
-							if ( false === $install_this_theme ) {
+							if ( ! $install_this_theme ) {
 								// Latest theme already installed, so break out of the while loop:
 								break;
 							}
@@ -817,7 +878,7 @@ class Boldgrid_Inspirations_Deploy {
 						 * so that other themes aren't installed this very moment
 						 */
 						if ( true == $install_this_theme ) {
-							if ( false === $this->update_site_option_retry(
+							if ( ! $this->update_site_option_retry(
 								'boldgrid_we_are_currently_installing_a_theme', time() ) ) {
 								$install_this_theme = false;
 							} else {
@@ -904,12 +965,14 @@ class Boldgrid_Inspirations_Deploy {
 
 							$this->add_to_deploy_log( 'Error: Exiting theme deployment.' );
 
-							// On multisite, remove locks:
+							// On multisite, remove locks.
 							if ( is_multisite() ) {
 								$we_are_currently_installing_this_theme = get_site_option(
-									'boldgrid_we_are_currently_installing_this_theme', false, false );
-								if ( $this->theme_details->theme->Name ==
-									 $we_are_currently_installing_this_theme ) {
+									'boldgrid_we_are_currently_installing_this_theme', false, false
+								);
+
+								if ( $this->theme_details->theme->Name ===
+								$we_are_currently_installing_this_theme ) {
 									delete_site_option(
 										'boldgrid_we_are_currently_installing_this_theme' );
 									delete_site_option(
@@ -922,7 +985,7 @@ class Boldgrid_Inspirations_Deploy {
 							// Looks like the theme was installed successfully.
 							$theme_installation_done = true;
 
-							// Set wp options to mark the newly-installed them version:
+							// Set wp options to mark the newly-installed them version.
 							if ( is_multisite() ) {
 								$this->update_site_option_retry( $theme_version_option_name,
 									$incoming_theme_version );
@@ -932,22 +995,22 @@ class Boldgrid_Inspirations_Deploy {
 						}
 
 						// Regardless of whether we failed or succeeded, we're not longer
-						// installing:
+						// installing.
 						if ( is_multisite() ) {
 							delete_site_option( 'boldgrid_we_are_currently_installing_a_theme' );
 							delete_site_option( 'boldgrid_we_are_currently_installing_this_theme' );
 						}
 					}
-				} // End of while
+				} // End of while.
 			}
 
-			// Enable Theme Sitewide
+			// Enable Theme Sitewide.
 			$allowed_themes = get_site_option( 'allowedthemes' );
 			$allowed_themes[$theme_folder_name] = true;
 			$this->update_site_option_retry( 'allowedthemes', $allowed_themes );
 
 			if ( 'child' == $entity ) {
-				// Save the theme id as a theme mod
+				// Save the theme id as a theme mod.
 				$this->set_theme_mod_id( $theme_folder_name, $this->theme_details->theme->Id );
 
 				if ( $this->activate_theme ) {
@@ -961,7 +1024,7 @@ class Boldgrid_Inspirations_Deploy {
 						}
 					}
 
-					// Activate the theme:
+					// Activate the theme.
 					switch_theme( $activation_theme );
 				}
 			}
@@ -1002,6 +1065,40 @@ class Boldgrid_Inspirations_Deploy {
 	}
 
 	/**
+	 * Start over before deployment.
+	 *
+	 * @since 1.2.3
+	 */
+	public function start_over() {
+		// If the user does not want to start over, abort.
+		if( ! $this->start_over ) {
+			return;
+		}
+
+		// Check our nonce.
+		check_admin_referer( 'deploy', 'deploy' );
+
+		$start_over = new BoldGrid_Inspirations_Start_over();
+
+		// Are we starting over with our active site?
+		$start_over->start_over_active = ( false === $this->is_staging_install() );
+
+		// Are we starting over with our staging site?
+		$start_over->start_over_staging = (true === $this->is_staging_install() );
+
+		// Are we deleting forms?
+		$start_over->delete_forms = false;
+
+		// Are we deleting pages?
+		$start_over->delete_pages = false;
+
+		// Are we deleting themes?
+		$start_over->delete_themes = false;
+
+		$start_over->start_over();
+	}
+
+	/**
 	 * When we install a page we attach post meta data to indicate that it is a boldgrid page
 	 * This function returns all pages that are still installed on the users wordpress that were
 	 * created by boldgrid
@@ -1023,7 +1120,8 @@ class Boldgrid_Inspirations_Deploy {
 	/**
 	 * Download and import the page set the user selected
 	 *
-	 * http://codex.wordpress.org/Function_Reference/wp_insert_post
+	 * @see Boldgrid_Inspirations_Api::get_api_key_hash().
+	 * @link http://codex.wordpress.org/Function_Reference/wp_insert_post
 	 */
 	public function deploy_page_sets() {
 		$this->change_deploy_status( 'Creating pages...' );
@@ -1093,9 +1191,12 @@ class Boldgrid_Inspirations_Deploy {
 		);
 		// 'include_additional_pages' => 1,
 
+		// Get the API key hash.
+		$api_key_hash = $this->asset_manager->api->get_api_key_hash();
+
 		// Add the API key to the arguments:
-		if ( ! empty( $this->api_key_hash ) ) {
-			$arguments['body']['key'] = $this->api_key_hash;
+		if ( ! empty( $api_key_hash ) ) {
+			$arguments['body']['key'] = $api_key_hash;
 		}
 
 		// Make a call to the asset server:
@@ -1139,7 +1240,7 @@ class Boldgrid_Inspirations_Deploy {
 		}
 
 		// Save the parent category name, if available:
-		if ( false === empty( $json_response->result->data->parent_category_name ) ) {
+		if ( ! empty( $json_response->result->data->parent_category_name ) ) {
 			$this->update_existing_install_options(
 				array (
 					'parent_category_name' => $json_response->result->data->parent_category_name
@@ -1264,7 +1365,7 @@ class Boldgrid_Inspirations_Deploy {
 
 			// do we have any featured images?
 			if ( $page_v->featured_image_asset_id ) {
-				$this->AssetManager->download_and_attach_asset( $post_id, true,
+				$this->asset_manager->download_and_attach_asset( $post_id, true,
 					$page_v->featured_image_asset_id );
 			}
 
@@ -1283,7 +1384,7 @@ class Boldgrid_Inspirations_Deploy {
 					$plugin->plugin_activate_path, $plugin->version, $plugin );
 
 				// If the we have defined configurations for this plugin, configure it
-				if ( false === empty( $plugin->config_script ) ) {
+				if ( ! empty( $plugin->config_script ) ) {
 					// Passing page_id to config script
 					$plugin_install_details = $this->plugin_installation_data[$plugin->plugin_activate_path];
 
@@ -1370,8 +1471,9 @@ class Boldgrid_Inspirations_Deploy {
 
 	/**
 	 * Each page/post includes media.
-	 * Loop through each post/page and
-	 * download / setup the required media (typically imgs)
+	 * Loop through each post/page and download / setup the required media (typically imgs).
+	 *
+	 * @see Boldgrid_Inspirations_Api::get_api_key_hash().
 	 */
 	public function deploy_page_sets_media() {
 		$this->change_deploy_status( 'Downloading page/post media...' );
@@ -1416,7 +1518,7 @@ class Boldgrid_Inspirations_Deploy {
 		foreach ( $pages_and_posts as $k => $page ) {
 			$dom = new DOMDocument();
 
-			@$dom->loadHTML( mb_convert_encoding( $page->post_content, 'HTML-ENTITIES', 'UTF-8' ) );
+			@$dom->loadHTML( Boldgrid_Inspirations_Utility::utf8_to_html( $page->post_content ) );
 
 			$images = $dom->getElementsByTagName( 'img' );
 
@@ -1441,7 +1543,7 @@ class Boldgrid_Inspirations_Deploy {
 
 					$this->add_to_deploy_log( 'Beginning download_and_attach call.' );
 
-					$url_to_downloaded_image = $this->AssetManager->download_and_attach_asset(
+					$url_to_downloaded_image = $this->asset_manager->download_and_attach_asset(
 						$page->ID, false, $asset_id );
 
 					// Validate return:
@@ -1486,6 +1588,9 @@ class Boldgrid_Inspirations_Deploy {
 
 					$width = $exploded_results[0];
 
+					// Get the API key hash.
+					$api_key_hash = $this->asset_manager->api->get_api_key_hash();
+
 					/*
 					 * Download and attach the image
 					 */
@@ -1499,7 +1604,7 @@ class Boldgrid_Inspirations_Deploy {
 						'page_id' => $remote_page_id,
 						'position' => $built_photo_search_counter,
 						'asset_user_id' => $this->asset_user_id,
-						'key' => $this->api_key_hash,
+						'key' => $api_key_hash,
 						'current_build_cost' => $this->current_build_cost,
 						'coin_budget' => $this->coin_budget,
 						'site_hash' => $this->site_hash
@@ -1507,8 +1612,9 @@ class Boldgrid_Inspirations_Deploy {
 
 					$this->add_to_deploy_log( 'Beginning get_photo_data.' );
 
-					$built_photo_search_get_photo_data = $this->BuiltPhotoSearch->get_photo_data(
-						$post_params_for_get_photo_api_call );
+					$built_photo_search_get_photo_data = $this->built_photo_search->get_photo_data(
+						$post_params_for_get_photo_api_call
+					);
 
 					$this->add_to_deploy_log( 'Finished get_photo_data.' );
 
@@ -1535,7 +1641,7 @@ class Boldgrid_Inspirations_Deploy {
 
 						$this->add_to_deploy_log( 'Beginning download_and_attach call.' );
 
-						$new_image_data = $this->AssetManager->download_and_attach_asset(
+						$new_image_data = $this->asset_manager->download_and_attach_asset(
 							$page->ID, false, $item, 'all' );
 
 						$this->add_to_deploy_log( 'Finished download_and_attach call.' );
@@ -1588,7 +1694,7 @@ class Boldgrid_Inspirations_Deploy {
 					$attachment_ids = array ();
 
 					foreach ( $images as $image_asset_id ) {
-						$attachment_id = $this->AssetManager->download_and_attach_asset( $page->ID,
+						$attachment_id = $this->asset_manager->download_and_attach_asset( $page->ID,
 							false, $image_asset_id, 'attachment_id', true );
 
 						$attachment_ids[] = $attachment_id;
@@ -1616,7 +1722,9 @@ class Boldgrid_Inspirations_Deploy {
 	}
 
 	/**
-	 * Deploy page sets: Media: Find placeholders
+	 * Deploy page sets: Media: Find placeholders.
+	 *
+	 * @see Boldgrid_Inspirations_Api::get_api_key_hash().
 	 */
 	public function deploy_page_sets_media_find_placeholders() {
 		// Update deploy status and log:
@@ -1646,13 +1754,16 @@ class Boldgrid_Inspirations_Deploy {
 
 		$pages_and_posts = get_posts( $post_params );
 
+		// Get the API key hash.
+		$api_key_hash = $this->asset_manager->api->get_api_key_hash();
+
 		$this->image_placeholders_needing_images['bps_build_info'] = array (
 			'subcategory_id' => $this->subcategory_id,
 			'page_set_id' => $this->page_set_id,
 			'theme_id' => $this->theme_id,
 			'language_id' => $this->language_id,
 			'asset_user_id' => $this->asset_user_id,
-			'key' => $this->api_key_hash,
+			'key' => $api_key_hash,
 			'current_build_cost' => $this->current_build_cost,
 			'coin_budget' => $this->coin_budget,
 			'site_hash' => $this->site_hash
@@ -1666,7 +1777,7 @@ class Boldgrid_Inspirations_Deploy {
 		foreach ( $pages_and_posts as $k => $page ) {
 			// Get all of the images.
 			$dom = new DOMDocument();
-			@$dom->loadHTML( mb_convert_encoding( $page->post_content, 'HTML-ENTITIES', 'UTF-8' ) );
+			@$dom->loadHTML( Boldgrid_Inspirations_Utility::utf8_to_html( $page->post_content ) );
 			$images = $dom->getElementsByTagName( 'img' );
 
 			// Keep track of the order in which built_photo_search images appear on the page.
@@ -1788,7 +1899,7 @@ class Boldgrid_Inspirations_Deploy {
 		 * ********************************************************************
 		 */
 		$params = array (
-			'key' => $this->api_key_hash,
+			'key' => $api_key_hash,
 			'image_placeholders_needing_images' => json_encode(
 				$this->image_placeholders_needing_images ),
 			'coin_budget' => $this->coin_budget,
@@ -1839,7 +1950,7 @@ class Boldgrid_Inspirations_Deploy {
 				if ( isset( $image_data['asset_id'] ) && is_numeric( $image_data['asset_id'] ) ) {
 					$download_url = $boldgrid_configs['asset_server'] .
 						 $boldgrid_configs['ajax_calls']['get_asset'] . '?id=' .
-						 $image_data['asset_id'] . '&key=' . $this->api_key_hash;
+						 $image_data['asset_id'] . '&key=' . $api_key_hash;
 
 					$this->image_placeholders_needing_images['by_page_id'][$page_id][$images_array_key]['download_type'] = 'get';
 					$this->image_placeholders_needing_images['by_page_id'][$page_id][$images_array_key]['download_url'] = $download_url;
@@ -1852,7 +1963,7 @@ class Boldgrid_Inspirations_Deploy {
 
 					/* @formatter:off */
 					$download_params = array(
-						'key' => $this->api_key_hash,
+						'key' => $api_key_hash,
 						'id_from_provider' =>			isset( $image_data['getPhotoAction']['id_from_provider'] ) 			? $image_data['getPhotoAction']['id_from_provider']  : null,
 						'image_provider_id' =>			isset( $image_data['getPhotoAction']['image_provider_id'] ) 		? $image_data['getPhotoAction']['image_provider_id'] : null,
 						'imgr_image_id' =>				isset( $image_data['getPhotoAction']['imgr_image_id'] ) 			? $image_data['getPhotoAction']['imgr_image_id']	 : null,
@@ -1944,7 +2055,7 @@ class Boldgrid_Inspirations_Deploy {
 					$cache_array );
 
 				// Try to get the $response from cache.
-				if ( false === empty( $image_queue[$image_key]['cache_id'] ) ) {
+				if ( ! empty( $image_queue[$image_key]['cache_id'] ) ) {
 					$response[$image_key] = $this->asset_cache->get_cache_files(
 						$image_queue[$image_key]['cache_id'] );
 				}
@@ -2012,7 +2123,7 @@ class Boldgrid_Inspirations_Deploy {
 			// If we did not receive a filename in the headers, then log and skip.
 			if ( empty( $arrayify['headers']['z-filename'] ) ) {
 				// If body is binary, then remove it.
-				if ( false === empty( $arrayify['body'] ) &&
+				if ( ! empty( $arrayify['body'] ) &&
 					 Boldgrid_Inspirations_Utility::is_binary( $arrayify['body'] ) ) {
 					$arrayify['body'] = '(removed)';
 				}
@@ -2031,13 +2142,13 @@ class Boldgrid_Inspirations_Deploy {
 			} else {
 				// If image caching is enabled, a cache id exists, and was not retrieved from cache,
 				// then save to cache.
-				if ( null !== $this->asset_cache && false === empty( $image_data['cache_id'] ) &&
-					 true !== $image_data['cached'] ) {
+				if ( null !== $this->asset_cache && ! empty( $image_data['cache_id'] ) &&
+					 ! $image_data['cached'] ) {
 					$this->asset_cache->save_cache_files( $image_data['cache_id'], $arrayify );
 				}
 			}
 
-			$attachment_data = $this->AssetManager->attach_asset(
+			$attachment_data = $this->asset_manager->attach_asset(
 				array (
 					'headers' => $arrayify['headers'],
 					'body' => $arrayify['body'],
@@ -2091,7 +2202,7 @@ class Boldgrid_Inspirations_Deploy {
 		foreach ( $pages_and_posts as $k => $page ) {
 			$dom = new DOMDocument();
 
-			@$dom->loadHTML( mb_convert_encoding( $page->post_content, 'HTML-ENTITIES', 'UTF-8' ) );
+			@$dom->loadHTML( Boldgrid_Inspirations_Utility::utf8_to_html( $page->post_content ) );
 
 			$images = $dom->getElementsByTagName( 'img' );
 
@@ -2253,8 +2364,9 @@ class Boldgrid_Inspirations_Deploy {
 
 	/**
 	 * Primary Design Elements (pde) vary based upon theme group.
-	 * This function will
-	 * download and setup the appropriate pde's
+	 * This function will download and setup the appropriate pde's.
+	 *
+	 * @see Boldgrid_Inspirations_Api::get_api_key_hash().
 	 */
 	public function deploy_pde( $params = array() ) {
 		// Update deploy status and log:
@@ -2292,8 +2404,11 @@ class Boldgrid_Inspirations_Deploy {
 						)
 					);
 
-					if ( ! empty( $this->api_key_hash ) ) {
-						$arguments['body']['key'] = $this->api_key_hash;
+					// Get the API key hash.
+					$api_key_hash = $this->asset_manager->api->get_api_key_hash();
+
+					if ( ! empty( $api_key_hash ) ) {
+						$arguments['body']['key'] = $api_key_hash;
 					}
 
 					$response = wp_remote_post( $get_curated_url, $arguments );
@@ -2313,7 +2428,7 @@ class Boldgrid_Inspirations_Deploy {
 					 */
 					// Set the last argument to true in order to 'add_meta_data'.
 					// This is because the attribution class looks for thumbnails.
-					$pde_url = $this->AssetManager->download_and_attach_asset( false, false,
+					$pde_url = $this->asset_manager->download_and_attach_asset( false, false,
 						$asset_id, 'url', true );
 
 					/**
@@ -2321,7 +2436,7 @@ class Boldgrid_Inspirations_Deploy {
 					 * Step 3: Set the theme mod
 					 * ********************************************************
 					 */
-					if ( true === $params['update_current_themes_mods'] ) {
+					if ( $params['update_current_themes_mods'] ) {
 						set_theme_mod( 'default_' . $pde['pde_type_name'], $pde_url );
 					}
 
@@ -2333,7 +2448,7 @@ class Boldgrid_Inspirations_Deploy {
 					 * above), it would affect the user's current live site (IE change their
 					 * background / header image).
 					 */
-					if ( false === $params['update_current_themes_mods'] &&
+					if ( ! $params['update_current_themes_mods'] &&
 						 isset( $params['stylesheet'] ) ) {
 						$staging_prefix = $this->is_staging_install() ? 'boldgrid_staging_' : '';
 
@@ -2605,7 +2720,7 @@ class Boldgrid_Inspirations_Deploy {
 	/**
 	 * This plugin requests a list of sitewide plugins to be installed, and then installs them.
 	 *
-	 * @return null
+	 * @see Boldgrid_Inspirations_Api::get_api_key_hash().
 	 */
 	public function install_sitewide_plugins() {
 		$this->change_deploy_status( 'Installation sitewide plugins...' );
@@ -2625,12 +2740,16 @@ class Boldgrid_Inspirations_Deploy {
 		// Build API call arguments:
 		$arguments = array (
 			'method' => 'POST',
-			'body' => array (),
-			'channel' => $release_channel
+			'body' => array(
+				'channel' => $release_channel
+			)
 		);
 
-		if ( ! empty( $this->api_key_hash ) ) {
-			$arguments['body']['key'] = $this->api_key_hash;
+		// Get the API key hash.
+		$api_key_hash = $this->asset_manager->api->get_api_key_hash();
+
+		if ( ! empty( $api_key_hash ) ) {
+			$arguments['body']['key'] = $api_key_hash;
 		}
 
 		$response = wp_remote_post( $get_plugins_url, $arguments );
@@ -2694,12 +2813,12 @@ class Boldgrid_Inspirations_Deploy {
 	/**
 	 * Download and activate a plugin.
 	 *
+	 * @see Boldgrid_Inspirations_Api::get_api_key_hash().
+	 *
 	 * @param string $url A URL such as "https://downloads.wordpress.org/plugin/quick-cache.140829.zip".
 	 * @param string $activate_path A plugin path such as "quick-cache/quick-cache.php".
 	 * @param string $version Version number.
 	 * @param object $full_plugin_data Plugin details.
-	 *
-	 * @return null
 	 */
 	public function download_and_install_plugin( $url, $activate_path, $version, $full_plugin_data ) {
 		$boldgrid_configs = $this->get_configs();
@@ -2709,9 +2828,12 @@ class Boldgrid_Inspirations_Deploy {
 			// Replace ASSET_SERVER with the asset server name
 			$url = str_replace( 'ASSET_SERVER', $boldgrid_configs['asset_server'], $url );
 
+			// Get the API key hash.
+			$api_key_hash = $this->asset_manager->api->get_api_key_hash();
+
 			// Attach the api key:
-			if ( false === empty( $this->api_key_hash ) ) {
-				$url .= '&key=' . $this->api_key_hash;
+			if ( ! empty( $api_key_hash ) ) {
+				$url .= '&key=' . $api_key_hash;
 			}
 		}
 
@@ -2780,8 +2902,8 @@ class Boldgrid_Inspirations_Deploy {
 		$original_active_path = $activate_path; // <-- overwriting if activating forked plugin
 
 		// If the plugin needs to be installed, first check for a forked version:
-		if ( false === $plugin_version_already_exists &&
-			 false === empty( $full_plugin_data->forked_plugin_path ) ) {
+		if ( ! $plugin_version_already_exists &&
+			 ! empty( $full_plugin_data->forked_plugin_path ) ) {
 			if ( file_exists( $plugin_path . $full_plugin_data->forked_plugin_path ) ) {
 				// Check if forked plugin active:
 				$forked_plugin_active = $this->external_plugin->is_active(
@@ -2803,7 +2925,7 @@ class Boldgrid_Inspirations_Deploy {
 		}
 
 		// If the plugin still needs to be installed, then do it:
-		if ( false === $plugin_version_already_exists ) {
+		if ( ! $plugin_version_already_exists ) {
 			// Install the plugin:
 			$upgrader = new Plugin_Upgrader(
 				new Plugin_Installer_Skin( compact( 'title', 'url', 'nonce', 'plugin', 'api' ) ) );
@@ -2927,7 +3049,7 @@ class Boldgrid_Inspirations_Deploy {
 
 						// do we have any featured images?
 					if ( 0 != $homepage_step_obj->page->featured_image_asset_id ) {
-						$this->AssetManager->download_and_attach_asset( $post_id, true,
+						$this->asset_manager->download_and_attach_asset( $post_id, true,
 							$homepage_step_obj->page->featured_image_asset_id );
 					}
 
@@ -2997,7 +3119,7 @@ class Boldgrid_Inspirations_Deploy {
 					break;
 
 				case 'download_asset' :
-					$url_to_uploaded_asset = $this->AssetManager->download_and_attach_asset( false,
+					$url_to_uploaded_asset = $this->asset_manager->download_and_attach_asset( false,
 						false, $homepage_step_obj->action_id );
 
 					if ( substr( $homepage_step_obj->return_value_save_as, 0, 7 ) == 'option:' ) {
@@ -3392,7 +3514,7 @@ class Boldgrid_Inspirations_Deploy {
 		@ini_set( 'max_execution_time', 120 );
 
 		// Start XHProf.
-		if ( false === empty( $boldgrid_configs['xhprof'] ) && extension_loaded( 'xhprof' ) ) {
+		if ( ! empty( $boldgrid_configs['xhprof'] ) && extension_loaded( 'xhprof' ) ) {
 			xhprof_enable( XHPROF_FLAGS_CPU | XHPROF_FLAGS_MEMORY );
 		}
 
@@ -3401,6 +3523,9 @@ class Boldgrid_Inspirations_Deploy {
 
 		// Check permalink structure:
 		$this->check_permalink_structure();
+
+		// Start over.
+		$this->start_over();
 
 		// Run the specified deployment:
 		switch ( $this->deploy_type ) {
@@ -3418,7 +3543,7 @@ class Boldgrid_Inspirations_Deploy {
 		}
 
 		// Save report to the log.
-		if ( false === empty( $boldgrid_configs['xhprof'] ) && extension_loaded( 'xhprof' ) ) {
+		if ( ! empty( $boldgrid_configs['xhprof'] ) && extension_loaded( 'xhprof' ) ) {
 			$xhprof_data = xhprof_disable();
 
 			$xhprof_utils_path = '/usr/share/pear/xhprof_lib/utils';

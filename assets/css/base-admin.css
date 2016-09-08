@@ -149,6 +149,21 @@ plugin-card
 	width: 100%;
 }
 
+.boldgrid-plugin-card {
+	border: 1px solid #dfdfdf;
+}
+
+.boldgrid-plugin-card .top {
+	background:#fff; padding:15px;
+}
+
+.boldgrid-plugin-card .bottom {
+	background: #fafafa;
+	padding: 15px;
+	text-align: right;
+	border-top: 1px solid #dfdfdf;
+}
+
 /* *****************************************************************
 Misc
 ***************************************************************** */

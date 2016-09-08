@@ -75,7 +75,7 @@ IMHWPB.BoldGrid_Cart = function( configs ) {
 				var checked = $( this ).attr( 'checked' ) ? true : false;
 
 				// If applicable, add opacity to the image to show it's unselectd.
-				if ( true === checked ) {
+				if ( checked ) {
 					image_container.removeClass( 'unselected-image' );
 					self.baseAdmin.update_header_cart( image_price );
 				} else {
@@ -212,7 +212,7 @@ IMHWPB.BoldGrid_Cart = function( configs ) {
 			 */
 
 			// Abort if the user did not click the checkbox.
-			if ( false === $( '#agree_to_tos' ).is( ':checked' ) ) {
+			if ( ! $( '#agree_to_tos' ).is( ':checked' ) ) {
 				self.set_purchase_error( error_tos_not_agreed_to );
 				return false;
 			}
@@ -225,7 +225,7 @@ IMHWPB.BoldGrid_Cart = function( configs ) {
 			 * ********************************************************************
 			 */
 			var success_action = function( response ) {
-				if ( true === response.result.data ) {
+				if ( response.result.data ) {
 					$( 'form#purchase_for_publish' ).submit();
 				} else {
 					$( 'span#purchase_error' ).html( 'Invalid BoldGrid Connect Key!' );

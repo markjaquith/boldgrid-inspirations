@@ -9,60 +9,60 @@
  * @author BoldGrid.com <wpb@boldgrid.com>
  */
 
-// Prevent direct calls
-if ( ! defined( 'WPINC' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
-}
-
+// Die if user cannot upload files.
 if ( ! current_user_can( 'upload_files' ) )
-	wp_die( __( 'You do not have permission to upload files.' ) );
+	wp_die( esc_html__( 'You do not have permission to upload files.', 'boldgrid-inspirations' ) );
 
 /**
- * BoldGrid Enable Media Replace class
+ * The BoldGrid Enable Media Replace class.
  */
 class Boldgrid_Inspirations_Enable_Media_Replace {
-	
 	/**
-	 * Replace image
+	 * The Boldgrid Inspirations Asset Manager class object.
 	 *
-	 * @param unknown $attachment_id        	
-	 * @param unknown $new_file_path        	
+	 * @var Boldgrid_Inspirations_Asset_Manager
+	 */
+	private $asset_manager;
+
+	/**
+	 * Replace image.
+	 *
+	 * @param unknown $attachment_id
+	 * @param unknown $new_file_path
 	 * @return boolean
 	 */
 	public function replace_image( $attachment_id, $new_file_path ) {
 		$file['userfile'] = array (
 			'tmp_name' => $new_file_path,
 			'name' => basename( $new_file_path ),
-			'size' => filesize( $new_file_path ) 
+			'size' => filesize( $new_file_path )
 		);
-		
+
 		// Define DB table names
 		global $wpdb;
-		
+
 		$table_name = $wpdb->prefix . 'posts';
-		
+
 		$postmeta_table_name = $wpdb->prefix . 'postmeta';
-		
+
 		// Get old guid and filetype from DB
 		$sql = "SELECT guid, post_mime_type FROM " . $table_name . " WHERE ID = '" .
 			 ( int ) $attachment_id . "'";
-		
+
 		list ( $current_filename, $current_filetype ) = $wpdb->get_row( $sql, ARRAY_N );
-		
+
 		// Massage a bunch of vars
 		$current_guid = $current_filename;
 		$current_filename = substr( $current_filename, ( strrpos( $current_filename, '/' ) + 1 ) );
-		
+
 		$current_file = get_attached_file( ( int ) $attachment_id, true );
 		$current_path = substr( $current_file, 0, ( strrpos( $current_file, '/' ) ) );
 		$current_file = str_replace( '//', '/', $current_file );
 		$current_filename = basename( $current_file );
-		
+
 		// We have two types: replace / replace_and_search; we only use replace.
 		$replace_type = 'replace';
-		
+
 		/* @formatter:off */
 		/**
 
@@ -76,133 +76,133 @@ class Boldgrid_Inspirations_Enable_Media_Replace {
 				[error] => 0
 				[size] => 4588
 			)
-		
+
 		)
-		
+
 		$filedata = Array
 		(
     		[ext] => png
     		[type] => image/png
-    		[proper_filename] => 
+    		[proper_filename] =>
 		)
-		
+
 		*/
 		/* @formatter:on */
-		
+
 		// New method for validating that the uploaded file is allowed, using WP:s internal
 		// wp_check_filetype_and_ext() function.
-		$filedata = wp_check_filetype_and_ext( $file['userfile']['tmp_name'], 
+		$filedata = wp_check_filetype_and_ext( $file['userfile']['tmp_name'],
 			$file['userfile']['name'] );
-		
+
 		if ( empty( $filedata['ext'] ) ) {
 			echo __( 'File type does not meet security guidelines. Try another.' );
 			echo '<pre>$filedata = ' . print_r( $filedata, true ) . '</pre>';
-			
+
 			return false;
 		}
-		
+
 		$new_filename = $file['userfile']['name'];
 		$new_filesize = $file['userfile']['size'];
 		$new_filetype = $filedata['type'];
-		
+
 		// save original file permissions
 		$original_file_perms = fileperms( $current_file ) & 0777;
-		
+
 		if ( 'replace' == $replace_type ) {
 			// Drop-in replace and we don't even care if you uploaded something that is the wrong
 			// file-type.
 			// That's your own fault, because we warned you!
-			
+
 			// Delete the old image file and resized images:
 			$this->emr_delete_current_files( $current_file, $attachment_id );
-			
+
 			// Move new file to old location/name
 			// move_uploaded_file( $file["userfile"]["tmp_name"], $current_file );
 			rename( $file['userfile']['tmp_name'], $current_file );
-			
+
 			// Chmod new file to original file permissions
 			chmod( $current_file, $original_file_perms );
-			
+
 			// Delete the temp attachment:
-			
+
 			// Make thumb and/or update metadata
-			wp_update_attachment_metadata( ( int ) $attachment_id, 
+			wp_update_attachment_metadata( ( int ) $attachment_id,
 				wp_generate_attachment_metadata( ( int ) $attachment_id, $current_file ) );
-			
+
 			// Trigger possible updates on CDN and other plugins
 			update_attached_file( ( int ) $attachment_id, $current_file );
-			
+
 			// Update any cropped images.
 			$this->update_crops( $attachment_id, $new_file_path );
 		}
-		
+
 		// Execute hook actions - thanks rubious for the suggestion!
 		if ( isset( $new_guid ) ) {
-			do_action( 'enable-media-replace-upload-done', 
+			do_action( 'enable-media-replace-upload-done',
 				( $new_guid ? $new_guid : $current_guid ) );
 		}
 	}
-	
+
 	/**
 	 * emr_delete_current_files
 	 *
 	 * @param unknown $current_file
 	 *        	=
 	 *        	/home/user/public_html/wp-content/uploads/sites/316/2015/04/4-FotoliaComp_78800821_jwmdPMmrLDqay9EtDkXISZ7kKwezB0Vk.jpg
-	 * @param int $attachment_id        	
+	 * @param int $attachment_id
 	 */
 	public function emr_delete_current_files( $current_file, $attachment_id ) {
 		// Delete old file
-		
+
 		// Find path of current file
 		$current_path = substr( $current_file, 0, ( strrpos( $current_file, '/' ) ) );
-		
+
 		// Check if old file exists first
 		if ( file_exists( $current_file ) ) {
 			// Now check for correct file permissions for old file
 			clearstatcache();
-			
+
 			if ( is_writable( $current_file ) ) {
 				// Everything OK; delete the file
 				unlink( $current_file );
 			} else {
 				// File exists, but has wrong permissions. Let the user know.
-				printf( 
-					__( 
-						'The file %1$s can not be deleted by the web server, most likely because the permissions on the file are wrong.', 
+				printf(
+					__(
+						'The file %1$s can not be deleted by the web server, most likely because the permissions on the file are wrong.',
 						'enable-media-replace' ), $current_file );
-				
+
 				exit();
 			}
 		}
-		
+
 		// Delete old resized versions if this was an image
 		$suffix = substr( $current_file, ( strlen( $current_file ) - 4 ) );
 		$prefix = substr( $current_file, 0, ( strlen( $current_file ) - 4 ) );
 		$imgAr = array (
 			'.png',
 			'.gif',
-			'.jpg' 
+			'.jpg'
 		);
-		
+
 		if ( in_array( $suffix, $imgAr ) ) {
 			// It's a png/gif/jpg based on file name
 			// Get thumbnail filenames from metadata
 			$metadata = wp_get_attachment_metadata( $attachment_id );
-			
+
 			if ( is_array( $metadata ) ) { // Added fix for error messages when there is no metadata
 			                               // (but WHY would there not be? I don't know…)
 				foreach ( $metadata['sizes'] as $thissize ) {
 					// Get all filenames and do an unlink() on each one;
 					$thisfile = $thissize['file'];
-					
+
 					// Create array with all old sizes for replacing in posts later
 					$oldfilesAr[] = $thisfile;
-					
+
 					// Look for files and delete them
 					if ( strlen( $thisfile ) ) {
 						$thisfile = $current_path . '/' . $thissize['file'];
-						
+
 						if ( file_exists( $thisfile ) ) {
 							unlink( $thisfile );
 						}
@@ -211,7 +211,7 @@ class Boldgrid_Inspirations_Enable_Media_Replace {
 			}
 		}
 	}
-	
+
 	/**
 	 * Array
 	 * (
@@ -259,85 +259,87 @@ class Boldgrid_Inspirations_Enable_Media_Replace {
 	public function update_crops( $attachment_id, $new_file_path ) {
 		// Get the asset.
 		require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-asset-manager.php';
-		$this->AssetManager = new Boldgrid_Inspirations_Asset_Manager();
-		$asset = $this->AssetManager->get_asset( 
-			array (
+		$this->asset_manager = new Boldgrid_Inspirations_Asset_Manager();
+
+		$asset = $this->asset_manager->get_asset(
+			array(
 				'by' => 'attachment_id',
-				'attachment_id' => $attachment_id 
-			) );
-		
+				'attachment_id' => $attachment_id,
+			)
+		);
+
 		// If this is not an asset, abort.
 		if ( false == $asset ) {
 			return;
 		}
-		
+
 		// Abort if there are no 'crops'.
 		if ( ! isset( $asset['crops'] ) ) {
 			return;
 		}
-		
+
 		foreach ( $asset['crops'] as $crops_key => $crop_details ) {
 			// crop the new unwatermarked image, $cropped.
 			$data = array_map( 'absint', $crop_details['cropDetails'] );
-			
-			$cropped = wp_crop_image( $attachment_id, $data['x1'], $data['y1'], $data['width'], 
+
+			$cropped = wp_crop_image( $attachment_id, $data['x1'], $data['y1'], $data['width'],
 				$data['height'], $data['dst_width'], $data['dst_height'] );
-			
+
 			/*
 			 * Rename the watermarked crop.
 			 * $crop_details['path'] is the path the cropped watermarked image.
 			 * $cropped is the path to the cropped NON watermarked image.
 			 */
 			$rename_result = rename( $cropped, $crop_details['path'] );
-			
+
 			if ( false == $rename_result ) {
 				error_log( 'Error replacing cropped watermark with cropped NON-watermark.' );
 			}
 		}
 	}
-	
+
 	/**
 	 * Retreive an attachment id from a URL address or absolute file path
 	 *
 	 * Note: The path must contain "/uploads/".
 	 *
-	 * @param string $path        	
+	 * @param string $path
 	 *
 	 * @return int or false
 	 */
 	public function get_attachement_id_from_path( $path ) {
 		// Trim the path:
 		$path = trim( $path );
-		
+
 		// Is the path a URL or file path?
 		$is_url = ( bool ) strpos( $path, '://' );
-		
+
 		// Validate the input:
-		if ( empty( $path ) || ( ! $is_url && false === realpath( $path ) ) ) {
+		if ( empty( $path ) || ( ! $is_url && ! realpath( $path ) ) ) {
 			return false;
 		}
-		
+
 		// Get the part of the GUI we need:
 		preg_match( '#/uploads/.+$#', $path, $matches );
 		$guid_part = $matches[0];
-		
+
 		// Check if we have valid search criteria:
 		if ( empty( $guid_part ) ) {
 			return false;
 		}
-		
+
 		// Connect WordPress database:
 		global $wpdb;
-		
+
 		// Get the table prefix:
 		$table_prefix = $wpdb->prefix;
-		
+
 		// Retrieve the attachment id(s) from the matching posts:
-		$id = $wpdb->get_var( 
-			$wpdb->prepare( 
+		$id = $wpdb->get_var(
+			$wpdb->prepare(
 				"SELECT ID FROM " . $table_prefix .
 					 "posts WHERE post_type='attachment' AND guid LIKE '%%%s'", $guid_part ) );
-		
+
 		// Return the result(s):
 		return $id;
 	}

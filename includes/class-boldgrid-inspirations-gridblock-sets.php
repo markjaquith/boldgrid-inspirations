@@ -1,5 +1,4 @@
 <?php
-
 /**
  * BoldGrid Source Code
  *
@@ -8,13 +7,6 @@
  * @version $Id$
  * @author BoldGrid.com <wpb@boldgrid.com>
  */
-
-// Prevent direct calls
-if ( ! defined( 'WPINC' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
-	exit();
-}
 
 /**
  * BoldGrid Inspirations GridBlock Sets.
@@ -28,31 +20,31 @@ class Boldgrid_Inspirations_GridBlock_Sets {
 	 * Construct.
 	 *
 	 * @since 1.0.10
-	 *       
-	 * @param array $configs        	
+	 *
+	 * @param array $configs
 	 */
 	public function __construct( $configs ) {
 		$this->configs = $configs;
-		
+
 		// Include our Kitchen Sink Class.
 		include_once BOLDGRID_BASE_DIR .
 			 '/includes/class-boldgrid-inspirations-gridblock-sets-kitchen-sink.php';
-		$this->kitchen_sink_helper = new Boldgrid_Inspirations_GridBlock_Sets_Kitchen_Sink( 
+		$this->kitchen_sink_helper = new Boldgrid_Inspirations_GridBlock_Sets_Kitchen_Sink(
 			$this->configs );
 	}
-	
+
 	/**
 	 * Get our GridBlock Sets.
 	 *
 	 * @since 1.0.10
-	 *       
+	 *
 	 * @return array Our GridBlock Sets.
 	 */
 	public function get() {
 		$this->kitchen_sink = $this->kitchen_sink_helper->get();
-		
+
 		return array (
-			'kitchen_sink' => $this->kitchen_sink 
+			'kitchen_sink' => $this->kitchen_sink
 		);
 	}
 }

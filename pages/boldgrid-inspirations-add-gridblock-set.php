@@ -1,6 +1,7 @@
 <?php
-// Don't let this page get loaded directly.
-defined( 'WPINC' ) ?  : die();
+// Prevent direct calls.
+require BOLDGRID_BASE_DIR . '/pages/templates/restrict-direct-access.php';
+
 ?>
 
 <div class='wrap'>

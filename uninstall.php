@@ -42,22 +42,19 @@ delete_option( 'imhwpbgrid.css' );
 delete_option( 'boldgrid_reseller' );
 delete_option( 'imhwpb_reseller' );
 
+delete_option( 'boldgrid_settings' );
+delete_option( 'imhwpb_settings' );
+
 delete_transient( 'boldgrid_valid_api_key' );
 delete_transient( 'imhwpb_valid_api_key' );
 
-delete_transient( 'boldgrid_api_data' );
-delete_transient( 'imhwpb_api_data' );
-
-delete_option( 'boldgrid_settings' );
-delete_option( 'imhwpb_settings' );
+delete_site_transient( 'boldgrid_api_data' );
+delete_site_transient( 'imhwpb_api_data' );
 
 if ( is_multisite() ) {
 	delete_site_option( 'boldgrid_we_are_currently_installing_a_theme' );
 	delete_site_option( 'imhwpb_we_are_currently_installing_a_theme' );
-	
+
 	delete_site_option( 'boldgrid_we_are_currently_installing_this_theme' );
 	delete_site_option( 'imhwpb_we_are_currently_installing_this_theme' );
-	
-	delete_site_transient( 'boldgrid_api_data' );
-	delete_site_transient( 'imhwpb_api_data' );
 }

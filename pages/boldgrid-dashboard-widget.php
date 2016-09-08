@@ -1,4 +1,8 @@
-<?php defined( 'WPINC' ) ? : die; // Don't let this page get loaded directly. ?>
+<?php
+// Prevent direct calls.
+require BOLDGRID_BASE_DIR . '/pages/templates/restrict-direct-access.php';
+
+?>
 <!-- Start of BoldGrid Dashboard Widget -->
 <div id="dashboard-widget" class="metabox-holder">
 	<div id="postbox-container-0" class="postbox-container"
@@ -16,7 +20,7 @@
 					<section id="boldgrid-first-widget" class="left w50">
 						<div class="boldgrid-50-50-left">
 							<h2>First Time Users</h2>
-							<?php include BOLDGRID_BASE_DIR . '/pages/boldgrid-dashboard-first-time-users.php'; ?>							
+							<?php include BOLDGRID_BASE_DIR . '/pages/boldgrid-dashboard-first-time-users.php'; ?>
 						</div>
 					</section>
 					<section id="boldgrid-experienced-section" class="right w50">
