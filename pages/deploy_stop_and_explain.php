@@ -8,12 +8,12 @@ require BOLDGRID_BASE_DIR . '/pages/templates/restrict-direct-access.php';
  * 2: Set any applicable cookies.
  * ****************************************************************************
  */
-$url_to_customizer = 'customize.php';
+$url_to_customizer = admin_url( 'customize.php' );
 
 // If we don't have the staging plugin installed:
 if ( ! is_plugin_active( 'boldgrid-staging/boldgrid-staging.php' ) ) {
 	$template = 'Your new BoldGrid site is now installed and <a href="%s" target="_blank">ready to view</a>.';
-	$your_new_site_is_now_installed_message = sprintf( $template, get_site_url() );
+	$your_new_site_is_now_installed_message = sprintf( $template, esc_url( get_site_url() ) );
 
 	$_SESSION['wp_staging_view_version'] = 'production';
 } else {
@@ -27,11 +27,11 @@ if ( ! is_plugin_active( 'boldgrid-staging/boldgrid-staging.php' ) ) {
 		$site_type = 'Staging';
 
 		$_SESSION['wp_staging_view_version'] = 'staging';
-		$url_to_customizer = "customize.php?staging=1";
+		$url_to_customizer = admin_url( "customize.php?staging=1" );
 	}
 
 	$template = 'Your new BoldGrid site has installed as your <strong>%s</strong> site, and is <a href="%s" target="_blank">ready to view</a>.';
-	$your_new_site_is_now_installed_message = sprintf( $template, $site_type, get_site_url() );
+	$your_new_site_is_now_installed_message = sprintf( $template, esc_html( $site_type ), esc_url( get_site_url() ) );
 }
 
 ?>
@@ -65,7 +65,7 @@ if ( ! is_plugin_active( 'boldgrid-staging/boldgrid-staging.php' ) ) {
 			<p>
 				If you want to jump right in, continue by going to <a
 					class='dashicons dashicons-inline dashicons-admin-customize'
-					href='<?php echo $url_to_customizer; ?>'>Customize</a> in the left
+					href='<?php echo esc_url( $url_to_customizer ); ?>'>Customize</a> in the left
 				menu.
 			</p>
 		</div>
@@ -73,7 +73,7 @@ if ( ! is_plugin_active( 'boldgrid-staging/boldgrid-staging.php' ) ) {
 			<div class='column-updated'>
 				<a href='admin.php?page=boldgrid-tutorials'
 					class='button button-secondary' target='_blank'>Learn More</a> <a
-					href='<?php  echo $url_to_customizer; ?>'
+					href='<?php echo esc_url( $url_to_customizer ); ?>'
 					class='button button-primary'>Customize</a>
 			</div>
 		</div>
