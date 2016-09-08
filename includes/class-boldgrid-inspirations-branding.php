@@ -181,7 +181,7 @@ class Boldgrid_Inspirations_Branding {
 	 * Add the login logo url instead of default wordpress.org logo url.
 	 */
 	public function boldgrid_login_logo_url() {
-		return esc_url( 'http://www.boldgrid.com/' );
+		return esc_url( 'https://www.boldgrid.com/' );
 	}
 
 	/**
@@ -213,7 +213,7 @@ class Boldgrid_Inspirations_Branding {
 
 		$reseller_support_url = esc_url(
 			! empty( $reseller_data['reseller_support_url'] ) ?
-			$reseller_data['reseller_support_url'] : 'http://www.boldgrid.com/documentation'
+			$reseller_data['reseller_support_url'] : 'https://www.boldgrid.com/documentation'
 		);
 
 		// Print HTML.
@@ -234,7 +234,7 @@ class Boldgrid_Inspirations_Branding {
 		<?php
 		} else {
 		?>
-			Check out the<a href='http://www.boldgrid.com/support/'
+			Check out the<a href='https://www.boldgrid.com/support/'
 		target='_blank'>BoldGrid Education Channel</a>!
 		<?php
 		}
@@ -283,7 +283,7 @@ class Boldgrid_Inspirations_Branding {
 		$args = array(
 			'id' => 'boldgrid-adminbar-icon',
 			'title' => '<span aria-hidden="true" class="boldgrid-icon ab-icon"></span>',
-			'href' => 'http://www.boldgrid.com/',
+			'href' => 'https://www.boldgrid.com/',
 			'meta' => array(
 				'class' => 'boldgrid-node-icon',
 			),
@@ -295,7 +295,7 @@ class Boldgrid_Inspirations_Branding {
 			'id' => 'boldgrid-site-url',
 			'parent' => 'boldgrid-adminbar-icon',
 			'title' => __( 'BoldGrid.com', 'boldgrid-inspirations' ),
-			'href' => 'http://www.boldgrid.com/',
+			'href' => 'https://www.boldgrid.com/',
 			'meta' => array(
 				'class' => 'boldgrid-dropdown',
 				'target' => '_blank',
@@ -310,7 +310,7 @@ class Boldgrid_Inspirations_Branding {
 			'id' => 'boldgrid-site-documentation',
 			'parent' => 'boldgrid-adminbar-icon',
 			'title' => __( 'Documentation', 'boldgrid-inspirations' ),
-			'href' => 'http://www.boldgrid.com/docs',
+			'href' => 'https://www.boldgrid.com/docs',
 			'meta' => array(
 				'class' => 'boldgrid-dropdown',
 				'target' => '_blank',
@@ -325,7 +325,7 @@ class Boldgrid_Inspirations_Branding {
 			'id' => 'boldgrid-support-center',
 			'parent' => 'boldgrid-adminbar-icon',
 			'title' => __( 'Support Center', 'boldgrid-inspirations' ),
-			'href' => 'http://www.boldgrid.com/support',
+			'href' => 'https://www.boldgrid.com/support',
 			'meta' => array(
 				'class' => 'boldgrid-dropdown',
 				'target' => '_blank',
@@ -340,7 +340,7 @@ class Boldgrid_Inspirations_Branding {
 			'id' => 'boldgrid-feedback-url',
 			'parent' => 'boldgrid-adminbar-icon',
 			'title' => __( 'Feedback', 'boldgrid-inspirations' ),
-			'href' => 'http://www.boldgrid.com/feedback',
+			'href' => 'https://www.boldgrid.com/feedback',
 			'meta' => array(
 				'class' => 'boldgrid-dropdown',
 				'target' => '_blank',
@@ -379,12 +379,12 @@ class Boldgrid_Inspirations_Branding {
 
 		$reseller_website_url = (
 			! empty( $reseller_data['reseller_website_url'] ) ?
-			$reseller_data['reseller_website_url'] : 'http://www.boldgrid.com/'
+			$reseller_data['reseller_website_url'] : 'https://www.boldgrid.com/'
 		);
 
 		$reseller_support_url = (
 			! empty( $reseller_data['reseller_support_url'] ) ?
-			$reseller_data['reseller_support_url'] : 'http://www.boldgrid.com/documentation'
+			$reseller_data['reseller_support_url'] : 'https://www.boldgrid.com/documentation'
 		);
 
 		$reseller_amp_url = (

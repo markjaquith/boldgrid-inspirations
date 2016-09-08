@@ -15,7 +15,7 @@
  * filter in the editor plugin to return the content.
  *
  * @since 1.0.9
- * @link http://www.boldgrid.com.
+ * @link https://www.boldgrid.com/
  * @package Boldgrid_Inspiration.
  * @subpackage Boldgrid_Inspiration/includes.
  * @author BoldGrid <wpb@boldgrid.com>.
