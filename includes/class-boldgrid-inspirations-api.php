@@ -226,7 +226,7 @@ class Boldgrid_Inspirations_Api {
 		$configs = Boldgrid_Inspirations_Config::get_format_configs();
 
 		// Check for api data transient.
-		$boldgrid_api_data = get_transient( 'boldgrid_api_data' );
+		$boldgrid_api_data = get_site_transient( 'boldgrid_api_data' );
 
 		// If there is no transient data, then retrieve it from the asset server.
 		if ( empty( $boldgrid_api_data ) ) {
