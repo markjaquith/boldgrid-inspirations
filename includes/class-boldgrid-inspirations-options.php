@@ -13,6 +13,7 @@
  */
 class Boldgrid_Inspirations_Options {
 	/**
+	 * 
 	 * Is the staging plugin installed?
 	 *
 	 * @var bool
@@ -25,9 +26,7 @@ class Boldgrid_Inspirations_Options {
 	 * @return mixed
 	 */
 	public static function get_install_options() {
-		$install_options = get_option( 'boldgrid_install_options' );
-
-		return $install_options;
+		return get_option( 'boldgrid_install_options' );
 	}
 
 	/**
