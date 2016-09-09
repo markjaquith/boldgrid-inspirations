@@ -939,14 +939,14 @@ class Boldgrid_Inspirations_Attribution extends Boldgrid_Inspirations {
 		 */
 		$license = "<strong>License</strong>: ";
 		if ( isset( $license_id ) && isset( $this->license_details[$license_id] ) ) {
-			$license .= "<a href='" . $this->license_details[$license_id]['url'] .
-				 "' target='_blank'><img src='" . $this->license_details[$license_id]['icon'] .
-				 "' title='" . $this->license_details[$license_id]['name'] . "' /></a>";
+			$license .= "<a href='" . esc_url( $this->license_details[$license_id]['url'] ) .
+				 "' target='_blank'><img src='" . esc_url( $this->license_details[$license_id]['icon'] ) .
+				 "' title='" . esc_attr( $this->license_details[$license_id]['name'] ) . "' /></a>";
 		} else {
 			$license .= "<em>Unknown license</em>";
 		}
 
-		return $image_tag . "<br />" . $author . "<br />" . $license;
+		return $image_tag . "<br />" . esc_html( $author ) . "<br />" . $license;
 	}
 
 	/**
