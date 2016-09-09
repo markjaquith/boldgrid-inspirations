@@ -220,7 +220,7 @@ class Boldgrid_Inspirations_Branding {
 		?>
 <br />
 <center>
-	<img src='<?php echo $reseller_logo_url; ?>'>
+	<img src='<?php echo esc_url( $reseller_logo_url ); ?>'>
 </center>
 <br />
 <div style='text-align: center;'>
