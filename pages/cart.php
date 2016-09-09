@@ -103,7 +103,7 @@ if ( $have_assets_needing_purchase ) {
 	id="purchase_for_publish">
 	<?php
 
-	echo wp_nonce_field( 'purchase_for_publish' );
+	wp_nonce_field( 'purchase_for_publish' );
 
 	/**
 	 * ************************************************************************
