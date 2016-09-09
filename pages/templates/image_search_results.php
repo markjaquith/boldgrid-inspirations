@@ -13,7 +13,7 @@
 			<a class="check" href="#" title="Deselect" tabindex="-1"><div class="media-modal-icon"></div></a>
 	<div class='image-details'>
 		{{#if_eq license_type 'creative_commons'}}
-			<img src='<?php echo plugins_url() . '/' . basename( BOLDGRID_BASE_DIR ) . '/assets/images/cc/cc.png'; ?>' class='cc-sm' />
+			<img src='<?php echo esc_url( plugins_url() . '/' . basename( BOLDGRID_BASE_DIR ) . '/assets/images/cc/cc.png' ); ?>' class='cc-sm' />
 		{{/if_eq}}
 		{{#if_eq license_type 'paid'}}
 			Coins: <strong>{{coins}}</strong>
