@@ -288,10 +288,10 @@ iframe#boldgrid_connect_search {
 			// Return / echo the image tag, if we have a caption:
 			if ( ! empty( $_POST['caption'] ) ) {
 				$response['html_for_editor'] = '[caption ' . $caption_id . ' ' . $caption_align .
-					 '] <img src="' . $image['uploaded_url'] . '" ' . $image_width_and_height . ' ' .
+					 '] <img src="' . esc_url( $image['uploaded_url'] ) . '" ' . $image_width_and_height . ' ' .
 					 $image_alt_text . ' ' . $image_class . ' />' . $caption . '[/caption]';
 			} else {
-				$response['html_for_editor'] = '<img src="' . $image['uploaded_url'] . '" ' .
+				$response['html_for_editor'] = '<img src="' . esc_url( $image['uploaded_url'] ) . '" ' .
 					 $image_width_and_height . ' ' . $image_alt_text . ' ' . $image_class . ' />';
 			}
 		}
