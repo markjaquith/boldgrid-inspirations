@@ -422,6 +422,10 @@ class Boldgrid_Inspirations_Dependency_Plugins {
 			return false;
 		}
 
+		if ( ! wp_verify_nonce( $_POST['_bg_nonce'], 'install_plugins' ) ) {
+			return false;
+		}
+
 		if ( $this->user_is_requesting_dependency_plugin_installation ) {
 			require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 
@@ -531,6 +535,7 @@ class Boldgrid_Inspirations_Dependency_Plugins {
 
 			?>
 	<form method='post' action='plugins.php'>
+		<?php wp_nonce_field( 'install_plugins', '_bg_nonce', false, true ); ?>
 		<ul>
 				<?php
 
