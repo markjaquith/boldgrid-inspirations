@@ -332,8 +332,6 @@ class Boldgrid_Inspirations_Dependency_Plugins {
 		// Get the $pagenow global.
 		global $pagenow;
 
-		$boldgrid_requires = __( 'The BoldGrid Inspirations plugin requires these other plugins for best results. Please click to install and activate', 'boldgrid-inspirations' );
-
 		// Should we print the notice?
 		if ( $this->show_notice() &&
 			(
@@ -345,7 +343,7 @@ class Boldgrid_Inspirations_Dependency_Plugins {
 		) {
 		?>
 	<div class='notice notice-warning is-dismissible boldgrid-admin-notice' data-admin-notice-id='class-dependency-plugins' >
-		<p><?php echo $boldgrid_requires; ?></p>
+		<p><?php _e( 'The BoldGrid Inspirations plugin requires these other plugins for best results. Please click to install and activate', 'boldgrid-inspirations' ); ?></p>
 		<?php $this->print_uninstalled_plugins(); ?>
 	</div>
 		<?php
