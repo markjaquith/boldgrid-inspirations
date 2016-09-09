@@ -21,10 +21,10 @@ if ( false !== $reseller && ! empty( $reseller['reseller_title'] ) ) {
 	$reseller_attribution = ' Web hosting support is provided by ';
 
 	if ( ! empty( $reseller['reseller_website_url'] ) ) {
-		$reseller_attribution .= '<a href="' . $reseller['reseller_website_url'] . '">' .
-			 $reseller['reseller_title'] . '</a>.';
+		$reseller_attribution .= '<a href="' . esc_url( $reseller['reseller_website_url'] ) . '">' .
+			 esc_html( $reseller['reseller_title'] ) . '</a>.';
 	} else {
-		$reseller_attribution .= $reseller['reseller_title'] . '.';
+		$reseller_attribution .= esc_html( $reseller['reseller_title'] ) . '.';
 	}
 } else {
 	$reseller_attribution = '';
