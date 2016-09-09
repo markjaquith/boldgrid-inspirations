@@ -568,17 +568,17 @@ class Boldgrid_Inspirations_Dashboard extends Boldgrid_Inspirations {
 			$link = '';
 			$content = '';
 			$date = $item->get_date();
-			$link = esc_url( strip_tags( $item->get_link() ) );
-			$title = esc_html( $item->get_title() );
+			$link = $item->get_link();
+			$title = $item->get_title();
 			$content = $item->get_content();
 			$content = wp_html_excerpt( $content, 250 ) . ' ...';
 
 			?>
 			<li>
 				<span class='rss-title'>
-					<a class='rsswidget' href='<?php echo $link; ?>' target='_blank'><?php echo $title; ?></a>
+					<a class='rsswidget' href='<?php echo esc_url( $link ); ?>' target='_blank'><?php echo esc_html( $title ); ?></a>
 				</span>
-				<span class='rss-date'><?php echo $date; ?></span>
+				<span class='rss-date'><?php echo esc_html( $date ); ?></span>
 				<div class='rssSummary'><?php echo $content; ?></div>
 			<?php
 		}
