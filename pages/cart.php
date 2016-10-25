@@ -118,7 +118,7 @@ if ( $have_assets_needing_purchase ) {
 		if ( is_numeric( $post_id ) ) {
 			$link_edit_post = get_edit_post_link( $post_id );
 		} else {
-			$link_edit_post = get_admin_url( null, 'customize.php' );
+			$link_edit_post = admin_url( 'customize.php' );
 		}
 
 		// Get the link to view the post.

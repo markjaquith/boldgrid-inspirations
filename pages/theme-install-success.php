@@ -18,7 +18,7 @@ require BOLDGRID_BASE_DIR . '/pages/templates/restrict-direct-access.php';
         <a title="Enable theme for this site"
         href="<?php echo esc_url( $enable_theme_url ); ?>">Enable Theme</a> |
         <a title="Return to Theme Installer"
-            href="<?php echo get_admin_url();?>themes.php">View Themes</a>
+            href="<?php echo esc_url( admin_url( 'themes.php' ) ) ?>">View Themes</a>
     </p>
     <?php } else { ?>
 

@@ -2609,9 +2609,9 @@ class Boldgrid_Inspirations_Deploy {
 	 * Send to home
 	 */
 	public function redirect_to_admin( $action = '' ) {
-		$url = get_admin_url() . $action;
+		$url = admin_url( $action );
 
-		$oneliner = 'window.location.href = "' . $url . '";';
+		$oneliner = 'window.location.href = ' . json_encode( $url ) . ';';
 		Boldgrid_Inspirations_Utility::inline_js_oneliner( $oneliner );
 	}
 

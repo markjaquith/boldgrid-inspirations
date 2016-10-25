@@ -580,7 +580,7 @@ class Boldgrid_Inspirations_Built {
 			'open-section' =>			( ! empty( $_GET['force-section'] ) ) ? sanitize_text_field( $_GET['force-section'] ) : '',
 			'staging_active' =>			$this->check_staging_plugin(),
 			'staging_installed' =>		file_exists( WP_PLUGIN_DIR . '/boldgrid-staging' ),
-			'url' =>					get_admin_url() . 'admin.php?page=boldgrid-inspirations',
+			'url' =>					admin_url( 'admin.php?page=boldgrid-inspirations' ),
 		);
 	}
 

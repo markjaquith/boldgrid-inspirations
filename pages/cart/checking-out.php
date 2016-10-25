@@ -63,9 +63,9 @@ h1 .dashicons.dashicons-yes {
 
 		<div class="plugin-card-bottom">
 			<div class="column-updated">
-				<a class="button" href="<?php echo get_site_url(); ?>">Visit Your
+				<a class="button" href="<?php echo esc_url( get_site_url() ); ?>">Visit Your
 					Site</a> <a class="button button-primary"
-					href="<?php echo get_admin_url(); ?>">Continue to your Dashboard</a>
+					href="<?php echo esc_url( admin_url() ); ?>">Continue to your Dashboard</a>
 			</div>
 		</div>
 	</div>

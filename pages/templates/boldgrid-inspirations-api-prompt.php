@@ -102,7 +102,7 @@ If you have lost your key, you can have it resent by entering your information b
 				<input type='text' id='emailAddr' maxlength='50'
 				placeholder='your@name.com' value='<?php echo $email; ?>' />
 				<br />
-				<input type='hidden' id='siteUrl' value='<?php echo get_admin_url(); ?>' />
+				<input type='hidden' id='siteUrl' value='<?php echo esc_url( admin_url() ); ?>' />
 				<br />
 				<button id='requestKey' class='button button-primary'>
 				<?php esc_html_e( 'Submit', 'boldgrid-inspirations' ); ?>

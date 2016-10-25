@@ -317,7 +317,7 @@ class Boldgrid_Inspirations_Options {
 		if ( is_multisite() && 1 !== get_current_blog_id() ) {
 			?>
 			This setting must be set in your primary blog.  Click
-			<a href='<?php echo get_admin_url( 1, '/options-general.php?page=boldgrid-settings' ); ?>'>
+			<a href='<?php echo esc_url( get_admin_url( 1, '/options-general.php?page=boldgrid-settings' ) ); ?>'>
 			here</a> to go the BoldGrid Settings page in your primary blog.
 			<?php
 
@@ -354,7 +354,7 @@ name="boldgrid_settings[plugin_autoupdate]" value="0"<?php echo $disabled; ?> />
 		if ( is_multisite() && 1 !== get_current_blog_id() ) {
 			?>
 			This setting must be set in your primary blog.  Click
-			<a href='<?php echo get_admin_url( 1, '/options-general.php?page=boldgrid-settings' ); ?>'>
+			<a href='<?php echo esc_url( get_admin_url( 1, '/options-general.php?page=boldgrid-settings' ) ); ?>'>
 			here</a> to go the BoldGrid Settings page in your primary blog.
 			<?php
 
