@@ -1,3 +1,5 @@
+/* globals ajaxurl, Inspiration, wp, _, jQuery */
+
 var IMHWPB = IMHWPB || {};
 
 /**
@@ -9,10 +11,6 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 	var self = this;
 
 	this.configs = configs;
-//	this.api_url = this.configs.asset_server;
-//	this.api_key = this.configs.api_key;
-//	this.api_param = 'key';
-//	this.api_key_query_str = this.api_param + "=" + this.api_key;
 
 	self.ajax = new IMHWPB.Ajax( configs );
 
@@ -25,7 +23,27 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 
 	self.$theme = '';
 	self.$pageset = '';
-	self.$budget = '';
+
+	/**
+	 * An object of generic builds.
+	 *
+	 * @since 1.2.6
+	 */
+	self.genericBuilds = {};
+
+	/**
+	 * An area for notices in step 2, Content.
+	 *
+	 * @since 1.2.6
+	 */
+	self.$contentNotices = $( '#step-content-notices p' );
+
+	/**
+	 * An array of distinct themes returned from our call to get generic builds.
+	 *
+	 * @since 1.2.6
+	 */
+	self.distinctThemes = [];
 
 	/**
 	 * The selected sub category id in step 1.
@@ -33,6 +51,20 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 	 * @since 1.2.5
 	 */
 	self.subCategoryId = '0';
+
+	/**
+	 * Theme release channel.
+	 *
+	 * @since 1.2.5
+	 */
+	self.themeReleaseChannel = configs.settings.theme_release_channel;
+
+	/**
+	 * Theme preview.
+	 *
+	 * @since 1.2.9
+	 */
+	self.$themePreview = $( '#screen-content iframe#theme-preview' );
 
 	// scroll position.
 	self.scrollPosition = '';
@@ -61,9 +93,7 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 	 */
 	this.chooseTheme = function( ) {
 		// Immediately hide the iframe to give a better transition effect.
-		$( '#screen-content iframe#theme-preview' )
-			.addClass( 'hidden' )
-			.css( 'display', '' );
+		self.$themePreview.css( 'visibility', 'hidden' );
 
 		// Load the theme title and sub category title.
 		$( '#sub-category-title' ).html( '- ' + self.$theme.closest( '.theme' ).attr( 'data-sub-category-title' ) );
@@ -72,9 +102,6 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 		self.toggleStep( 'content' );
 
 		$( '[data-step="content"]' ).removeClass( 'disabled' );
-
-		// Reset the coin budget to 20.
-		$( 'input[data-coin="20"]' ).prop( 'checked', true );
 
 		self.initPagesets();
 	};
@@ -194,6 +221,44 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 	};
 
 	/**
+	 * @summary Enable or disable install buttons on the last step of Inspirations.
+	 *
+	 * After the user clicks "Install this website!", disable that button so the user cannot click
+	 * it again.
+	 *
+	 * If there is an issue with the installation, we need to be able to enable the buttons
+	 * again too (the disable parament).
+	 *
+	 * @since 1.2.14
+	 *
+	 * @param bool $disable Are we disabling the install buttons?
+	 */
+	this.disableInstallButton = function( disable ) {
+		var $selectInstallType = $( '#select-install-type' );
+
+		if( true === disable ) {
+			// Disable the "Go back" and "Install this website" buttons.
+			$selectInstallType.find( 'button' ).prop( 'disabled', true );
+
+			// Show a spinner
+			$selectInstallType.append( '<span class="spinner inline"></span>' );
+		} else {
+			$selectInstallType.find( 'button' ).prop( 'disabled', false );
+
+			$selectInstallType.find( 'span.spinner' ).remove();
+		}
+	}
+
+	/**
+	 * @summary Get the selected coin budget.
+	 *
+	 * @since 1.2.6
+	 */
+	this.getSelectedBudget = function() {
+		return $( '.coin-option.active' ).attr( 'data-coin' );
+	};
+
+	/**
 	 * Event handler for the back button on step 2.
 	 */
 	this.backButton = function() {
@@ -226,6 +291,12 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 		 * try again. Handle the click of that try again button.
 		 */
 		$( '.wrap' ).on( 'click', '#try-pagesets-again', self.initPagesets );
+
+		/*
+		 * During step 2, if there is an error building a site preview, we'll give the user a button
+		 * to try again. Handle the click of that try again button.
+		 */
+		$( '.wrap' ).on( 'click', '#try-build-again', self.loadBuild );
 	};
 
 	/**
@@ -257,12 +328,7 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 			// Get our install decision.
 			var installDecision = $( 'input[name="install-decision"]:checked' ).val(), data;
 
-			// Disable the "Go back" and "Install this website" buttons.
-			$( '#install-buttons button' ).prop( 'disabled', true );
-
-			// Show a spinner
-			$( '#install-buttons' ).append( '<span class="spinner inline"></span>' );
-
+			self.disableInstallButton( true );
 
 			switch( installDecision ) {
 
@@ -316,6 +382,7 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 							$( '#post_deploy' ).submit();
 						} else {
 							alert ('failed setting up staging plugin');
+							self.disableInstallButton( false );
 						}
 					});
 					break;
@@ -332,7 +399,8 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 							$( '#start_over' ).val( 'true' );
 							$( '#post_deploy' ).submit();
 						} else {
-							alert ('failed activating up staging plugin');
+							alert ('failed activating staging plugin');
+							self.disableInstallButton( false );
 						}
 					});
 					break;
@@ -425,47 +493,60 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 	};
 
 	/**
-	 * @summary Shuffle an array.
-	 *
-	 * Used to shuffle our generic builds. If we didn't shuffle those, you'd see them grouped by
-	 * theme.
-	 *
-	 * @since 1.2.3
-	 * @link http://stackoverflow.com/questions/3718282/javascript-shuffling-objects-inside-an-object-randomize
-	 */
-	this.shuffle = function( myArray ) {
-		var i = myArray.length, j, tempi, tempj;
-
-		if ( i === 0 ) {
-			return false;
-		}
-
-		while ( --i ) {
-			j = Math.floor( Math.random() * ( i + 1 ) );
-
-		    tempi = myArray[i];
-		    tempj = myArray[j];
-
-		    myArray[i] = tempj;
-		    myArray[j] = tempi;
-		}
-
-		return myArray;
-	};
-
-	/**
 	 * @summary Sort all builds based upon "All Order".
 	 *
+	 * Definitions:
+	 * # CategoryOrder: The order a theme should appear when viewing themes by category.
+	 * # AllOrder: When viewing all theme / category combinations, the order in which a particular
+	 *   theme should appear.
+	 * # SubCategoryDisplayOrder: The order in which sub categories are sorted.
+	 *
 	 * @since 1.2.3
 	 */
-	this.sortAll = function( genericBuilds ) {
-		return $( genericBuilds ).sort( function( a, b ) {
-			if( ! a.AllOrder ) {
-				return 1;
-			}
+	this.sortAll = function( ) {
+		var themeCount;
+
+		self.setDistinctThemes();
+
+		themeCount = self.distinctThemes.length;
+
+		self.genericBuilds.sort( function( a, b ) {
+			/*
+			 * If a theme does not have a CategoryOrder, set it to themeCount, which does the same
+			 * thing as setting it to be the last theme displayed in the category.
+			 */
+			a.CategoryOrder = ( a.CategoryOrder === null ? themeCount : a.CategoryOrder );
+			b.CategoryOrder = ( b.CategoryOrder === null ? themeCount : b.CategoryOrder );
+
+			/*
+			 * Based upon the theme's CategoryOrder and the SubCategoryDisplayOrder, calculate this
+			 * theme's AllOrder.
+			 */
+			a.AllOrder = ( ( parseInt( a.SubCategoryDisplayOrder ) - 1 ) * themeCount ) + a.CategoryOrder;
+			b.AllOrder = ( ( parseInt( b.SubCategoryDisplayOrder ) - 1 ) * themeCount ) + b.CategoryOrder;
 
 			return ( parseInt( a.AllOrder ) > parseInt( b.AllOrder ) ? 1 : -1 );
 		});
+	};
+
+	/**
+	 * @summary Sort Categories.
+	 *
+	 * @since 1.2.6
+	 */
+	this.sortCategories = function( sortBy ) {
+		// The "Category Filter" heading.
+		var $categoryHeading =  $( '.category-filter', self.$categories ),
+			// Sorted categories.
+			$sortedCategories = $( '.sub-category', self.$categories ).sort( function( a, b ) {
+				var aSort = parseInt( $( a ).attr( sortBy ) ),
+					bSort = parseInt( $( b ).attr( sortBy ) );
+
+				return ( aSort > bSort ? 1 : -1 );
+			});
+
+		// Insert our sorted categories after the category heading.
+		$sortedCategories.insertAfter( $categoryHeading );
 	};
 
 	/**
@@ -566,6 +647,21 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 	};
 
 	/**
+	 * @summary Set distinct themes.
+	 *
+	 * @since 1.2.6
+	 */
+	this.setDistinctThemes = function() {
+		var i = 0;
+
+		for( i; i < self.genericBuilds.length; i++ ) {
+			if( ! self.distinctThemes.includes( self.genericBuilds[i].ThemeName ) ) {
+				self.distinctThemes.push( self.genericBuilds[i].ThemeName );
+			}
+		}
+	};
+
+	/**
 	 * Sets the hover colors class.
 	 */
 	this.hoverColors = function() {
@@ -647,17 +743,12 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 				return;
 			}
 
-			var $coinInput = $( this ).find( 'input[name="coin-budget"]' );
+			var $currentBudget = $( '.coin-option.active' ),
+				$newBudget = $( this );
 
-			$( '.coin-option.active' ).removeClass( 'active' );
-
-			$coinInput.prop( 'checked', true );
-
-			if ( $coinInput.is( ':checked' ) ) {
-				$( this ).addClass( 'active' );
-			}
-
-			self.$budget = $( 'input[name="coin-budget"]:checked' );
+			// Toggle the active class.
+			$currentBudget.removeClass( 'active' );
+			$newBudget.addClass( 'active' );
 
 			self.loadBuild();
 		});
@@ -667,14 +758,14 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 	 * Loads the iframe for the theme preview.
 	 */
 	this.iframeLoad = function() {
-		$( '#screen-content iframe#theme-preview' ).on( 'load', function() {
+		self.$themePreview.on( 'load', function() {
 			var $iframe = $( this );
 			$( '#screen-content .boldgrid-loading' ).fadeOut( function() {
 				self.allActions( 'enable' );
 				$( '#build-cost' )
 					.html( $iframe.attr( 'data-build-cost' ) + ' Coins' )
 					.animate( { opacity: 1 }, 400 );
-				$( '#screen-content iframe#theme-preview' ).fadeIn();
+				self.$themePreview.css( 'visibility', 'visible' );
 			} );
 		});
 	};
@@ -755,6 +846,9 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 			}
 
 			self.$categories.html( ( template( self.categories ) ) );
+
+			self.sortCategories( 'data-display-order' );
+
 			self.initThemes();
 		};
 
@@ -773,17 +867,15 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 		// Define a message for users when fetching pagesets has failed.
 		var failureMessage = Inspiration.errorFetchingPagesets + ' ' + Inspiration.tryFewMinutes + '<br />' +
 		'<button class="button" id="try-pagesets-again">' + Inspiration.tryAgain + '</button>',
-			// If there are any issues with fetching pagesets, notices will be placed in $notices.
-			$notices = $( '#step-content-notices p' ),
 			categoryId = self.$theme.closest( '.theme' ).attr( 'data-category-id' ),
 			pagesetFail, pagesetSuccess;
 
 		// Reset any previous error messages.
-		$notices.html( '' );
+		self.$contentNotices.html( '' );
 
 		// Error function: If we failed to retrieve pagesets, show a 'Try again' message to the user.
 		pagesetFail = function() {
-			$( '#step-content-notices p' ).html( failureMessage );
+			self.$contentNotices.html( failureMessage );
 		};
 
 		// Success function: We successfully fetched pagesets.
@@ -792,14 +884,13 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 
 			// If we have 0 pagesets, show a try again notice and abort.
 			if( 0 === $( msg.result.data.pageSets ).length ) {
-				$notices.html( failureMessage );
+				self.$contentNotices.html( failureMessage );
 				return;
 			}
 
 			$( '#pageset-options' ).html( ( template( msg.result.data.pageSets ) ) );
 
 			self.$pageset = $( 'input[name="pageset"]:checked' );
-			self.$budget = $( 'input[name="coin-budget"]:checked' );
 
 			self.loadBuild();
 		};
@@ -815,7 +906,7 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 	this.initThemes = function() {
 		var template = wp.template( 'theme' ),
 			data = { 'site_hash' : self.configs.site_hash },
-			genericBuilds, getGenericSuccess, getGenericFail, failureMessage;
+			getGenericSuccess, getGenericFail, failureMessage;
 
 		// Define a message for users when fetching themes has failed.
 		failureMessage = Inspiration.errorFetchingThemes + ' ' + Inspiration.tryFewMinutes + '<br />' +
@@ -834,20 +925,24 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 
 		getGenericSuccess = function( msg ) {
 
-			// If there were 0 themes returned, show a 'Try again' message and abort.
+			/*
+			 * Review the count of themes returned.
+			 *
+			 * If 0 themes are returned, show a 'Try again' message and abort.
+			 * Else, assign themes to self.genericBuilds and sort them.
+			 */
 			if( 0 === msg.result.data.length ) {
 				self.$themes.html( failureMessage );
 				return;
+			} else {
+				self.genericBuilds = msg.result.data;
+				self.sortAll();
 			}
 
 			// Empty the themes container. We'll fill it with themes below.
 			self.$themes.empty();
 
-			genericBuilds = self.shuffle( msg.result.data );
-
-			genericBuilds = self.sortAll( genericBuilds );
-
-			_.each( genericBuilds, function( build ){
+			_.each( self.genericBuilds, function( build ){
 				self.$themes.append( template( { configs: IMHWPB.configs, build: build } ) );
 			});
 
@@ -863,44 +958,78 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 	 * @since 1.2.3
 	 */
 	this.loadBuild = function() {
+		var data, successAction,
+			failureMessage = Inspiration.errorBuildingPreview + ' ' + Inspiration.tryFewMinutes,
+			tryAgainButton = '<button class="button" id="try-build-again">' + Inspiration.tryAgain + '</button>',
+			// Should our request for a build be for a generic build?
+			requestGeneric = false,
+			coinBudget = self.getSelectedBudget();
+
+		/*
+		 * By default, we will not request a generic build. The only time we will request a generic
+		 * build is IF we're looking at the default pageset and coin budget of a 'stable' build,
+		 * because that is already built.
+		 */
+		if( '1' === self.$pageset.attr( 'data-is-default' ) && '20' === coinBudget && 'stable' === self.themeReleaseChannel ) {
+			requestGeneric = true;
+		}
+
 		// Disable all actions.
 		self.allActions( 'disable' );
 
+		// Reset any previous error messages.
+		self.$contentNotices.html( '' );
+
 		// Load our loading graphic.
 		$( '#build-cost' ).animate( { opacity: 0 }, 400 );
-		$( '#screen-content iframe#theme-preview' ).fadeOut( function() {
-			$( '#screen-content .boldgrid-loading' ).fadeIn();
-		} );
+		self.$themePreview.css( 'visibility', 'hidden' );
+		$( '#screen-content .boldgrid-loading' ).fadeIn();
 
-
-		var success_action = function( msg ) {
+		successAction = function( msg ) {
 			var $screenContent = $( '#screen-content' ),
 				$iframe = $screenContent.find( 'iframe#theme-preview' ),
+				url;
+
+			/*
+			 * If there was an error building the site, show the user a try again button and abort.
+			 *
+			 * Else, load the preview for them.
+			 */
+			if( 200 !== msg.status ) {
+				$( '#screen-content .boldgrid-loading' ).fadeOut( function() {
+					self.$contentNotices.html( failureMessage + '<br />' + tryAgainButton );
+					self.allActions( 'enable' );
+				});
+				return;
+			} else {
 				url = msg.result.data.profile.preview_url;
 
-			$iframe
-				.attr( 'src', url )
-				.attr( 'data-build-cost', msg.result.data.profile.coins );
+				$iframe
+					.attr( 'src', url )
+					.attr( 'data-build-cost', msg.result.data.profile.coins );
 
-			self.highlightDeviceButton();
+				self.highlightDeviceButton();
+			}
 		};
 
 		data = {
+			'build_profile_id' :	self.$theme.closest( '.theme' ).attr( 'data-build-id' ),
 			'theme_id' :			self.$theme.closest( '.theme' ).attr( 'data-theme-id' ),
 			'cat_id' :				self.$theme.closest( '.theme' ).attr( 'data-category-id' ),
 			'sub_cat_id' :			self.$theme.closest( '.theme' ).attr( 'data-sub-category-id' ),
 			'page_set_id' :			self.$pageset.attr( 'data-page-set-id' ),
 			'pde' :					self.$theme.closest( '.theme' ).attr( 'data-pde' ),
 			'wp_language' :			'en-US',
-			'coin_budget' :			self.$budget.attr( 'data-coin' ),
-			'theme_version_type' :	null,
-			'page_version_type' :	null,
+			'coin_budget' :			coinBudget,
+			'theme_version_type' :	self.themeReleaseChannel,
+			'page_version_type' :	self.themeReleaseChannel,
 			'site_hash' :			self.configs.site_hash,
 			'inspirations_mode' :	'standard',
-			'is_generic' :			( '1' === self.$pageset.attr( 'data-is-default' ) ? 'true' : 'false' ),
+			'is_generic' :			requestGeneric,
 		};
 
 		// Set form.
+		$( '[name=boldgrid_build_profile_id]' ).val( data.build_profile_id );
 		$( '[name=boldgrid_cat_id]' ).val( data.cat_id );
 		$( '[name=boldgrid_sub_cat_id]' ).val( data.sub_cat_id );
 		$( '[name=boldgrid_theme_id]' ).val( data.theme_id );
@@ -909,7 +1038,7 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 		$( '[name=boldgrid_pde]' ).val( data.pde );
 		$( '[name=coin_budget]' ).val( data.coin_budget );
 
-		self.ajax.ajaxCall( data, 'get_build_profile', success_action );
+		self.ajax.ajaxCall( data, 'get_build_profile', successAction );
 	};
 
 	/**
@@ -941,6 +1070,7 @@ IMHWPB.InspirationsDesignFirst = function( $, configs ) {
 
 			$content.removeClass( 'hidden' );
 			$design.addClass( 'hidden' );
+			$( document ).scrollTop( 0 );
 		}
 	};
 

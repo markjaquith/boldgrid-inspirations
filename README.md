@@ -1,14 +1,17 @@
-=== BoldGrid Inspirations ===
-Contributors: imh_brad, joemoto, rramo012, timph
-Tags: inspiration,customization,build,create,design
-Requires at least: 4.3
-Tested up to: 4.6.1
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+[![License](https://img.shields.io/badge/license-GPL--2.0%2B-orange.svg)](https://raw.githubusercontent.com/BoldGrid/boldgrid-inspirations/master/LICENSE)
+[![PHP Version](https://img.shields.io/badge/PHP-5.3%2B-blue.svg)](https://php.net)
+
+# BoldGrid Inspirations #
+**Contributors:** imh_brad, joemoto, rramo012, timph
+**Tags:** inspiration,customization,build,create,design
+**Requires at least:** 4.3
+**Tested up to:** 4.6.1
+**License:** GPLv2 or later
+**License URI:** http://www.gnu.org/licenses/gpl-2.0.html
 
 BoldGrid Inspirations is an inspiration-driven plugin to assist with creating a fresh new website, or to customize an existing website.
 
-== Description ==
+## Description ##
 
 BoldGrid Inspirations is an inspiration-driven plugin to assist with creating a fresh new website, or to customize an existing website.
 
@@ -16,7 +19,7 @@ The first phase is Inspiration; the guided tool creates your base website.  If y
 
 The second phase is Customization; tools to transform your website into your vision.
 
-== Installation ==
+## Installation ##
 
 1. Upload the entire boldgrid-inspirations folder to the /wp-content/plugins/ directory.
 
@@ -24,15 +27,15 @@ The second phase is Customization; tools to transform your website into your vis
 
 3. You will find the Inspirations menu in your WordPress Dashboard / admin panel.
 
-== Changelog ==
+## Changelog ##
 
-= 1.3 =
+### 1.3 ###
 * Bug fix:		JIRA WPB-2544	Disable 'Install' button after clicking it.
 
-= 1.2.13 =
+### 1.2.13 ###
 * Bug fix:		JIRA WPB-2531	Javascript error checking needed for mine count.	
 
-= 1.2.12 =
+### 1.2.12 ###
 * Update:		JIRA WPB-2472	Added update notice for 1.3.
 * Bug fix:		JIRA WPB-2486	Incorrect page count on All Pages.
 * Bug fix:		JIRA WPB-2467	With staging disabled, Customize goes to "Change Themes".
@@ -45,18 +48,18 @@ The second phase is Customization; tools to transform your website into your vis
 * Update:		JIRA WPB-2497	Add new dashboard videos.
 * Bug fix:		JIRA WPB-2376	'No search results' method is not cleared in BGCS.
 
-= 1.2.11 =
+### 1.2.11 ###
 * Bug fix:      JIRA WPB-2468   Switching between boldgrid admin menu and standard wp menu no longer works.
 * Bug fix:		JIRA WPB-2477	If you have an existing site non BG, no route for staging exists.
 
-= 1.2.10 =
+### 1.2.10 ###
 * Bug fix:		JIRA WPB-2446	Fixed missing build id passed on site install.
 * Bug fix:		JIRA WPB-2426	Insert Gridblock button is missing.
 * Bug fix:		JIRA WPB-2443	When starting over, I get a blank page.
 * Bug fix:		JIRA WBP-2445	Inspirations is not fetching cached themes.
 * Update:		JIRA WPB-2458	Update 'Recommended' verbiage in last step of Inspirations.
 
-= 1.2.9 =
+### 1.2.9 ###
 * Misc:			JIRA WPB-2420	Added EOF line breaks.
 * Bug fix:		JIRA WPB-2387	Fixed issue with AJAX theme updates and BG theme slugs duplicated in the WP repo.
 * Bug fix:		JIRA WPB-2324	Attribution should not show in 404 sitemap.
@@ -69,11 +72,11 @@ The second phase is Customization; tools to transform your website into your vis
 * Bug fix:		JIRA WPB-2401	Gallery not displaying correctly in Chrome && FF.
 * Bug fix:		JIRA WPB-2423	Trying to get property of non-object in ...stock-photography.php.
 
-= 1.2.8 =
+### 1.2.8 ###
 * Bug fix:		JIRA WPB-2398	Error requesting free key.
 * Bug fix:		JIRA WPB-2399	Only show feedback widget to admins.
 
-= 1.2.7 =
+### 1.2.7 ###
 * Bug fix:		JIRA WPB-2389	Fixed saving BoldGrid Settings.
 * Bug fix:		JIRA WPB-2388	Removed duplicate boldgrid_activate().
 * Update:		JIRA WPB-2390	Update verbiage for inspirations install success.
@@ -85,7 +88,7 @@ The second phase is Customization; tools to transform your website into your vis
 * Bug fix:		JIRA WPB-2396	Remove staging from recommended plugin notices.
 * Bug fix:		JIRA WPB-2327	Check if framework is handling plugin recommendations before recommending.
 
-= 1.2.6 =
+### 1.2.6 ###
 * Misc:			JIRA WPB-2344	Updated readme.txt for Tested up to 4.6.1.
 * Bug fix:		JIRA WPB-2336	Load BoldGrid settings from the correct WP option (site/blog).
 * Bug fix:		JIRA WPB-2248	Removed 'New From GridBlocks' button on edit submission page.
@@ -105,7 +108,7 @@ The second phase is Customization; tools to transform your website into your vis
 * Update:		JIRA WPB-2380	Remove references to tutorials in deployment congrats message.
 * Bug fix:		JIRA WPB-2383	Image Search tab appears when clicking 'Add GridBlock'.
 
-= 1.2.5 =
+### 1.2.5 ###
 * Bug fix:		JIRA WPB-2325	Added wrapper to handle mb_convert_encoding() if mbstring is not loaded.
 * Bug fix:		JIRA WPB-2313	Disabled GridBlocks in network admin pages.
 * New feature:	JIRA WPB-2268	Changed to resized preview screenshots for Inspirations Design First concept.
@@ -125,11 +128,11 @@ The second phase is Customization; tools to transform your website into your vis
 * Update:		JIRA WPB-2327	Check user capabilities before showing admin notices.
 * Update:		JIRA WPB-2331	Update confirmation messages.
 
-= 1.2.4 =
+### 1.2.4 ###
 * Bug fix:		JIRA WPB-2269	Typo fix in Boldgrid_Inspirations_Dependency_Plugins::print_uninstalled_plugins().
 * Bug fix:		JIRA WPB-2270	New From GridBlocks became unavailable.
 
-= 1.2.3 =
+### 1.2.3 ###
 * New feature:	JIRA WPB-2172	For preview generic builds, added an option for identification for purges, etc.
 * Bug fix:		JIRA WPB-2263	For preview sites under multisite, set the admin email address using the network admin email address.
 * Bug fix:		JIRA WPB-2223	Reworked API key validation and connection issue notices, formatting.
@@ -144,7 +147,7 @@ The second phase is Customization; tools to transform your website into your vis
 * Bug fix:		JIRA WPB-2237	Limit ajax requests by user.
 * Bug fix:		JIRA WPB-2240	Limit printing of configs in head.
 
-= 1.2.2 =
+### 1.2.2 ###
 * Bug fix:		JIRA WPB-2058	Added wrap class to the tutorials page.
 * Bug fix:		JIRA WPB-2184	In PHP 5.2, deactivate and die properly.
 * New feature:  				Added BoldGrid news widget to dashboard.
@@ -153,13 +156,13 @@ The second phase is Customization; tools to transform your website into your vis
 * Bug fix:		JIRA WPB-2169	Connect Search defaults to smallest image size when no recommended sizes available.
 * Bug fix:    JIRA WPB-2192 Allow bug report to correctly show parent themes if submitted.
 
-= 1.2.1 =
+### 1.2.1 ###
 * Bug fix:		JIRA WPB-2160	New From GridBlocks, multiple pages are installed.
 * Update:						Changed text of getting and entering connect keys.
 * Security:		JIRA WPB-2151	Disabled autocomplete for API key entry fields.
 * Bug fix:		JIRA WPB-2145	Fixing issue with theme screenshots on Chrome Ubuntu.
 
-= 1.2 =
+### 1.2 ###
 * Bug fix:		JIRA WPB-2119	For asset downloads, when Imagick is loaded, set the thread limit to 1.
 * Bug fix:		JIRA WPB-2125	Fixing issue where theme was overwritten without version change.
 * Bug fix:		JIRA WPB-2104	Go back button hides all themes (Inspirations > Add Theme).
@@ -169,7 +172,7 @@ The second phase is Customization; tools to transform your website into your vis
 * Bug fix:		JIRA WPB-2134	Staging's boldgrid_attribution option and 'Uninitialized string offset' Notice.
 * Bug fix:		JIRA WPB-2135	Image not replaced in Page & Post Editor after using Connect Search.
 
-= 1.1.8 =
+### 1.1.8 ###
 * Bug fix:		JIRA WPB-2058	Added wrap class to Inspirations, so admin notices are displayed at the top.
 * Bug fix:		JIRA WPB-2041	Fixed BoldGrid theme update check in WordPress 4.6.
 * Testing:		JIRA WPB-2046	Tested on WordPress 4.5.3.
@@ -177,7 +180,7 @@ The second phase is Customization; tools to transform your website into your vis
 * Update:		JIRA WPB-2008	Deploy class updated to allow for is_generic flag.
 * Bug fix:		JIRA WPB-1950	Prevent a portait image from displaying atop 'Crop Image' and 'Skip Cropping' buttons.
 
-= 1.1.7 =
+### 1.1.7 ###
 * Bug fix:		JIRA WPB-2032	Fixed issue when activating key.  Added nonce to api key form.
 * Rework:		JIRA WPB-2030	Updated the "I don't have an API key" section.
 * New feature:	JIRA WPB-2029	Added TOS box to API key submission form.
@@ -185,15 +188,15 @@ The second phase is Customization; tools to transform your website into your vis
 * Bug fix:		JIRA WPB-2002	Fixed theme update issue where upgrader says is up to date at times.
 * Bug fix:		JIRA WPB-2006	Pdes and Homepage not installing correctly on Inpirations Theme Only installs.
 
-= 1.1.6 =
+### 1.1.6 ###
 * New feature:	JIRA WPB-1839	Users can now change their theme release channel.
 * Security fix:	JIRA WPB-1977	Validate nonce for feedback form diagnostic data callback and form submit.
 * Bug fix:		JIRA WPB-1955	Fatal error: Class 'Boldgrid_Staging_Plugin' not found.
 
-= 1.1.5 =
+### 1.1.5 ###
 * Bug fix:		JIRA WPB-1914	Staged image used on Active page not showing in cart.
 
-= 1.1.4 =
+### 1.1.4 ###
 * Bug fix:		JIRA WPB-1886	Fixed feedback notice being displayed too often (more than a week after submitting).
 * New feature:	JIRA WPB-1183	Refresh the Library Tab after downloading an image.
 * Update:		JIRA WPB-1865	Update style of 'Transactions' pages to better incorporate BoldGrid Staging's nav menu.
@@ -205,24 +208,24 @@ The second phase is Customization; tools to transform your website into your vis
 * Bug fix:		JIRA WPB-1893	JS errors in console when viewing attachments.
 * Bug fix:		JIRA WPB-1900	Attribution shows in menu when menu generated using wp_page_menu.
 
-= 1.1.3 =
+### 1.1.3 ###
 * Bug fix:		JIRA WPB-1824	Fixed order of plugin deactivation and uninstall in Start Over process.
 * Bug fix:		JIRA WPB-1814	Fixed PHP notice in page and post editor for In Menu when there is a corrupted nav menu array.
 * Bug fix:		JIRA WPB-1823	Fixed display of "Themes" H1 and the additional themes bar when choosing active or staging before installing a theme.
 * Bug fix:		JIRA WPB-1840	Fixing thumbnail presentation in inspirations and add new theme.
 
-= 1.1.2.3 =
+### 1.1.2.3 ###
 * Update:				Sync version. See version 1.1.1.1.
 
-= 1.1.2.2 =
+### 1.1.2.2 ###
 * Bug fix:		JIRA WPB-1833	Fixed checking for previously downloaded assets in deployment when using multisite (wp-preview).
 
-= 1.1.2.1 =
+### 1.1.2.1 ###
 * Bug fix:		JIRA WPB-1817	BoldGrid Connect Search: Was not being added when changing a header image in the Customizer.
 * Rework:		JIRA WPB-1541	Removed feedback form bug report diagnostic report items.
 * Bug fix:		JIRA WPB-1816	Fixed update class interference with the Add Plugins page.
 
-= 1.1.2 =
+### 1.1.2 ###
 * Bug fix:		JIRA WPB-1809	Fixed undefined index "action" for some scenarios.  Optimized update class and addressed CodeSniffer items.
 * Rework:		JIRA WPB-1541	Reworked admin feedback notice.
 * Rework:		JIRA WPB-1751	Removed analysis processing and optional logging capabilities.  Added support for XHProf.
@@ -235,14 +238,14 @@ The second phase is Customization; tools to transform your website into your vis
 * Bug fix:		JIRA WPB-1788	webkit css missing from 'new from gridblocks'.
 * New feature:	JIRA WPB-1806	Add 'BoldGrid search' tab when replacing an image.
 
-= 1.1.1.1 =
+### 1.1.1.1 ###
 * Bug Fix:						Fixing logo display on login screen.
 
-= 1.1.1 =
+### 1.1.1 ###
 * Bug fix:						Fixed analysis include for preview server.
 * Bug fix:						New From GridBlocks: Asset download issues.
 
-= 1.1 =
+### 1.1 ###
 * New feature:	JIRA WPB-1751	Added analysis processing and optional logging capabilities.
 * Bug fix:		JIRA WPB-1781	Removed boldgrid_dismissed_admin_notices from Start Over cleanup.
 * New feature:	JIRA WPB-1541	Added feedback notice.
@@ -250,13 +253,13 @@ The second phase is Customization; tools to transform your website into your vis
 * Bug fix:		JIRA WPB-1760	New From GridBlocks: Ensure page title shows on preview page.
 * Update:		JIRA WPB-1779	New From GridBlocks: Update verbiage for 'Downloading GridBlocks'.
 
-= 1.0.12.1 =
+### 1.0.12.1 ###
 * Bug fix:		JIRA WPB-1710	Fixed missing device preview tabs on Add New Theme preview modal.
 * Bug fix:		JIRA WPB-1710	Fixed notice dismissal checking.
 * Bug fix:		JIRA WPB-1749	On start over, staging menus are not deleted.
 * Bug fix:		JIRA WPB-1755	Gallery images not showing in cart.
 
-= 1.0.12 =
+### 1.0.12 ###
 * Bug fix:		JIRA WPB-1740	Fixed "In Menu" messages in editor when staging plugin is not active, and fixed saving menu selections.
 * New feature:	JIRA WPB-1726	Added optional feedback for GridBlock Add Page.
 * Removed Ft:	JIRA WPB-1710	Removed Inspirations Add Pages; replaced by GridBlocks.
@@ -265,7 +268,7 @@ The second phase is Customization; tools to transform your website into your vis
 * Bug Fix:		JIRA WPB-1732	Fixing css issues on login screen (firefox).
 * Bug Fix:		JIRA WPB-1687	Image search: Title, Caption, Alt Text and Description do not display on new pages.
 
-= 1.0.11 =
+### 1.0.11 ###
 * New feature:	JIRA WPB-1699	Added optional feedback for theme activation.
 * New feature:  JIRA WPB-1690   Adding BoldGrid themes to All themes install menu.
 * Bug fix:		JIRA WPB-1686	Limited items loaded in network admin pages.
@@ -279,22 +282,22 @@ The second phase is Customization; tools to transform your website into your vis
 * Bug fix:		JIRA WPB-1647	JS error with easy-attachment-preview-size.js.
 * Bug fix:		JIRA WPB-1651	When the BG menu is turned off, Appearance link should take you to themes.
 
-= 1.0.10 =
+### 1.0.10 ###
 * Bug fix:		JIRA WPB-1632	Fixed handling of subcategory_id in deploy_page_sets.
 * New feature:	JIRA WPB-1510	Moved adhoc functions.php to class-boldgrid-inspirations-utility.php (class Boldgrid_Inspirations_Utility).
 * Rework:		JIRA WPB-1553	Updated require and include statements for standards.
 * Bug fix:		JIRA WPB-1563	Updated pages in which wp_iframe-media_upload.css is loaded.
 * Bug fix:		JIRA WPB-1549	Resolve attribution page missing attribution for several images.png.
 
-= 1.0.9.2 =
+### 1.0.9.2 ###
 * Bug fix:						Add GridBlock Sets feature disabled.
 
-= 1.0.9.1 =
+### 1.0.9.1 ###
 * Bug fix:		JIRA WPB-1553	Fixed support for PHP 5.2 to deactivate plugin.
 * Bug fix:						Prevent click of links in add_new_page_selection previews.
 * Bug fix:		JIRA WPB-1554	Fixed undefined JavaScript variable pagenow for customizer link.
 
-= 1.0.9 =
+### 1.0.9 ###
 * Bug fix:		JIRA WPB-1554	Fixed theme link in network dashboard nav menu.
 * Bug fix:		JIRA WPB-1590	Fixed JavaScript error for undefined screen info in network dashboard.
 * Bug fix:		JIRA WPB-1535	Fixed theme deployment issues.
@@ -305,10 +308,10 @@ The second phase is Customization; tools to transform your website into your vis
 * Bug fix:  	JIRA WPB-1575	Addressed an issue causing mismatch color palettes on cached previews
 * New feature:	JIRA WPB-1514	Add new pages offers page templates to choose from.
 
-= 1.0.8.1 =
+### 1.0.8.1 ###
 * Bug fix:		JIRA WPB-1553	Fixed PHP version check condition (<5.3).
 
-= 1.0.8 =
+### 1.0.8 ###
 * Bug fix:		JIRA WPB-1561	Fixed missing get_plugin_data on update calls.
 * New feature:	JIRA WPB-1511	Added dependency plugin notice on editor pages.
 * Bug fix:		JIRA WPB-1553	Added support for __DIR__ in PHP <=5.2.
@@ -323,16 +326,16 @@ The second phase is Customization; tools to transform your website into your vis
 * Bug fix:		JIRA WPB-1443	Extra page listed under 'Mine'.
 * Bug fix:		JIRA WPB-1560	Install options not available on preview server
 
-= 1.0.7 =
+### 1.0.7 ###
 * Rework:		JIRA WPB-1533	Ensured activation data is sent after first login.
 
-= 1.0.7 =
+### 1.0.7 ###
 * Rework:		JIRA WPB-1533	Ensured activation data is sent after first login.
 
-= 1.0.6 =
+### 1.0.6 ###
 * Rework:		JIRA WPB-1411	Added more output to the deploy log.
 
-= 1.0.5 =
+### 1.0.5 ###
 * Bug fix:		JIRA WPB-1462	Fixed position of dependency plugins admin notice.  Also limited to Dashboard and plugins page.
 * Bug fix:		JIRA WPB-1290	Fixing issues with galleries leaving empty spaces
 * Bug fix:		JIRA WPB-1471	Made deployment plugin installation respect release channel.
@@ -341,7 +344,7 @@ The second phase is Customization; tools to transform your website into your vis
 * Bug fix:		JIRA WPB-1384	Increase width of select input on image search modal.
 * Bug fix:		JIRA WPB-1508	BoldGrid Image search box size is inconsistent.
 
-= 1.0.4 =
+### 1.0.4 ###
 * Bug fix:		JIRA WPB-1442	Fixing inspiration border styles for wordpress 4.4
 * Bug fix:		JIRA WPB-1461	Updating login button styles for wordpress 4.4
 * Bug fix:		JIRA WPB-1411	Added initialization and checks for empty image queues in deployment.
@@ -349,12 +352,12 @@ The second phase is Customization; tools to transform your website into your vis
 * Bug fix:		JIRA WPB-1451	Active images are showing in Staging attribution page.
 * Bug fix:		JIRA WPB-1466   Tabs on tutorials page too small at 1035px - 1482px.
 
-= 1.0.3 =
+### 1.0.3 ###
 * New feature:	JIRA WPB-1363	Updated readme.txt for WordPress standards.
 * New feature:	JIRA WPB-1389	When starting over theme mods are saved with a flag to recompile sass
 * Bug fix:		JIRA WPB-1420	Content of Attribution page is overwriting page saves.
 
-= 1.0.2 =
+### 1.0.2 ###
 * Bug fix:		JIRA WPB-1395	Adjusted theme update data; now gets theme uri from theme style.css, download url from api data.
 * Rework		JIRA WPB-1374	Updated activation timestamp to use GMT/UTC.
 * Bug fix:		JIRA WPB-1377	Reseller option is now set on first call to either the front end or wp_login.
@@ -367,18 +370,18 @@ The second phase is Customization; tools to transform your website into your vis
 * Bug fix:						Count of 'All' pages inaccurate on 'All pages'.
 * Bug fix:		JIRA WPB-1367	Updated link for 'Lost your BoldGrid Connect Key?'.
 
-= 1.0.1 =
+### 1.0.1 ###
 * Bug fix:		JIRA WPB-1374	Updated activation timestamp to include timezone in UTC.
 * Bug fix:						Attribution page shows style tags.
 * Bug fix:						Strict Standards fix for wp_kses_allowed_html.
 * Bug fix:						Fixed incorrect link.
 
-= 1.0 =
+### 1.0 ###
 * Initial public release.
 
-== Upgrade Notice ==
-= 1.3 =
+## Upgrade Notice ##
+### 1.3 ###
 Version 1.3 has been released with a redesigned Inspiration phase. For more information on this change and others, please visit our blog at https://www.boldgrid.com/boldgrid-1-3-released/ .
 
-= 1.0.2 =
+### 1.0.2 ###
 Users should upgrade to version 1.0.2 to ensure proper BoldGrid theme updates.

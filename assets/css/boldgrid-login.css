@@ -1,5 +1,5 @@
 body.login {
-	background: #F1F1F1; 
+	background: #F1F1F1;
 }
 .login h1 a {
 	background-size: 318px 158px;
@@ -19,51 +19,25 @@ body.login {
 	overflow: hidden;
 	display: block;
 }
-.login input:hover,
-.login textarea:hover {
-    border: goldenrod solid 1px;
-}
-.login input:focus,
-.login textarea:focus {
-    border: firebrick solid 1px;
-}
 .login #login_error {
-    border-left: 48px solid firebrick;
-    background: #fff;
-    -webkit-box-shadow: 0 0 15px 5px firebrick;
-    -moz-box-shadow: 0 0 15px 5px firebrick;
-    box-shadow: 0 0 15px 5px firebrick;
+	border-left: 4px solid firebrick;
+	background: #fff;
 }
 .login .message {
-    border-left: 4px solid #00a0d2;
-    background-color: #fff;
-    -webkit-box-shadow: 0 0 15px 5px rgba(33, 117, 155, 1);
-    -moz-box-shadow: 0 0 15px 5px rgba(33, 117, 155, 1);
-    box-shadow: 0 0 15px 5px rgba(33, 117, 155, 1);
-}
-.login form {
-	border: dashed .1em;
-}
-.login form:hover {
-    -webkit-box-shadow: 0 0 15px 5px rgba(33, 117, 155, 1);
-    -moz-box-shadow: 0 0 15px 5px rgba(33, 117, 155, 1);
-    box-shadow: 0 0 15px 5px rgba(33, 117, 155, 1);
+	border-left: 4px solid #00a0d2;
+	background-color: #fff;
 }
 .login .button-primary:active,
 .login .button-primary {
-	border: none !important; 
-	float:right; 
+	border: none !important;
+	float:right;
 	box-shadow: none;
-	background-color:#FF6600 !important; 
+	background-color:#FF6600 !important;
 	text-shadow: none;
-}
-.login .button-primary:hover {
-    outline: goldenrod auto 1px;
 }
 input, textarea, select, a {
 	border: 1px solid transparent;
 }
-
 .boldgrid-login-bottom-text {
 	text-align:center;
 }

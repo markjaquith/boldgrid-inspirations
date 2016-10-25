@@ -1,6 +1,6 @@
 <?php
 
-// If uninstall not called from WordPress exit
+// Abort if uninstall is not called from WordPress.
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit();
 }
@@ -48,6 +48,7 @@ delete_option( 'imhwpb_settings' );
 delete_transient( 'boldgrid_valid_api_key' );
 delete_transient( 'imhwpb_valid_api_key' );
 
+delete_site_option( 'boldgrid_settings' );
 delete_site_transient( 'boldgrid_api_data' );
 delete_site_transient( 'imhwpb_api_data' );
 

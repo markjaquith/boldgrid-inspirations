@@ -70,26 +70,11 @@ $lang = array(
 					</p>
 				</div>
 
-				<div class="coin-option active">
-					<input type="radio" name="coin-budget" data-coin="20" checked >
-					<span class="pointer">0 - 20 <?php echo $lang['Coins']; ?></span>
-				</div>
-				<div class="coin-option">
-					<input type="radio" name="coin-budget" data-coin="40">
-					<span class="pointer">0 - 40 <?php echo $lang['Coins']; ?></span>
-				</div>
-				<div class="coin-option">
-					<input type="radio" name="coin-budget" data-coin="60">
-					<span class="pointer">0 - 60 <?php echo $lang['Coins']; ?></span>
-				</div>
-				<div class="coin-option">
-					<input type="radio" name="coin-budget" data-coin="80">
-					<span class="pointer">0 - 80 <?php echo $lang['Coins']; ?></span>
-				</div>
-				<div class="coin-option">
-					<input type="radio" name="coin-budget" data-coin="0">
-					<span class="pointer"><?php echo $lang['Free']; ?></span>
-				</div>
+				<div class="coin-option active" data-coin="20">0 - 20 <?php echo $lang['Coins']; ?></div>
+				<div class="coin-option"        data-coin="40">0 - 40 <?php echo $lang['Coins']; ?></div>
+				<div class="coin-option"        data-coin="60">0 - 60 <?php echo $lang['Coins']; ?></div>
+				<div class="coin-option"        data-coin="80">0 - 80 <?php echo $lang['Coins']; ?></div>
+				<div class="coin-option"        data-coin="0">        <?php echo $lang['Free'];  ?></div>
 			</div>
 		</div>
 
@@ -147,7 +132,7 @@ $lang = array(
 	<input type="text"   name="boldgrid_build_profile_id"      id="boldgrid_build_profile_id"      value="" >
 	<input type="text"   name="coin_budget"                    id="coin_budget"                    value="20" >
 	<input type="text"   name="boldgrid_theme_version_type"    id="boldgrid_theme_version_type"    value="<?php echo $theme_channel ?>" >
-	<input type="text"   name="boldgrid_page_set_version_type" id="boldgrid_page_set_version_type" value="active" >
+	<input type="text"   name="boldgrid_page_set_version_type" id="boldgrid_page_set_version_type" value="<?php echo $theme_channel ?>" >
 	<input type="text"   name="start_over"						id="start_over"                    value="false" >
 	<input type="text"   name="deploy-type"                                                        value="" >
 	<input type="text"   name="pages"                                                              value="" >

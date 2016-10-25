@@ -88,6 +88,8 @@ class Boldgrid_Inspirations_Built {
 				'you_should_start_with_inspirations',
 			)
 		);
+
+		add_action( 'admin_init', array( $this, 'remove_notices' ) );
 	}
 
 	/**
@@ -156,27 +158,27 @@ class Boldgrid_Inspirations_Built {
 	 */
 	public static function get_installed_pages( $post_status ) {
 		$all_pages = get_pages(
-			array (
-				'post_status' => array (
+			array(
+				'post_status' => array(
 					$post_status,
-					'draft'
-				)
+					'draft',
+				),
 			) );
 
-		if ( false == is_array( $all_pages ) ) {
-			$all_pages = array ();
-		}
-
-		$boldgrid_pages = array ();
-
-		foreach ( $all_pages as $page ) {
-			$post_meta = get_post_meta( $page->ID );
-			if ( isset( $post_meta['boldgrid_page_id'] ) ) {
-				$boldgrid_pages[] = $post_meta['boldgrid_page_id'][0];
+			if ( false == is_array( $all_pages ) ) {
+				$all_pages = array();
 			}
-		}
 
-		return $boldgrid_pages;
+			$boldgrid_pages = array();
+
+			foreach ( $all_pages as $page ) {
+				$post_meta = get_post_meta( $page->ID );
+				if ( isset( $post_meta['boldgrid_page_id'] ) ) {
+					$boldgrid_pages[] = $post_meta['boldgrid_page_id'][0];
+				}
+			}
+
+			return $boldgrid_pages;
 	}
 
 	/**
@@ -187,29 +189,29 @@ class Boldgrid_Inspirations_Built {
 	public static function find_all_install_options() {
 		// Get Installed Settings.
 		( $active_install_options = get_option( 'boldgrid_install_options' ) ) ||
-			 ( $active_install_options = array () );
+			 ( $active_install_options = array() );
 
-		$active_install_options['installed_pages'] = self::get_installed_pages( 'publish' );
-		$active_install_options['theme_stylesheet'] = get_stylesheet();
-		$active_install_options['theme_name'] = self::get_boldgrid_theme_name( wp_get_theme() );
+			 $active_install_options['installed_pages'] = self::get_installed_pages( 'publish' );
+			 $active_install_options['theme_stylesheet'] = get_stylesheet();
+			 $active_install_options['theme_name'] = self::get_boldgrid_theme_name( wp_get_theme() );
 
-		$install_options['active_options'] = $active_install_options;
+			 $install_options['active_options'] = $active_install_options;
 
-		( $staging_install_options = get_option( 'boldgrid_staging_boldgrid_install_options' ) ) ||
-			 ( $staging_install_options = array () );
+			 ( $staging_install_options = get_option( 'boldgrid_staging_boldgrid_install_options' ) ) ||
+			 ( $staging_install_options = array() );
 
-		$staging_install_options['installed_pages'] = self::get_installed_pages( 'staging' );
-		$staging_install_options['theme_name'] = self::get_boldgrid_theme_name(
-			$staging_theme = self::get_staging_theme() );
+			 $staging_install_options['installed_pages'] = self::get_installed_pages( 'staging' );
+			 $staging_install_options['theme_name'] = self::get_boldgrid_theme_name(
+			 $staging_theme = self::get_staging_theme() );
 
-		if ( $staging_theme ) {
-			$staging_install_options['theme_stylesheet'] = $staging_theme->get_stylesheet();
-		}
+			 if ( $staging_theme ) {
+				 $staging_install_options['theme_stylesheet'] = $staging_theme->get_stylesheet();
+				}
 
-		$install_options['boldgrid_staging_options'] = $staging_install_options;
-		$install_options['theme_release_channel'] = Boldgrid_Inspirations_Theme_Install::fetch_theme_channel();
+				$install_options['boldgrid_staging_options'] = $staging_install_options;
+				$install_options['theme_release_channel'] = Boldgrid_Inspirations_Theme_Install::fetch_theme_channel();
 
-		return $install_options;
+				return $install_options;
 	}
 
 	/**
@@ -222,7 +224,7 @@ class Boldgrid_Inspirations_Built {
 
 		if ( $this->staging_plugin_active ) {
 			$staged_pages = Boldgrid_Staging_Page_And_Post_Staging::get_all_staged_pages();
-			$staged_pages = is_array( $staged_pages ) ? $staged_pages : array ();
+			$staged_pages = is_array( $staged_pages ) ? $staged_pages : array();
 			$has_staged_site = ( bool ) count( $staged_pages );
 		}
 
@@ -237,7 +239,7 @@ class Boldgrid_Inspirations_Built {
 	public function has_active_bg_site( $install_options ) {
 		$installed_pages = get_option( 'boldgrid_installed_page_ids', array() );
 
-		if( empty( $installed_pages ) ) {
+		if ( empty( $installed_pages ) ) {
 			return false;
 		}
 
@@ -246,7 +248,7 @@ class Boldgrid_Inspirations_Built {
 
 		$pages = get_pages( array(
 			'include' => $installed_pages,
-			'post_status' => 'publish'
+			'post_status' => 'publish',
 		));
 
 		// If we have at least one 'BoldGrid installed page' published, return true.
@@ -273,7 +275,7 @@ class Boldgrid_Inspirations_Built {
 		$coming_soon_page = get_page_by_title( 'WEBSITE COMING SOON' );
 
 		// Initialize $ids_to_remove.
-		$ids_to_filter = array ();
+		$ids_to_filter = array();
 
 		// Get the boldgrid_attribution option data.
 		$attribution = get_option( 'boldgrid_attribution' );
@@ -285,10 +287,10 @@ class Boldgrid_Inspirations_Built {
 
 		// Add the page ids of the default, attribution, and coming soon pages from title match,
 		// to the array.
-		foreach ( array (
+		foreach ( array(
 			$default_page,
 			$attribution_page,
-			$coming_soon_page
+			$coming_soon_page,
 		) as $page ) {
 			if ( null !== $page ) {
 				$ids_to_filter[] = $page->ID;
@@ -296,7 +298,7 @@ class Boldgrid_Inspirations_Built {
 		}
 
 		// Build an array of page objects that do not match page ids in $ids_to_filter.
-		$active_pages = array ();
+		$active_pages = array();
 
 		foreach ( $pages as $page ) {
 			if ( ! in_array( $page->ID, $ids_to_filter ) ) {
@@ -319,7 +321,7 @@ class Boldgrid_Inspirations_Built {
 		 */
 		$attribution_page = get_page_by_title( 'Attribution' );
 
-		if( is_object( $attribution_page ) ) {
+		if ( is_object( $attribution_page ) ) {
 			$exclude = $attribution_page->ID;
 		} else {
 			$exclude = '';
@@ -343,8 +345,8 @@ class Boldgrid_Inspirations_Built {
 
 		// How many of our default pages were found.
 		$default_pages_found = 0;
-		foreach( $default_pages as $page ) {
-			if( is_object( $page ) ) {
+		foreach ( $default_pages as $page ) {
+			if ( is_object( $page ) ) {
 				$default_pages_found++;
 			}
 		}
@@ -353,7 +355,7 @@ class Boldgrid_Inspirations_Built {
 		 * If the count of our pages found is the same as our count of default pages found, then we
 		 * have a blank site.
 		 */
-		if( $default_pages_found == count( $pages ) ) {
+		if ( $default_pages_found == count( $pages ) ) {
 			return true;
 		}
 		/*
@@ -368,7 +370,7 @@ class Boldgrid_Inspirations_Built {
 		 * If we have 1 page and we have 2 default pages, then one of our default pages is the current
 		 * page.
 		 */
-		if( count( $pages ) <= $default_pages_found ) {
+		if ( count( $pages ) <= $default_pages_found ) {
 			return true;
 		} else {
 			return false;
@@ -408,11 +410,11 @@ class Boldgrid_Inspirations_Built {
 	public function enqueue_scripts() {
 		$current_screen = get_current_screen();
 
-		if( 'toplevel_page_boldgrid-inspirations' != $current_screen->base ) {
+		if ( 'toplevel_page_boldgrid-inspirations' != $current_screen->base ) {
 			return;
 		}
 
-		if( isset( $_REQUEST['task'] ) ) {
+		if ( isset( $_REQUEST['task'] ) ) {
 			return;
 		}
 
@@ -464,6 +466,7 @@ class Boldgrid_Inspirations_Built {
 				'errorFetchingThemes' => __( 'There was an error fetching themes.', 'boldgrid-inspirations' ),
 				'errorFetchingCategories' => __( 'There was an error fetching categories.', 'boldgrid-inspirations' ),
 				'errorFetchingPagesets' => __( 'There was an error fetching pagesets.', 'boldgrid-inspirations' ),
+				'errorBuildingPreview' => __( 'There was an error building your custom website preview.', 'boldgrid-inspirations' ),
 				'tryFewMinutes' => __( 'Please try again in a few minutes.', 'boldgrid-inspirations' ),
 				'tryAgain' => __( 'Try again', 'boldgrid-inspirations' ),
 			)
@@ -474,7 +477,7 @@ class Boldgrid_Inspirations_Built {
 			plugins_url(
 				'assets/js/lazyload.js',
 				BOLDGRID_BASE_DIR . '/boldgrid-inspirations.php'
-				),
+			),
 			array( 'jquery' ),
 			BOLDGRID_INSPIRATIONS_VERSION,
 			true
@@ -488,9 +491,9 @@ class Boldgrid_Inspirations_Built {
 	 */
 	public function add_top_menu_item( $top_level ) {
 		add_menu_page( 'Inspirations', 'Inspirations', 'manage_options', $top_level,
-			array (
+			array(
 				$this,
-				'inspiration_page'
+				'inspiration_page',
 			), 'dashicons-lightbulb', '21.36' );
 	}
 
@@ -516,10 +519,9 @@ class Boldgrid_Inspirations_Built {
 	 * @return null
 	 */
 	public function inspiration_page() {
-		// If a key is not authorized, then just return.
-		if ( ! $this->inspiration->api->get_passed_key_validation() ||
-		$this->inspiration->api->get_have_enqueued_api_key_prompt() ||
-		200 !== $this->inspiration->api->get_last_api_status() ) {
+
+		// If we are prompting the user for an API key, then show only that prompt.
+		if ( $this->inspiration->api->get_have_enqueued_api_key_prompt() ) {
 			return;
 		}
 
@@ -535,7 +537,7 @@ class Boldgrid_Inspirations_Built {
 			wp_die( $this->inspiration->api->notify_connection_issue() );
 		}
 
-		if( isset( $_POST['task'] ) && 'deploy' == $_POST['task'] ) {
+		if ( isset( $_POST['task'] ) && 'deploy' == $_POST['task'] ) {
 			// Check nonce.
 			check_admin_referer( 'deploy', 'deploy' );
 
@@ -559,6 +561,39 @@ class Boldgrid_Inspirations_Built {
 	}
 
 	/**
+	 * Remove all admin notices from BoldGrid Inspirations page.
+	 *
+	 * If we allow admin notices to the Inspirations page, the page begins to feel a bit wonky. Don't
+	 * allow any notices on this page.
+	 *
+	 * @since 1.2.6
+	 *
+	 * @global string $pagenow
+	 */
+	public function remove_notices() {
+		global $pagenow;
+
+		$page = ( isset( $_GET['page'] ) ? $_GET['page'] : null );
+
+		// Are we on the Inspirations page?
+		$is_inspirations_page = ( 'admin.php' === $pagenow && 'boldgrid-inspirations' === $page );
+
+		// Are we prompting the user to enter their API key?
+		$prompting_for_key = $this->inspiration->api->get_have_enqueued_api_key_prompt();
+
+		/*
+		 * If we're on the Inspirations page and we're not prompting the user for a key, remove all
+		 * notices.
+		 *
+		 * If we were prompting them for a key, then we don't want to remove the notice to prompt
+		 * them for a key.
+		 */
+		if ( $is_inspirations_page && ! $prompting_for_key ) {
+			remove_all_actions( 'admin_notices' );
+		}
+	}
+
+	/**
 	 * Determine the user's scenario.
 	 *
 	 * # The user has a blank website.							has_blank_active_site()
@@ -573,25 +608,27 @@ class Boldgrid_Inspirations_Built {
 		$this->install_options = self::find_all_install_options();
 
 		// Create return array.
-		return array (
-			'has_active_bg_site' =>		$this->has_active_bg_site( $this->install_options ),
-			'has_staged_site' =>		$this->has_staged_site(),
-			'has_blank_active_site' =>	self::has_blank_active_site(),
-			'open-section' =>			( ! empty( $_GET['force-section'] ) ) ? sanitize_text_field( $_GET['force-section'] ) : '',
-			'staging_active' =>			$this->check_staging_plugin(),
-			'staging_installed' =>		file_exists( WP_PLUGIN_DIR . '/boldgrid-staging' ),
-			'url' =>					admin_url( 'admin.php?page=boldgrid-inspirations' ),
+		return array(
+			'has_active_bg_site' => $this->has_active_bg_site( $this->install_options ),
+			'has_staged_site' => $this->has_staged_site(),
+			'has_blank_active_site' => self::has_blank_active_site(),
+			'open-section' => ( ! empty( $_GET['force-section'] ) ) ? sanitize_text_field( $_GET['force-section'] ) : '',
+			'staging_active' => $this->check_staging_plugin(),
+			'staging_installed' => file_exists( WP_PLUGIN_DIR . '/boldgrid-staging' ),
+			'url' => admin_url( 'admin.php?page=boldgrid-inspirations' ),
 		);
 	}
 
 	/**
 	 * Should the user be starting with inspirations? If so, give them a notice at the top of the
 	 * page.
+	 *
+	 * @global pagenow
 	 */
 	public function you_should_start_with_inspirations() {
-		$pages_to_show_this_notice = array (
+		$pages_to_show_this_notice = array(
 			'post-new.php',
-			'theme-install.php'
+			'theme-install.php',
 		);
 
 		global $pagenow;
@@ -604,12 +641,8 @@ class Boldgrid_Inspirations_Built {
 		// Generate our scenario data.
 		$scenarios = $this->generate_scenarios();
 
-		// Should we display the message?
-		$display_message = ( ! isset( $scenarios['has_built_with_either'] ) ||
-			 false == $scenarios['has_built_with_either'] ) ? true : false;
-
 		// Display our alert.
-		if ( true == $display_message ) {
+		if ( false === $scenarios['has_active_bg_site'] && false === $scenarios['has_staged_site'] ) {
 			?>
 <div class="error notice is-dismissible">
 	<p>

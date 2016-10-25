@@ -346,7 +346,8 @@ class Boldgrid_Inspirations_Api {
 		// If getting plugin version information, include other parameters.
 		if ( 1 === preg_match( '/(check|get-plugin)-version/', $api_path ) ) {
 			// Get BoldGrid settings.
-			$options = get_option( 'boldgrid_settings' );
+			( $options = get_site_option( 'boldgrid_settings' ) ) ||
+			( $options = get_option( 'boldgrid_settings' ) );
 
 			// Include update release and theme channels.
 			$params_array['channel'] = (
@@ -589,6 +590,16 @@ class Boldgrid_Inspirations_Api {
 	 * @since 1.2.2
 	 */
 	public function prompt_for_api_key() {
+		/*
+		 * Get our $configs, so we can supply them to the template file at the end of this method.
+		 *
+		 * Initially, this wasn't required as the configs were available on every page via js.
+		 * However, that is no longer the case. As the only configs required are
+		 * $configs['asset_server'] and $configs['ajax_calls']['generate_api_key'], to minimize
+		 * required changes to this method we'll simply include those values in the form.
+		 */
+		$configs = Boldgrid_Inspirations_Config::get_format_configs();
+
 		// Get current user.
 		$current_user = wp_get_current_user();
 

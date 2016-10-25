@@ -588,7 +588,29 @@ class Boldgrid_Inspirations_Asset_Manager extends Boldgrid_Inspirations {
 						'$response' => $response
 					), true ) );
 
-			return false;
+			/*
+			 * Determine our response for this failed download.
+			 *
+			 * Historically, we always returned false. This causes a problem when purchasing images
+			 * because false does not tell us why the purchase failed.
+			 *
+			 * Because of this problem, we've added a check of $is_purchase. If we are purchasing an
+			 * image, return additional information.
+			 */
+			if( $is_purchase ) {
+				$server_response = json_decode( $response['body'], true );
+
+				$message = ( is_array( $server_response ) && isset( $server_response['message'] ) )
+							? $server_response['message']
+							: __( 'Unknown Error.', 'boldgrid-inspirations' );
+
+				return array(
+					'success' => false,
+					'message' => $message,
+				);
+			} else {
+				return false;
+			}
 		}
 
 		// Save cache files, if enabled.

@@ -108,8 +108,8 @@ $download_button_text = ( true == $ref_is_dashboard_media || true == $ref_is_cus
 			<span>Size:</span><br />
 			<select id='image_size' class="size" name="size" data-setting="size" data-user-setting="imgsize">
 				{{#each sizes}}
-					<option data-cost-coins="{{cost_coins}}" data-width="{{width}}" data-height="{{height}}" value="{{name}}" {{#if_recommended_image_size width}}class='recommended_image_size' selected{{/if_recommended_image_size}}>
-							{{name}}: {{width}} × {{height}} - Coins: {{cost_coins}} {{#if_recommended_image_size width}}&#10004; Recommended size{{/if_recommended_image_size}}
+					<option data-cost-coins="{{cost_coins}}" data-width="{{width}}" data-height="{{height}}" value="{{name}}">
+							{{name}}: {{width}} × {{height}} - Coins: {{cost_coins}}
 					</option>
 				{{/each}}
 			</select>

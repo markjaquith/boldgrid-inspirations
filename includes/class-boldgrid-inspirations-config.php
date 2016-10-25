@@ -36,7 +36,9 @@ class Boldgrid_Inspirations_Config {
 		$channels = ! empty( $configs['features'][ $feature ] ) ? $configs['features'][ $feature ] : false;
 
 		if ( $channels ) {
-			$boldgrid_settings = get_option( 'boldgrid_settings', array () );
+			( $boldgrid_settings = get_site_option( 'boldgrid_settings', array() ) ) ||
+			( $boldgrid_settings = get_option( 'boldgrid_settings', array() ) );
+
 			$release_channel = ! empty( $boldgrid_settings['release_channel'] ) ?
 				$boldgrid_settings['release_channel'] : 'stable';
 
@@ -103,13 +105,53 @@ class Boldgrid_Inspirations_Config {
 		// Add boldgrid_settings to our configs.
 		// @since 1.0.10
 		if ( ! isset( $formated_configs['settings'] ) ) {
-			$formated_configs['settings'] = get_option( 'boldgrid_settings' );
+			( $formated_configs['settings'] = get_site_option( 'boldgrid_settings' ) ) ||
+			( $formated_configs['settings'] = get_option( 'boldgrid_settings' ) );
 		}
+
+		$formated_configs['settings'] = self::set_default_settings( $formated_configs['settings'] );
 
 		// Save the config array.
 		self::$configs = $formated_configs;
 
 		// Return the configuration array.
 		return $formated_configs;
+	}
+
+	/**
+	 * Configure default settings.
+	 *
+	 * Pass in an array of BoldGrid settings. For our default settings, set those defaults in the
+	 * array if they don't already have a value.
+	 *
+	 * You may be missing default settings if you've never gone to the settings page and clicked
+	 * save to save them, or you may have deleted your boldgrid_settings option.
+	 *
+	 * @since 1.2.10
+	 *
+	 * @param  array $settings An array of BoldGrid settings.
+	 * @return array $settings.
+	 */
+	public static function set_default_settings( $settings = array() ) {
+		if( ! is_array( $settings ) ) {
+			$settings = array();
+		}
+
+		$defaults = array(
+			'boldgrid_menu_option' => '1',
+  			'boldgrid_feedback_optout' => '0',
+  			'release_channel' => 'stable',
+  			'theme_release_channel' => 'stable',
+  			'plugin_autoupdate' => '0',
+  			'theme_autoupdate' => '0',
+		);
+
+		foreach( $defaults as $setting => $value ) {
+			if( ! isset( $settings[ $setting ] ) ) {
+				$settings[ $setting ] = $value;
+			}
+		}
+
+		return $settings;
 	}
 }

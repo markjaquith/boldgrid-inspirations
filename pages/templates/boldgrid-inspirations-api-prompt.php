@@ -107,6 +107,9 @@ If you have lost your key, you can have it resent by entering your information b
 				<button id='requestKey' class='button button-primary'>
 				<?php esc_html_e( 'Submit', 'boldgrid-inspirations' ); ?>
 				</button>
+
+				<input type="hidden" id="asset-server" value="<?php echo $configs['asset_server']; ?>" />
+				<input type="hidden" id="generate-api-key" value="<?php echo $configs['ajax_calls']['generate_api_key']; ?>" />
 			</form>
 		</div>
 	</div>

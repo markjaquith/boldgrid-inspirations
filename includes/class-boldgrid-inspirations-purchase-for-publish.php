@@ -233,6 +233,35 @@ class Boldgrid_Inspirations_Purchase_For_Publish extends Boldgrid_Inspirations {
 	}
 
 	/**
+	 * Determine if a call to purchase an image was successful.
+	 *
+	 * @since 1.2.12
+	 *
+	 * @param bool|array $result The results of an image download request.
+	 */
+	public function is_successful_purchase( $result ) {
+		/*
+		 * Historically, if a call to assetManager->download_and_attach_asset() returned false, then
+		 * the purchase failed. We'll keep this historical check in here.
+		 */
+		if( false === $result ) {
+			return false;
+		}
+
+		/*
+		 * We recently updated assetManager->download_and_attach_asset() to return an array of data
+		 * rather than false on image purchase failure.
+		 *
+		 * If false === $result['success'], then the purchase failed.
+		 */
+		if( is_array( $result ) && isset( $result['success'] ) && false === $result['success'] ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Check if local cost matches remote cost
 	 *
 	 * @return boolean
@@ -398,11 +427,16 @@ class Boldgrid_Inspirations_Purchase_For_Publish extends Boldgrid_Inspirations {
 				$download_data, 'all', true );
 
 			// Were we able to download the image successfully?
-			if ( false === $call_to_download_and_attach ) {
+			if ( false === $this->is_successful_purchase( $call_to_download_and_attach ) ) {
 				$errors ++;
 
-				$this->send_publish_status(
-					"<span style='color:red;'>Error downloading image.</li>" );
+				// Determine the error message to print.
+				$message = ( is_array( $call_to_download_and_attach ) && isset( $call_to_download_and_attach['message'] ) )
+							? htmlspecialchars( $call_to_download_and_attach['message'] )
+							: __( 'Error downloading image.', 'boldgrid-inspirations' );
+
+				// Print the error message.
+				$this->send_publish_status( "<span style='color:red;'>$message</li>" );
 			} else {
 				$total_coins_spent += $asset['coin_cost'];
 

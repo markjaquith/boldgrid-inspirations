@@ -5,3 +5,4 @@ logs*
 .buildpath
 .project
 .settings
+node_modules

@@ -27,6 +27,7 @@ IMHWPB.StockImageSearch = function( configs, $ ) {
 
 		// event handler: user clicks search
 		jQuery( '#image_search', $c_imhmf ).on( 'submit', function() {
+			self.reset_search();
 			self.initiate_stock_image_search();
 			return false;
 		} );
@@ -185,6 +186,8 @@ IMHWPB.StockImageSearch = function( configs, $ ) {
 				var template = Handlebars.compile( source );
 				jQuery( '#attachment_details', $c_imhmf ).html( template( msg.result.data ) );
 
+				self.selectRecommendedImage();
+
 				// After the attachment details pane has been loaded, set a few variables.
 				$imageSelect = $( '#image_size' );
 				recommendedCount = $imageSelect.find( 'option.recommended_image_size' ).length;
@@ -253,19 +256,59 @@ IMHWPB.StockImageSearch = function( configs, $ ) {
 	 */
 	this.getAction = function() {
 		var inCustomizer = ( 'dashboard-customizer' === self.baseAdmin.GetURLParameter( 'ref' ) ),
+			// The BoldGrid Connect Search tab.
+			$bgcsTab = $( '.media-menu-item.boldgrid-connect-search:visible', parent.document ),
 			action = null;
 
-		if ( 'undefined' !== parent.wp.media.frame && 'replace-image' === parent.wp.media.frame._state ) {
+		if( 'dashboard-media' === self.baseAdmin.GetURLParameter( 'ref' ) ) {
+			action = 'dashboard-media';
+		} else if( 'undefined' !== parent.wp.media.frame && 'replace-image' === parent.wp.media.frame._state ) {
 			action = 'replace-image';
+		} else if( 'section-background' === $bgcsTab.attr( 'data-added-by' ) ) {
+			action = 'section-background';
+		} else if( 'add-to-gallery' === $bgcsTab.attr( 'data-added-by' ) ) {
+			action = 'add-to-gallery';
+		} else if( 'create-gallery' === $bgcsTab.attr( 'data-added-by' ) ) {
+			action = 'create-gallery';
 		} else if( 'function' === typeof parent.window.send_to_editor && ! inCustomizer ) {
 			action = 'editor';
-		} else if( 'dashboard-media' === self.baseAdmin.GetURLParameter( 'ref' ) ) {
-			action = 'dashboard-media';
 		} else if( inCustomizer ) {
 			action = 'customizer';
 		}
 
 		return action;
+	}
+
+	/**
+	 * @summary Get a theme's header / background recommended width.
+	 *
+	 * For example, in the Customizer when you go to change your background image, it may
+	 * say something like:
+	 *
+	 * Suggested image dimensions: 1200 × 280
+	 *
+	 * Not all themes do this, but for those that do, this function will parse that text and return
+	 * the recommended width.
+	 *
+	 * @todo: Parsing the text to get the width isn't the best approach, but couldn't find these
+	 * values in standard variables, such as wp.customize;
+	 *
+	 * @since 1.2.6
+	 */
+	this.getRecommendedWidth = function() {
+		var $instructions = $('.instructions', window.parent.document).last().html(),
+			recommendedDimensions,
+			recommendedWidth = null;
+
+		if( typeof $instructions !== 'undefined' && $instructions.length ) {
+			recommendedDimensions = $instructions.split(':');
+
+			// Note, that's not an 'x' below, it's an '×'.
+			recommendedWidth = recommendedDimensions[1].split('×');
+			recommendedWidth = parseInt( recommendedWidth[0].trim() );
+		}
+
+		return recommendedWidth;
 	}
 
 	/**
@@ -307,6 +350,69 @@ IMHWPB.StockImageSearch = function( configs, $ ) {
 				}
 			}
 		}
+	};
+
+	/**
+	 * @summary Select the recommended image size.
+	 *
+	 * Based on different scenarios, we'll recommend different image sizes to the user. For example,
+	 * if the user is choosing a background image, they'll need a much larger image than if they
+	 * were downloading an image to be used within a page.
+	 *
+	 * This function used to be in handle-bar-helpers, but over time more functionality has been
+	 * needed, and so it has been moved here (and modified).
+	 *
+	 * @since 1.2.6
+	 */
+	this.selectRecommendedImage = function() {
+		var action = self.getAction();
+
+		$( '#image_size > option', $c_imhmf ).each( function() {
+			var $option = $(this),
+				width = parseInt( $option.attr( 'data-width' ) ),
+				low = 0,
+				high = 0,
+				originalHtml;
+
+			// Based upon our action, determine the low and high range for our recommended image width.
+			switch( action ) {
+				case 'editor':
+					low = 450;
+					high = 900;
+					break;
+				case 'customizer':
+				case 'section-background':
+					recommendedWidth = self.getRecommendedWidth();
+
+					/*
+					 * If the theme suggests a width, then use that.
+					 *
+					 * Else, suggest width based upon current monitor statistics:
+					 * https://www.w3counter.com/globalstats.php
+					 */
+					if( recommendedWidth ) {
+						low = recommendedWidth - 300;
+						high = recommendedWidth + 500;
+					} else {
+						low = 1024;
+						high = 1920;
+					}
+
+					break;
+			};
+
+			// If this is a recommended image, flag it as so.
+			if( width >= low && width <= high ) {
+				originalHtml = $option.html();
+
+				$option
+					.addClass( 'recommended_image_size' )
+					.html( originalHtml + ' &#10004; Recommended size' );
+			}
+		});
+
+		// Select the last recommended image in the list.
+		$( '#image_size > option.recommended_image_size', $c_imhmf ).last().prop( 'selected', true );
 	};
 
 	/**
@@ -367,12 +473,6 @@ IMHWPB.StockImageSearch = function( configs, $ ) {
 		var action = self.getAction();
 
 		switch( action ) {
-			case 'replace-image':
-
-				self.refresh_media_library();
-				self.whenInLibrary( response.attachment_id, action );
-
-				break;
 			case 'editor':
 
 				parent.window.send_to_editor( response.html_for_editor );
@@ -387,7 +487,11 @@ IMHWPB.StockImageSearch = function( configs, $ ) {
 		        $anchor.after( anchor_to_view_attachment_details_media_library );
 
 				break;
+			case 'replace-image':
 			case 'customizer':
+			case 'section-background':
+			case 'add-to-gallery':
+			case 'create-gallery':
 
 				self.refresh_media_library();
 	        	self.whenInLibrary( response.attachment_id, action );
@@ -518,24 +622,14 @@ IMHWPB.StockImageSearch = function( configs, $ ) {
 
 				switch( action ) {
 					case 'replace-image':
-
-						// In the media library, click the image we just downloaded, then click 'Replace'.
-				        $attachment.click();
-				        $( '.media-button-replace', window.parent.document ).click();
-
-						break;
-
 					case 'customizer':
-
-						/*
-						 * Make sure the toolbar at the bottom is visible. After selecting the image,
-						 * we'll be cropping it. We'll need to see the buttons for 'crop / not now'.
-						 */
-						$( '.media-modal:visible', window.parent.document ).find( '.media-frame-toolbar' ).removeClass( 'hidden' );
+					case 'section-background':
+					case 'add-to-gallery':
+					case 'create-gallery':
 
 						// In the media library, click the image that was just downloaded. Then, click the select button.
 						$attachment.click();
-						$( '.media-button-select', window.parent.document ).click();
+						$( '.media-toolbar .media-button.button-primary', window.parent.document ).click();
 
 						break;
 				}

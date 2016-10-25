@@ -57,7 +57,7 @@ var BoldGridDashboard = BoldGridDashboard || {};
 
 				function boldgridThumb( id ) {
 					return '<img class="youtube-thumb" src="//i.ytimg.com/vi/' + id +
-						'/sddefault.jpg"><div class="play-button"></div>';
+						'/hqdefault.jpg"><div class="play-button"></div>';
 				}
 
 				function boldgridIframe() {

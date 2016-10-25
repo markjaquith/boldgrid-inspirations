@@ -10,6 +10,10 @@
 	border: 1px solid #ddd;
 }
 
+#toggle_view_deploy_log{
+	cursor: pointer;
+}
+
 .white-bg {
 	background: #fff;
 }
@@ -36,6 +40,10 @@
 
 .clear {
 	clear: both;
+}
+
+.bottom-0 {
+	bottom: 0px;
 }
 
 /* *****************************************************************
@@ -202,7 +210,7 @@ Misc
 	0% {left:0px; opacity: 0;}
 	25% {left:0px; opacity: 1;}
 	50% {width:240px; left:0px;}
-	75% {width:9px; height:9px; left:231px; margin-top:20px;vopacity:1;}
+	75% {width:9px; height:9px; left:231px; margin-top:20px; opacity:1;}
 	100% {width:1px; height:1px; left:235px; margin-top:25px; opacity:0;}
 }
 

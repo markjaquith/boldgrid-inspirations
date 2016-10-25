@@ -30,6 +30,6 @@
 	<p>Whoops! There seemed to be a problem downloading the newest GridBlock Sets.</p>
 	<p>
 		<a class='button' id='try_again' >Try again</a> <a class='button button-primary' href='post-new.php?post_type=page'>Add blank</a>
-	</p> 
+	</p>
 </div>
 </script>

@@ -2,7 +2,7 @@
 /*
  * Plugin Name: BoldGrid Inspirations
  * Plugin URI: https://www.boldgrid.com/
- * Version: 1.2.5
+ * Version: 1.3
  * Author: BoldGrid.com <wpb@boldgrid.com>
  * Author URI: https://www.boldgrid.com/
  * Description: Be inspired, be custom, be bold!
@@ -13,7 +13,7 @@
 
 // Define version.
 if ( ! defined( 'BOLDGRID_INSPIRATIONS_VERSION' ) ) {
-	define( 'BOLDGRID_INSPIRATIONS_VERSION', '1.2.5' );
+	define( 'BOLDGRID_INSPIRATIONS_VERSION', implode( get_file_data( __FILE__, array( 'Version' ), 'plugin' ) ) );
 }
 
 // Used for this and other BoldGrid plugins to locate the core plugin directory.

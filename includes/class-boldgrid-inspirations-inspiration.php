@@ -45,8 +45,8 @@ class Boldgrid_Inspirations_Inspiration extends Boldgrid_Inspirations {
 	 * @see Boldgrid_Inspirations_Api::get_site_hash().
 	 */
 	public function pre_add_hooks() {
-		// Add hooks for users on the front end that are not logged in.
-		if ( ! is_user_logged_in() && ! is_admin() ) {
+		// Add hooks for users on the front end.
+		if ( ! is_admin() ) {
 			$this->add_wp_hooks();
 		}
 
@@ -130,10 +130,6 @@ class Boldgrid_Inspirations_Inspiration extends Boldgrid_Inspirations {
 			// Customizer.
 			$customizer = new Boldgrid_Inspirations_Customizer();
 			$customizer->add_hooks();
-
-			// BoldGrid Tutorials.
-			$tutorials = new Boldgrid_Inspirations_Tutorials();
-			$tutorials->add_hooks();
 
 			// Javascript files per screen.
 			$screen = new Boldgrid_Inspirations_Screen();
@@ -271,20 +267,11 @@ class Boldgrid_Inspirations_Inspiration extends Boldgrid_Inspirations {
 /**
  * Add front end hooks.
  *
- * These hooks are triggered for users to the front end of the site that
- * are not logged in, i.e. standard website visitors.
+ * These hooks are triggered for users to the front end of the site.
  *
  * @since 1.1.2
  */
 public function add_wp_hooks() {
-	/*
-	 * At this time, there is one frontend hook configured to load. It is for Attribution, and is
-	 * intended to add 'noindex' to the attribution page so it is not picked up by search engines.
-	 * That new item is not yet ready for launch, and because it's the only hook, we'll abort
-	 * immediately for now.
-	 */
-	return;
-
 	$this->include_wp_files();
 
 	$attribution = new Boldgrid_Inspirations_Attribution();
@@ -397,7 +384,6 @@ public function include_admin_files() {
 	require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-stock-photography.php';
 	require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-purchase-for-publish.php';
 	require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-dashboard.php';
-	require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-tutorials.php';
 	require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-screen.php';
 	require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-update.php';
 	require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-options.php';
@@ -441,6 +427,8 @@ public function add_boldgrid_configs_to_header() {
 	global $post;
 	global $pagenow;
 
+	$configs = $this->get_configs();
+
 	$boldgrid_post_id = ( isset( $post->ID ) ? intval( $post->ID ) : "''" );
 
 	// If we don't have a post id, try getting it from the URL.
@@ -448,15 +436,24 @@ public function add_boldgrid_configs_to_header() {
 		$boldgrid_post_id = ( isset( $_GET['post_id'] ) ? intval( $_GET['post_id'] ) : "''" );
 	}
 
+	/*
+	 * If we are not allowing ALL configs to be displayed in the header, create an array of configs
+	 * that are needed and safe to print on every admin page.
+	 */
+	if( false === $this->allow_header_configs() ) {
+		$configs = array(
+			'settings' => array(
+				'boldgrid_menu_option' => $configs['settings']['boldgrid_menu_option'],
+			),
+		);
+	}
+
 	$oneliner = '
 		var IMHWPB = IMHWPB || {};
 		IMHWPB.post_id = ' . $boldgrid_post_id . ';
 		IMHWPB.page_now = "' . $pagenow . '";
+		IMHWPB.configs = ' . json_encode( $configs ) . '
 	';
-
-	if( true === $this->allow_header_configs() ) {
-		$oneliner .= 'IMHWPB.configs = ' . json_encode( $this->get_configs() ) . ';';
-	}
 
 	Boldgrid_Inspirations_Utility::inline_js_oneliner( $oneliner );
 }
@@ -492,7 +489,8 @@ public function add_boldgrid_configs_to_header() {
 		}
 
 		// BoldGrid Connect Search.
-		if( 'media-upload.php' === $pagenow && 'image_search' === $tab && current_user_can( 'upload_files' ) ) {
+		$valid_tabs = array( 'insert_layout', 'image_search' );
+		if( 'media-upload.php' === $pagenow && in_array( $tab, $valid_tabs, true ) && current_user_can( 'upload_files' ) ) {
 			return true;
 		}
 
@@ -506,32 +504,13 @@ public function add_boldgrid_configs_to_header() {
 			return true;
 		}
 
-		return false;
-	}
-
-/**
- * On activation of BoldGrid, check Welcome Panel exists and make it show if not.
- *
- * @see register_activation_hook
- * @param
- *        	show_welcome_panel
- * @since .11.13
- */
-public function boldgrid_activate() {
-	// If not on a network admin page, then reset the welcome panel and create an attribution page.
-	if ( false === is_network_admin() ) {
-		// Get the current user id.
-		$user_id = get_current_user_id();
-
-		// check to see if Welcome Panel is hidden, if it is show it.
-		if ( 1 != get_user_meta( $user_id, 'show_welcome_panel', true ) ) {
-			update_user_meta( $user_id, 'show_welcome_panel', 1 );
+		// New Page.
+		if( 'post-new.php' === $pagenow && current_user_can( 'edit_posts' ) ) {
+			return true;
 		}
 
-		// Run the JavaScript one-liner.
-		Boldgrid_Inspirations_Utility::inline_js_oneliner( $oneliner );
+		return false;
 	}
-}
 
 /**
  * Add BoldGrid help link in the WordPress Help context tab

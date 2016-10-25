@@ -214,6 +214,10 @@ iframe#boldgrid_connect_search {
 	/**
 	 * Handle the user clicking "Download and insert into page"
 	 *
+	 * This method is triggered generally throughout all stock image downloads via ajax. Even though
+	 * the method name "insert into page" implies you're editing a page, you could actually be in
+	 * Dashboard > Media > BoldGrid Connect Search.
+	 *
 	 * @param string $_POST['caption']
 	 * @param string $_POST['alignment']
 	 * @param string $_POST['alt_text']
@@ -232,11 +236,21 @@ iframe#boldgrid_connect_search {
 		$response = array();
 
 		// Access the post object.
-		$post = ! empty( $_POST['post_id'] ) && get_post_status( $_POST['post_id'] ) ? get_post( $_POST['post_id'] ) : wp_die();
+		$post = ! empty( $_POST['post_id'] ) && get_post_status( $_POST['post_id'] ) ? get_post( $_POST['post_id'] ) : null;
 
-		// Capability check.
-		$cap = ( 'page' == $post->post_type ) ? 'edit_page' : 'edit_post';
-		current_user_can( $cap, $post->ID ) ? : wp_die();
+		/*
+		 * Capability check.
+		 *
+		 * If the user is editing a page / post, make sure they have permission to do so.
+		 *
+		 * Else, do a general check. Make sure they have permission to upload files.
+		 */
+		if( $post ) {
+			$cap = ( 'page' == $post->post_type ) ? 'edit_page' : 'edit_post';
+			current_user_can( $cap, $post->ID ) ? : wp_die();
+		} elseif( ! current_user_can( 'upload_files' ) ) {
+			wp_die();
+		}
 
 		require_once BOLDGRID_BASE_DIR . '/includes/class-boldgrid-inspirations-asset-manager.php';
 
@@ -256,7 +270,15 @@ iframe#boldgrid_connect_search {
 			)
 		);
 
-		$image = $this->asset_manager->download_and_attach_asset( $post->ID, null, $item, 'all',
+		/*
+		 * Configure our $post_id for the download_and_attach_asset call.
+		 *
+		 * If we don't have a post, then set to false. We won't have a post, for example, when we're
+		 * within Dashboard > Media > BGCS.
+		 */
+		$post_id = ( is_null( $post ) ? false : $post->ID );
+
+		$image = $this->asset_manager->download_and_attach_asset( $post_id, null, $item, 'all',
 			false );
 
 		$response['attachment_id'] = $image['attachment_id'];

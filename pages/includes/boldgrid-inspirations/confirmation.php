@@ -30,6 +30,7 @@ $lang = array(
 	'make_new_my_website'    => __( 'Make this new Inspiration my website.', 'boldgrid-inspirations' ),
 	'make_new_my_staging'    => __( 'Make this new Inspiration my Staging website.', 'boldgrid-inspirations' ),
 	'make_staged'            => __( 'Keep my existing website available for visitors and make this new Inspiration a "Staged Website".', 'boldgrid-inspirations' ),
+	'recommended'            => __( 'Recommended', 'boldgrid-inspirations' ),
 
 	/*
 	 * Confirmation choice notes.
@@ -110,7 +111,7 @@ switch( $scenario ) {
 					$lang['how_to_install'] . '
 			</p>
 			<p>
-				<input type="radio" name="install-decision" value="install-as-active" checked>' . $lang['make_new_my_website'] . '<br />
+				<input type="radio" name="install-decision" value="install-as-active" checked>' . $lang['make_new_my_website'] . ' (' . $lang['recommended'] . ')<br />
 				<input type="radio" name="install-decision" value="install-as-staging">' . $lang['make_new_my_staging'] . '
 			</p>
 		';
@@ -124,6 +125,14 @@ switch( $scenario ) {
 	 * [T] Staging is installed.
 	 */
 	case array( false, true, false, true, true ):
+	/*
+	 * [ ] Has blank active site.
+	 * [ ] Has active BG site.
+	 * [ ] Has staged site.
+	 * [T] Staging is active.
+	 * [T] Staging is installed.
+	 */
+	case array( false, false, false, true, true ):
 		$top = '
 			<p>' .
 					$lang['selected_inspiration'] . ' ' .
@@ -131,8 +140,8 @@ switch( $scenario ) {
 					$lang['how_to_install'] . '
 			</p>
 			<p>
-				<input type="radio" name="install-decision" value="overwrite-active" checked>' . $lang['make_new_my_website'] . '<br />
-				<input type="radio" name="install-decision" value="install-as-staging">' . $lang['make_staged'] . '
+				<input type="radio" name="install-decision" value="overwrite-active">' . $lang['make_new_my_website'] . '<br />
+				<input type="radio" name="install-decision" value="install-as-staging" checked>' . $lang['make_staged'] . '
 			</p>
 		';
 		break;
@@ -145,6 +154,14 @@ switch( $scenario ) {
 	 * [T] Staging is installed.
 	 */
 	case array( false, true, true, true, true ):
+	/*
+	 * [ ] Has blank active site.
+	 * [ ] Has active BG site.
+	 * [T] Has staged site.
+	 * [T] Staging is active.
+	 * [T] Staging is installed.
+	 */
+	case array( false, false, true, true, true ):
 		$top = '
 			<p>' .
 					$lang['selected_inspiration'] . ' ' .
@@ -152,8 +169,8 @@ switch( $scenario ) {
 					$lang['how_to_install'] . '
 			</p>
 			<p>
-				<input type="radio" name="install-decision" value="overwrite-active" checked>' . $lang['make_new_my_website'] . '<br />
-				<input type="radio" name="install-decision" value="overwrite-staging">' . $lang['make_new_my_staging'] . '
+				<input type="radio" name="install-decision" value="overwrite-active">' . $lang['make_new_my_website'] . '<br />
+				<input type="radio" name="install-decision" value="overwrite-staging" checked>' . $lang['make_new_my_staging'] . '
 			</p>
 		';
 		break;
@@ -187,6 +204,14 @@ switch( $scenario ) {
 	 * [ ] Staging is installed.
 	 */
 	case array( false, true, false, false, false ):
+	/*
+	 * [ ] Has blank active site.
+	 * [ ] Has active BG site.
+	 * [ ] Has staged site.
+	 * [ ] Staging is active.
+	 * [ ] Staging is installed.
+	 */
+	case array( false, false, false, false, false ):
 		$top = '
 			<p>' .
 				$lang['selected_inspiration'] . ' ' .
@@ -194,8 +219,8 @@ switch( $scenario ) {
 				$lang['how_to_install'] . '
 			</p>
 			<p>
-				<input type="radio" name="install-decision" value="overwrite-active" checked>' . $lang['make_new_my_website'] . '<br />
-				<input type="radio" name="install-decision" value="download-staging">' . $lang['make_staged'] . '
+				<input type="radio" name="install-decision" value="overwrite-active">' . $lang['make_new_my_website'] . '<br />
+				<input type="radio" name="install-decision" value="download-staging" checked>' . $lang['make_staged'] . '
 			</p>
 		';
 		break;
@@ -208,6 +233,14 @@ switch( $scenario ) {
 	 * [T] Staging is installed.
 	 */
 	case array( false, true, false, false, true ):
+	/*
+	 * [ ] Has blank active site.
+	 * [ ] Has active BG site.
+	 * [ ] Has staged site.
+	 * [ ] Staging is active.
+	 * [T] Staging is installed.
+	 */
+	case array( false, false, false, false, true ):
 		$top = '
 			<p>' .
 				$lang['selected_inspiration'] . ' ' .
@@ -215,8 +248,8 @@ switch( $scenario ) {
 				$lang['how_to_install'] . '
 			</p>
 			<p>
-				<input type="radio" name="install-decision" value="overwrite-active" checked>' . $lang['make_new_my_website'] . '<br />
-				<input type="radio" name="install-decision" value="activate-staging">' . $lang['make_staged'] . '
+				<input type="radio" name="install-decision" value="overwrite-active">' . $lang['make_new_my_website'] . '<br />
+				<input type="radio" name="install-decision" value="activate-staging" checked>' . $lang['make_staged'] . '
 			</p>
 		';
 		break;

@@ -52,6 +52,16 @@ class Boldgrid_Inspirations_Update {
 	}
 
 	/**
+	 * Parameters for displaying version-specific notices.
+	 *
+	 * @since 1.2.11
+	 * @access private
+	 *
+	 * @var array
+	 */
+	private $notice_params = array();
+
+	/**
 	 * Getter for the BoldGrid Inspirations class object.
 	 *
 	 * @since 1.1.7
@@ -91,7 +101,7 @@ class Boldgrid_Inspirations_Update {
 			global $pagenow;
 
 			// Make an array of plugin update pages.
-			$plugin_update_pages = array (
+			$plugin_update_pages = array(
 				'plugins.php',
 				'update-core.php',
 			);
@@ -110,30 +120,30 @@ class Boldgrid_Inspirations_Update {
 				 $is_plugin_update ) {
 				// Add filters.
 				add_filter( 'pre_set_site_transient_update_plugins',
-					array (
+					array(
 						$this,
-						'custom_plugins_transient_update'
+						'custom_plugins_transient_update',
 					)
 				);
 
 				add_filter( 'plugins_api',
-					array (
+					array(
 						$this,
-						'custom_plugins_transient_update'
+						'custom_plugins_transient_update',
 					)
 				);
 
 				// Force WP to check for updates, don't rely on cache / transients.
 				add_filter( 'site_transient_update_plugins',
-					array (
+					array(
 						$this,
-						'site_transient_update_plugins'
+						'site_transient_update_plugins',
 					)
 				);
 			}
 
 			// Make an array of theme update pages.
-			$theme_update_pages = array (
+			$theme_update_pages = array(
 				'themes.php',
 				'update-core.php',
 				'update.php',
@@ -143,35 +153,74 @@ class Boldgrid_Inspirations_Update {
 			$is_theme_upgrade = ( isset( $_REQUEST['action'] ) &&
 				 'upgrade-theme' === $_REQUEST['action'] && 'update.php' === $pagenow );
 
+			// Is this a plugin update action?
+			$is_theme_update = ( isset( $_REQUEST['action'] ) &&
+				'update-theme' === $_REQUEST['action'] && 'admin-ajax.php' === $pagenow );
+
 			// Add filters to modify theme update transient information.
-			if ( in_array( $pagenow, $theme_update_pages, true ) || $is_theme_upgrade ) {
+			if ( in_array( $pagenow, $theme_update_pages, true ) || $is_theme_upgrade ||
+				$is_theme_update ) {
 				add_filter( 'pre_set_site_transient_update_themes',
-					array (
+					array(
 						$this,
-						'custom_themes_transient_update'
+						'custom_themes_transient_update',
 					)
 				);
 
 				add_filter( 'site_transient_update_themes',
-					array (
+					array(
 						$this,
-						'custom_themes_transient_update'
+						'custom_themes_transient_update',
 					)
 				);
 			}
 		}
 
 		// If on the dashboard, then check if there is an admin notice to display.
-		add_action( 'admin_head-index.php', array (
-			$this,
-			'display_notices'
-		) );
+		add_action( 'admin_head-index.php',
+			array(
+				$this,
+				'display_notices',
+			)
+		);
 
 		// Check and update the current and previous version options.
-		add_action( 'admin_init', array (
-			$this,
-			'update_version_options'
-		) );
+		add_action( 'admin_init',
+			array(
+				$this,
+				'update_version_options',
+			)
+		);
+	}
+
+	/**
+	 * Set parameters for displaying version-specific notices.
+	 *
+	 * This method should be called on or after a hook that supports get_plugin_data().
+	 *
+	 * @since 1.2.11
+	 * @access private
+	 */
+	private function set_notice_params() {
+		// Get boldgrid settings.
+		$boldgrid_settings = get_option( 'boldgrid_settings' );
+
+		// Get the boldgrid menu option from settings.
+		$this->notice_params['boldgrid_menu_option'] = $boldgrid_settings['boldgrid_menu_option'];
+
+		// Get the current plugin version.
+		$plugin_data = get_plugin_data( BOLDGRID_BASE_DIR . '/boldgrid-inspirations.php', false );
+
+		$this->notice_params['plugin_version'] = $plugin_data['Version'];
+
+		// Get the boldgrid_inspirations_activated option.
+		$this->notice_params['activated_version'] = get_site_option( 'boldgrid_inspirations_activated_version' );
+
+		// Instantiate Boldgrid_Inspirations_Admin_Notices.
+		$admin_notices = new Boldgrid_Inspirations_Admin_Notices();
+
+		// Add $admin_notices as an array element.
+		$this->notice_params['admin_notices'] = $admin_notices;
 	}
 
 	/**
@@ -298,7 +347,7 @@ class Boldgrid_Inspirations_Update {
 		$boldgrid_configs = self::get_configs();
 
 		// If the API key is not set, then abort; return unchanged plugin update transient.
-		if( empty( $boldgrid_configs['api_key'] ) ){
+		if ( empty( $boldgrid_configs['api_key'] ) ) {
 			return $transient;
 		}
 
@@ -314,18 +363,24 @@ class Boldgrid_Inspirations_Update {
 			// If we have section data, then prepare it for use.
 			if ( ! empty( $boldgrid_api_data->result->data->sections ) ) {
 				// Remove new lines and double-spaces, to help prevent a broken JSON set.
-				$boldgrid_api_data->result->data->sections = preg_replace( '/\s+/', ' ',
-					trim( $boldgrid_api_data->result->data->sections ) );
+				$boldgrid_api_data->result->data->sections = preg_replace(
+					'/\s+/', ' ',
+					trim( $boldgrid_api_data->result->data->sections )
+				);
 
 				// Convert the JSON set into an array.
-				$transient->sections = json_decode( $boldgrid_api_data->result->data->sections,
-					true );
+				$transient->sections = json_decode(
+					$boldgrid_api_data->result->data->sections,
+					true
+				);
 
 				// If we have data, format it for use, else set a default message.
 				if ( ! empty( $transient->sections ) && count( $transient->sections ) ) {
 					foreach ( $transient->sections as $section => $section_data ) {
-						$transient->sections[$section] = html_entity_decode( $section_data,
-							ENT_QUOTES );
+						$transient->sections[ $section ] = html_entity_decode(
+							$section_data,
+							ENT_QUOTES
+						);
 					}
 				} else {
 					$transient->sections['description'] = 'Data not available';
@@ -344,9 +399,9 @@ class Boldgrid_Inspirations_Update {
 				 $boldgrid_configs['ajax_calls']['get_asset'] . '?key=' .
 				 $boldgrid_configs['api_key'] . '&id=' . $boldgrid_api_data->result->data->asset_id;
 
-			if ( ! empty( $boldgrid_api_data->result->data->compatibility ) && null !== ( $compatibility = json_decode(
-				$boldgrid_api_data->result->data->compatibility, true ) ) ) {
-				$transient->compatibility = $boldgrid_api_data->result->data->compatibility;
+			if ( ! empty( $boldgrid_api_data->result->data->compatibility ) &&
+				null !== ( $compatibility = json_decode( $boldgrid_api_data->result->data->compatibility, true ) ) ) {
+					$transient->compatibility = $boldgrid_api_data->result->data->compatibility;
 			}
 
 			/*
@@ -369,9 +424,9 @@ class Boldgrid_Inspirations_Update {
 				$transient->tags = $boldgrid_api_data->result->data->tags;
 			}
 
-			if ( ! empty( $boldgrid_api_data->result->data->banners ) && null !== ( $banners = json_decode(
-				$boldgrid_api_data->result->data->banners, true ) ) ) {
-				$transient->banners = $banners;
+			if ( ! empty( $boldgrid_api_data->result->data->banners ) &&
+				null !== ( $banners = json_decode( $boldgrid_api_data->result->data->banners, true ) ) ) {
+					$transient->banners = $banners;
 			}
 
 			$transient->plugin_name = 'boldgrid-inspirations.php';
@@ -394,14 +449,16 @@ class Boldgrid_Inspirations_Update {
 				 $boldgrid_configs['ajax_calls']['get_asset'] . '?key=' .
 				 $boldgrid_configs['api_key'] . '&id=' . $boldgrid_api_data->result->data->asset_id;
 
-			$plugin_data = get_plugin_data( BOLDGRID_BASE_DIR . '/boldgrid-inspirations.php',
-				false );
+			$plugin_data = get_plugin_data(
+				BOLDGRID_BASE_DIR . '/boldgrid-inspirations.php',
+				false
+			);
 
 			if ( $plugin_data['Version'] !== $boldgrid_api_data->result->data->version ) {
-				$transient->response[$obj->plugin] = $obj;
+				$transient->response[ $obj->plugin ] = $obj;
 				$transient->tested = $boldgrid_api_data->result->data->tested_wp_version;
 			} else {
-				$transient->no_update[$obj->plugin] = $obj;
+				$transient->no_update[ $obj->plugin ] = $obj;
 			}
 		}
 
@@ -446,71 +503,88 @@ class Boldgrid_Inspirations_Update {
 		// If themes are found, then iterate through them, adding update info for our themes.
 		if ( count( $installed_themes ) ) {
 			foreach ( $installed_themes as $installed_theme ) {
-				// If the current theme is a BoldGrid theme, then check for an upgrade.
-				if ( false !== strpos( $installed_theme->get( 'TextDomain' ), 'boldgrid' ) ) {
-					// Get the boldgrid-theme-id from the Tags line in the stylesheet.
-					$tags = $installed_theme->get( 'Tags' );
+				// Look for boldgrid-theme-id in the Tags line in the stylesheet.
+				$tags = $installed_theme->get( 'Tags' );
 
-					// Iterate through the tags to find theme id (boldgrid-theme-id-##).
-					$theme_id = null;
-					foreach ( $tags as $tag ) {
-						if ( preg_match( '/^boldgrid-theme-([0-9]+)$/', $tag, $matches ) ) {
-							$boldgrid_tag = $matches[0];
-							$theme_id = $matches[1];
-							unset( $matches );
+				// Iterate through the tags to find theme id (boldgrid-theme-id-##).
+				$theme_id = null;
+				foreach ( $tags as $tag ) {
+					if ( preg_match( '/^boldgrid-theme-([0-9]+)$/', $tag, $matches ) ) {
+						$boldgrid_tag = $matches[0];
+						$theme_id = $matches[1];
+						unset( $matches );
 
-							break;
-						}
+						break;
 					}
+				}
 
-					// Check if update available for a theme by comparing versions.
-					$current_version = $installed_theme->Version;
-					$incoming_version = ! empty( $theme_versions[ $theme_id ]['version'] ) ?
-						$theme_versions[ $theme_id ]['version'] : null;
-					$update_available = $incoming_version && $current_version != $incoming_version;
+				// If not a boldgrid theme, then skip.
+				if ( null === $theme_id ) {
+					continue;
+				}
 
-					// Update is available set transient.
-					if ( $update_available ) {
+				// Check if update available for a theme by comparing versions.
+				$current_version = $installed_theme->Version;
+				$incoming_version = ! empty( $theme_versions[ $theme_id ]['version'] ) ?
+					$theme_versions[ $theme_id ]['version'] : null;
+				$update_available = ($incoming_version && $current_version !== $incoming_version );
 
-						// Get the theme slug, name, and theme URI.
-						$slug = $installed_theme->get_template();
-						$theme_name = $installed_theme->get( 'Name' );
-						$theme_uri = $installed_theme->get( 'ThemeURI' );
+				// Get the theme slug (folder name).
+				$slug = $installed_theme->get_template();
 
-						// Add array elements to the transient.
-						$transient->response[$slug]['theme'] = $slug;
-						$transient->response[$slug]['new_version'] = $theme_versions[$theme_id]['version'];
+				// Update is available set transient.
+				if ( $update_available ) {
 
-						// URL for the new theme version information iframe.
-						$transient->response[$slug]['url'] = empty( $theme_uri ) ? 'https://www.boldgrid.com/themes/' .
-							 strtolower( $theme_name ) : $theme_uri;
+					// Get the theme name, and theme URI.
+					$theme_name = $installed_theme->get( 'Name' );
+					$theme_uri = $installed_theme->get( 'ThemeURI' );
 
-						// Theme package download link.
-						$transient->response[$slug]['package'] = isset(
-							$theme_versions[$theme_id]['package'] ) ? $theme_versions[$theme_id]['package'] : null;
+					// Add array elements to the transient.
+					$transient->response[ $slug ]['theme'] = $slug;
+					$transient->response[ $slug ]['new_version'] = $theme_versions[ $theme_id ]['version'];
 
-						// $transient->response[$slug]['browse'] = 'updated';
-						$transient->response[$slug]['author'] = $installed_theme->Author;
-						$transient->response[$slug]['Tag'] = $installed_theme->Tags;
-						$transient->response[$slug]['search'] = $boldgrid_tag;
-						$transient->response[$slug]['fields'] = array (
-							'version' => $theme_versions[$theme_id]['version'],
-							'author' => $installed_theme->Author,
-							// 'preview_url' => '',
-							// 'screenshot_url' = '',
-							// 'screenshot_count' => 0,
-							// 'screenshots' => array (),
-							// 'sections' => array (),
-							'description' => $installed_theme->Description,
-							'download_link' => $transient->response[$slug]['package'],
-							'name' => $installed_theme->Name,
-							'slug' => $slug,
-							'tags' => $installed_theme->Tags,
-							// 'contributors' => '',
-							'last_updated' => $theme_versions[$theme_id]['updated'],
-							'homepage' => ( isset( $boldgrid_api_data->result->data->siteurl ) ? $boldgrid_api_data->result->data->siteurl : 'https://www.boldgrid.com/' )
-						);
-						unset( $theme_id );
+					// URL for the new theme version information iframe.
+					$transient->response[ $slug ]['url'] = empty( $theme_uri ) ? '//www.boldgrid.com/themes/' .
+						 strtolower( $theme_name ) : $theme_uri;
+
+					// Theme package download link.
+					$transient->response[ $slug ]['package'] = (
+						isset( $theme_versions[ $theme_id ]['package'] ) ?
+						$theme_versions[ $theme_id ]['package'] : null
+					);
+
+					// $transient->response[$slug]['browse'] = 'updated';
+					$transient->response[ $slug ]['author'] = $installed_theme->Author;
+					$transient->response[ $slug ]['Tag'] = $installed_theme->Tags;
+					$transient->response[ $slug ]['search'] = $boldgrid_tag;
+					$transient->response[ $slug ]['fields'] = array(
+						'version' => $theme_versions[ $theme_id ]['version'],
+						'author' => $installed_theme->Author,
+						// 'preview_url' => '',
+						// 'screenshot_url' = '',
+						// 'screenshot_count' => 0,
+						// 'screenshots' => array (),
+						// 'sections' => array (),
+						'description' => $installed_theme->Description,
+						'download_link' => $transient->response[ $slug ]['package'],
+						'name' => $installed_theme->Name,
+						'slug' => $slug,
+						'tags' => $installed_theme->Tags,
+						// 'contributors' => '',
+						'last_updated' => $theme_versions[ $theme_id ]['updated'],
+						'homepage' => (
+							isset( $boldgrid_api_data->result->data->siteurl ) ?
+							$boldgrid_api_data->result->data->siteurl : 'https://www.boldgrid.com/'
+						),
+					);
+					unset( $theme_id );
+				} else {
+					/*
+					 * To prevent duplicate matches in the WordPress theme repo, check and
+					 * unset references in the transient.
+					 */
+					if ( isset( $transient->response[ $slug ] ) ) {
+						unset( $transient->response[ $slug ] );
 					}
 				}
 			}
@@ -547,40 +621,40 @@ class Boldgrid_Inspirations_Update {
 	 *
 	 * @since 1.1.7
 	 */
-	public function wp_update_this_plugin () {
+	public function wp_update_this_plugin() {
 		// Add filters to modify plugin update transient information.
 		add_filter( 'pre_set_site_transient_update_plugins',
-			array (
+			array(
 				$this,
-				'custom_plugins_transient_update'
+				'custom_plugins_transient_update',
 			)
 		);
 
 		add_filter( 'plugins_api',
-			array (
+			array(
 				$this,
-				'custom_plugins_transient_update'
+				'custom_plugins_transient_update',
 			)
 		);
 
 		add_filter( 'site_transient_update_plugins',
-			array (
+			array(
 				$this,
-				'site_transient_update_plugins'
+				'site_transient_update_plugins',
 			)
 		);
 
 		add_filter( 'auto_update_plugin',
-			array (
+			array(
 				$this,
-				'auto_update_this_plugin'
+				'auto_update_this_plugin',
 			), 10, 2
 		);
 
 		add_filter( 'auto_update_plugins',
-			array (
+			array(
 				$this,
-				'auto_update_this_plugin'
+				'auto_update_this_plugin',
 			), 10, 2
 		);
 
@@ -593,11 +667,11 @@ class Boldgrid_Inspirations_Update {
 	 *
 	 * @since 1.1.7
 	 *
-	 * @param bool $update Whether or not this plugin is set to update.
+	 * @param bool   $update Whether or not this plugin is set to update.
 	 * @param object $item The plugin transient object.
 	 * @return bool Whether or not to update this plugin.
 	 */
-	public function auto_update_this_plugin ( $update, $item ) {
+	public function auto_update_this_plugin( $update, $item ) {
 		if ( isset( $item->slug['boldgrid-inspirations'] ) && isset( $item->autoupdate ) ) {
 			return true;
 		} else {
@@ -640,11 +714,16 @@ class Boldgrid_Inspirations_Update {
 	 * @since 1.0.12
 	 */
 	public function display_notices() {
-		// Show any pending notices.
-		add_action( 'admin_notices', array (
-			$this,
-			'show_notices'
-		) );
+		// If the user can edit pages, then queue notices.
+		if ( current_user_can( 'edit_pages' ) ) {
+			// Show any pending notices.
+			add_action( 'admin_notices',
+				array(
+					$this,
+					'show_notices',
+				)
+			);
+		}
 	}
 
 	/**
@@ -653,57 +732,107 @@ class Boldgrid_Inspirations_Update {
 	 * @since 1.0.12
 	 */
 	public function show_notices() {
-		$admin_notices = new Boldgrid_Inspirations_Admin_Notices();
+		// Set parameters for displaying version-specific notices.
+		$this->set_notice_params();
 
-		// Get boldgrid settings.
-		$boldgrid_settings = get_option( 'boldgrid_settings' );
+		// Notice update-notice-1-0-12.
+		$this->update_notice_1012();
 
-		// Get the boldgrid menu option from settings.
-		$boldgrid_menu_option = $boldgrid_settings['boldgrid_menu_option'];
+		// Notice update-notice-1-3.
+		$this->update_notice_13();
+	}
 
-		// Get the current plugin version.
-		$plugin_data = get_plugin_data( BOLDGRID_BASE_DIR . '/boldgrid-inspirations.php', false );
+	/**
+	 * Show an individual notice.
+	 *
+	 * @since 1.2.11
+	 * @access private
+	 *
+	 * @param string $id A notice identifier.
+	 * @param string $version Version number for the notice.
+	 * @param string $message A message/markup to display in the notice.
+	 */
+	private function show_notice( $id, $version, $message ) {
+		// Is the live version greater than or equal to $version?
+		$is_live_ge = version_compare( $this->notice_params['plugin_version'], $version, '>=' );
 
-		// Get the boldgrid_inspirations_activated option.
-		$activated_version = get_site_option( 'boldgrid_inspirations_activated_version' );
-
-		/*
-		 * If current version is 1.0.12 or higher, the version originally activated was earlier than
-		 * 1.0.12, and the update notice was not previously dismissed, then show it.
-		 */
-
-		// Is the live version greater than or equal to 1.0.12?
-		$is_live_ge_1012 = version_compare( $plugin_data['Version'], '1.0.12', '>=' );
-
-		// Is the original activated version less than 1.0.12.
-		$is_activated_lt_1012 = ( empty( $activated_version ) ||
-			 version_compare( $activated_version, '1.0.12', '<' ) );
+		// Is the original activated version less than $version.
+		$is_activated_lt = ( empty( $this->notice_params['activated_version'] ) ||
+			version_compare( $this->notice_params['activated_version'], $version, '<' ) );
 
 		// Is the notice already marked as dismissed.
-		$has_been_dismissed = $admin_notices->has_been_dismissed( 'update-notice-1-0-12' );
+		$has_been_dismissed = $this->notice_params['admin_notices']->has_been_dismissed( $id );
 
-		/*
-		 * Check if the notice should be displayed.
-		 *
-		 * As of 1.2.5, the current_user_can check was added. If the user cannot edit pages, there's
-		 * no need to tell them "Inspirations - Pages" has moved.
-		 */
-		if ( $is_live_ge_1012 && $is_activated_lt_1012 && ! $has_been_dismissed & current_user_can( 'edit_pages' ) ) {
+		// Check if the notice should be displayed.
+		if ( $is_live_ge && $is_activated_lt && ! $has_been_dismissed ) {
 			// Display the notice.
-			?>
-<div id='update-notice-1-0-12'
-	class='updated notice is-dismissible fade boldgrid-admin-notice'
-	data-admin-notice-id='update-notice-1-0-12'>
-	<h2><?php echo __( 'Update notice' ); ?></h2>
-	<p>BoldGrid Inspirations <?php echo __( 'has been updated to version' ) . ' ' . $plugin_data['Version']; ?>.</p>
-	<p>
-		<?php echo __( 'Please note that as of version 1.0.12, the' ); ?> <strong><i><?php echo $boldgrid_menu_option?'Inspirations':'BoldGrid'; ?>
-		- Add Pages</i></strong> <?php echo __( 'feature has been removed and replaced with' ); ?> <strong><i>Pages
-				- <a href='edit.php?post_type=page&page=boldgrid-add-gridblock-sets'><?php echo $boldgrid_menu_option?'Add New':'New from GridBlocks'?></a>
-		</i></strong>.
-	</p>
-</div>
-<?php
+			echo $message;
 		}
+	}
+
+	/**
+	 * Update notice for >=1.0.12.
+	 *
+	 * If current version is 1.0.12 or higher, the version originally activated was earlier than
+	 * 1.0.12, and the update notice was not previously dismissed, then show the notice.
+	 *
+	 * @since 1.2.11
+	 * @access private
+	 */
+	private function update_notice_1012() {
+		// Build the notice.
+		$markup = sprintf(
+			'<div id="update-notice-1-0-12"
+			class="updated notice is-dismissible fade boldgrid-admin-notice"
+			data-admin-notice-id="update-notice-1-0-12">
+			<h2>%1$s</h2>
+			<p>BoldGrid Inspirations %2$s ' . $this->notice_params['plugin_version'] . '.</p>
+			<p>%3$s <strong><i>%4$s - Add Pages</i></strong> %5$s
+			<strong><i>Pages -
+			<a href="edit.php?post_type=page&page=boldgrid-add-gridblock-sets">%6$s</a>
+			</i></strong>.</p>
+			</div>
+			',
+			esc_html__( 'Update notice', 'boldgrid-inpirations' ),
+			esc_html__( 'has been updated to version', 'boldgrid-inpirations' ),
+			esc_html__( 'Please note that as of version 1.0.12, the', 'boldgrid-inpirations' ),
+			( $this->notice_params['boldgrid_menu_option'] ? 'Inspirations' : 'BoldGrid' ),
+			esc_html__( 'feature has been removed and replaced with', 'boldgrid-inpirations' ),
+			( $this->notice_params['boldgrid_menu_option'] ? 'Add New' : 'New from GridBlocks' )
+		);
+
+		// Display the notice.
+		$this->show_notice( 'update-notice-1-0-12', '1.0.12', $markup );
+	}
+
+	/**
+	 * Update notice for >=1.3.
+	 *
+	 * If current version is 1.3 or higher, the version originally activated was earlier than
+	 * 1.3, and the update notice was not previously dismissed, then show the notice.
+	 *
+	 * @since 1.2.11
+	 */
+	private function update_notice_13() {
+		// Build the notice.
+		$markup = sprintf(
+			'<div id="update-notice-1-3"
+			class="updated notice is-dismissible fade boldgrid-admin-notice"
+			data-admin-notice-id="update-notice-1-3">
+			<h2>%1$s</h2>
+			<p>BoldGrid Inspirations %2$s ' . $this->notice_params['plugin_version'] . '.</p>
+			<p>%3$s
+			<a target="_blank" href="https://www.boldgrid.com/boldgrid-1-3-released/">%4$s.</a>
+			</p>
+			</div>
+			',
+			esc_html__( 'Update notice', 'boldgrid-inpirations' ),
+			esc_html__( 'has been updated to version', 'boldgrid-inpirations' ),
+			esc_html__( 'Version 1.3 has been released with a redesigned Inspiration phase. For more information on this change and others, please', 'boldgrid-inpirations' ),
+			esc_html__( 'visit our blog', 'boldgrid-inpirations' )
+		);
+
+		// Display the notice.
+		$this->show_notice( 'update-notice-1-3', '1.3', $markup );
 	}
 }

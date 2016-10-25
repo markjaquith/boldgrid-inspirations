@@ -123,7 +123,8 @@ class Boldgrid_Inspirations_Dependency_Plugins {
 		$boldgrid_api_data = get_site_transient( 'boldgrid_api_data' );
 
 		// Get BoldGrid settings.
-		$options = get_option( 'boldgrid_settings' );
+		( $options = get_site_option( 'boldgrid_settings' ) ) ||
+		( $options = get_option( 'boldgrid_settings' ) );
 
 		// Set the release channel.
 		$release_channel = (
@@ -541,6 +542,9 @@ class Boldgrid_Inspirations_Dependency_Plugins {
 			// [ ] boldgrid-editor
 			// [ ] boldgrid-staging
 			foreach ( $this->dependent_plugins_not_installed as $plugin_name => $plugin_dir_file ) {
+				if ( 'boldgrid-staging' === $plugin_name ) {
+					continue;
+				}
 				?><li><input type='checkbox'
 				name='boldgrid-plugin-install[<?php echo $plugin_name?>]'
 				id='boldgrid-plugin-install[<?php echo $plugin_name; ?>]'
@@ -583,18 +587,24 @@ class Boldgrid_Inspirations_Dependency_Plugins {
 	public function show_notice() {
 		$admin_notices = new Boldgrid_Inspirations_Admin_Notices();
 
+		// If we are recommending plugins from theme framework - don't show this notice.
+		if ( array_key_exists( 'boldgrid_theme_framework', $GLOBALS ) ) {
+			return false;
+		}
+
 		// If we've previously dismissed, return false.
-		if( $admin_notices->has_been_dismissed( 'class-dependency-plugins' ) ) {
+		if ( $admin_notices->has_been_dismissed( 'class-dependency-plugins' ) ) {
 			return false;
 		}
 
 		// If the current user cannot install plugins, there's no need to show them this message.
-		if( ! current_user_can( 'install_plugins' ) ) {
+		if ( ! current_user_can( 'install_plugins' ) ) {
 			return false;
 		}
 
-		if ( ! isset( $_POST['boldgrid-plugin-install'] ) &&
-		! empty( $this->dependent_plugins_not_installed ) ) {
+		$only_staging = ( count( $this->dependent_plugins_not_installed ) === 1 && implode( $this->dependent_plugins_not_installed ) === 'boldgrid-staging/boldgrid-staging.php' ) ? true : false;
+
+		if ( ! isset( $_POST['boldgrid-plugin-install'] ) && ! empty( $this->dependent_plugins_not_installed ) && ! $only_staging ) {
 			return true;
 		}
 

@@ -1,3 +1,6 @@
+// JSHint
+/* globals jQuery */
+
 var IMHWPB = IMHWPB || {};
 
 /**
@@ -45,6 +48,16 @@ IMHWPB.PagenowPost = function( $ ) {
 			return;
 		}
 
+		/*
+		 * If we're not looking at a 'page', then abort.
+		 *
+		 * We don't want to offer gridblock options when someone is editing something like a
+		 * 'ninja forms' post.
+		 */
+		if( ! $( 'body' ).hasClass( 'post-type-page' ) ) {
+			return;
+		}
+
 		// If we're not using the BoldGrid menu:
 		if ( 0 === IMHWPB.configs.settings.boldgrid_menu_option ) {
 			self.gridblock_sets_append_button();
@@ -55,4 +68,4 @@ IMHWPB.PagenowPost = function( $ ) {
 	};
 };
 
-new IMHWPB.PagenowPost( jQuery );
+IMHWPB.PagenowPost( jQuery );

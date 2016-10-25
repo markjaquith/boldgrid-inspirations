@@ -4,7 +4,7 @@ require BOLDGRID_BASE_DIR . '/pages/templates/restrict-direct-access.php';
 
 ?>
 <div class="youtube-container">
-	<div class="youtube-player" data-id="qAz3UEJquSk"></div>
+	<div class="youtube-player" data-id="Swzm9Qw0llw"></div>
 </div>
 <p>Creating a site with BoldGrid is done in 3 steps:</p>
 <ol class="boldgrid-counter">
@@ -57,78 +57,18 @@ require BOLDGRID_BASE_DIR . '/pages/templates/restrict-direct-access.php';
 		to add your content and photos.</li>
 </ol>
 <p>
-Watching the video above is recommended.  You can also visit
-
-<?php
-// Use printf to separate out the actual words from HTML so it can be sent through translate.
-printf(
-	' <a href="%s" class="dashicons-before dashicons-welcome-learn-more"> %s</a> ',
-
-	// Escape the URL to avoid XSS.
-	esc_url(
-
-		// Add our query arguments.
-		add_query_arg(
-
-			array(
-
-				// The page we are linking to (BoldGrid Tutorials).
-				'page' => 'boldgrid-tutorials',
-
-				// The tab we are linking to, "Customization - Get it Done (1-2 hrs)."
-				'tab' => 'inspirations',
-			),
-			// The root page we are building our query off of.
-			'admin.php'
-		)
-	),
-
-	// Link title is by itself, esc_html() escapes this output,
-	// then __() allows it to be sent to translate.
-	// 'boldgrid-inspirations' is our text domain.
-	esc_html__( 'Tutorials', 'boldgrid-inspirations' )
-);
-
-?>
-	to learn more.
+<?php printf( __( 'Watching the video above is recommended.  You can also visit our %s support center %s to learn more.', 'boldgrid-inspirations' ), '<a href="http://www.boldgrid.com/support/" target="_blank">', '</a>' ); ?>
 </p>
 <div class="boldgrid-button-wrapper-left">
-<?php
-// Use printf to separate out the actual words from HTML so it can be sent through translate.
-printf(
-	'
-		<a href="%s">
-			<span class="button button-secondary button-hero">%s</span>
-		</a>',
+	<?php
+	// Use printf to separate out the actual words from HTML
+	// so it can be sent through translate.
+	printf(
+		'<a href="https://www.boldgrid.com/support/" target="_blank"><span class="button button-secondary button-hero">%s</span></a>',
+		esc_html__( 'Learn More', 'boldgrid-inspirations' )
+	);
 
-	// Escape the URL to avoid XSS.
-	esc_url(
-
-		// Add our query arguments.
-		add_query_arg(
-
-			array(
-
-				// The page we are linking to (BoldGrid Tutorials).
-				'page' => 'boldgrid-tutorials',
-
-				// The tab we are linking to, "Advanced For WordPress Users".
-				'tab' => 'inspiration',
-			),
-
-			// The root page we are building our query off of.
-			'admin.php'
-		)
-	),
-
-	// Link title is by itself, esc_html() escapes this output,
-	// then __() allows it to be sent to translate.
-	// 'boldgrid-inspirations'
-	// is our text domain.
-	esc_html__( 'Learn More', 'boldgrid-inspirations' )
-);
-
-?>
+	?>
 	<span class="boldgrid-between-buttons">or</span>
 	<?php
 

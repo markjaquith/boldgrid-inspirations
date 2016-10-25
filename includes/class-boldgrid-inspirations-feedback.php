@@ -558,7 +558,9 @@ class Boldgrid_Inspirations_Feedback {
 		$return .= 'BoldGrid Information:' . PHP_EOL;
 
 		// Get BoldGrid settings.
-		//$options = get_option( 'boldgrid_settings' );
+		// ( $options = get_site_option( 'boldgrid_settings' ) ) ||
+		// ( $options = get_option( 'boldgrid_settings' ) );
+
 
 		// Print the update release channel.
 		//$release_channel = ( isset( $options['release_channel'] ) ? $options['release_channel'] : 'stable' );
@@ -571,7 +573,7 @@ class Boldgrid_Inspirations_Feedback {
 		// Print some BoldGrid WordPress Options.
 		$return .= ' WordPress Options:' . PHP_EOL;
 
-		$include_options = array (
+		$include_options = array(
 			//'boldgrid_api_key',
 			//'boldgrid_site_hash',
 			//'boldgrid_settings',
